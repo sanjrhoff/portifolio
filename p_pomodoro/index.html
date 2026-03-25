@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer Pro PIP</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container" id="app-container">
+        <header class="settings">
+            <div class="setting-group">
+                <label for="work-time">Trabalho (min)</label>
+                <input type="number" id="work-time" value="25" min="1" max="60">
+            </div>
+            <div class="setting-group">
+                <label for="break-time">Pausa (min)</label>
+                <input type="number" id="break-time" value="5" min="1" max="30">
+            </div>
+            <div class="setting-group">
+                <label for="long-break-time">Pausa Longa (min)</label>
+                <input type="number" id="long-break-time" value="10" min="1" max="60">
+            </div>
+            <div class="setting-group pip-container hidden" id="pip-group">
+                <label>Janela</label>
+                <button id="pip-btn" class="btn-pip" title="Modo Flutuante">
+                    <i class="fas fa-external-link-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="timer-section">
+            <h2 id="mode-label">Foco</h2>
+            <div class="time-display" id="time-display">25:00</div>
+            <div class="session-tracker">
+                Sessões concluídas: <span id="session-count">0</span>/4
+            </div>
+        </main>
+
+        <div class="controls">
+            <button id="start-btn" class="btn primary"><i class="fas fa-play"></i> Iniciar</button>
+            <button id="pause-btn" class="btn secondary hidden"><i class="fas fa-pause"></i> Pausar</button>
+            <button id="reset-btn" class="btn danger"><i class="fas fa-redo"></i> Resetar</button>
+        </div>
+
+        <audio id="alarm-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

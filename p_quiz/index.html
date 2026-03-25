@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Master Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <div id="auth-screen" class="screen">
+            <i class="fas fa-brain logo-icon"></i>
+            <h1>Quiz Master</h1>
+            <p>Identifique-se para salvar seu progresso</p>
+            <div class="input-group">
+                <input type="text" id="username-input" placeholder="Seu nome de usuário..." autocomplete="off">
+                <button id="login-btn" class="btn primary">Entrar</button>
+            </div>
+        </div>
+
+        <div id="dashboard-screen" class="screen hidden">
+            <header class="dash-header">
+                <h2>Olá, <span id="user-display-name"></span>!</h2>
+                <button id="logout-btn" class="btn text-btn">Sair</button>
+            </header>
+            
+            <div class="dash-content">
+                <div class="quizzes-available">
+                    <h3>Escolha seu Desafio</h3>
+                    <div id="quiz-list" class="quiz-grid">
+                        </div>
+                </div>
+
+                <div class="user-history">
+                    <h3>Seu Histórico</h3>
+                    <ul id="history-list">
+                        </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="screen hidden">
+            <header class="quiz-header">
+                <span id="quiz-title-display" class="badge">Tema</span>
+                <div class="timer"><i class="fas fa-stopwatch"></i> <span id="time-display">00:00</span></div>
+            </header>
+            
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <main class="question-container">
+                <h3 id="question-text">Pergunta aqui?</h3>
+                <div id="options-container" class="options-grid">
+                    </div>
+            </main>
+        </div>
+
+        <div id="result-screen" class="screen hidden">
+            <div class="result-card">
+                <div id="result-icon" class="result-icon"></div>
+                <h2 id="result-title">Fim de Jogo!</h2>
+                <p id="result-message" class="result-message"></p>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Acertos</span>
+                        <span id="score-display" class="stat-value">0/0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Tempo</span>
+                        <span id="total-time-display" class="stat-value">0s</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="share-btn" class="btn social"><i class="fab fa-twitter"></i> Compartilhar</button>
+                    <button id="back-dash-btn" class="btn primary">Voltar ao Dashboard</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

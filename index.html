@@ -1,80 +1,90 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio de Artes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
+    <title>Sandro Hoffmann | Portfólio de Engenharia de Software</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-dark text-white text-center">
-    <header class="bg-black p-3 shadow">
-        <h1 class="fw-bold">Meu Portfólio de Artes</h1>
-        <nav>
-            <ul class="nav justify-content-center">
-                <li class="nav-item"><a class="nav-link text-warning" href="#galeria">Galeria</a></li>
-                <li class="nav-item"><a class="nav-link text-warning" href="#sobre">Sobre</a></li>
-                <li class="nav-item"><a class="nav-link text-warning" href="#contato">Contato</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <section id="galeria" class="container py-5">
-        <h2>Galeria</h2>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-4">
-                <div class="arte rounded shadow-lg" style="background-image: url('arte1.jpg');"></div>
-            </div>
-            <div class="col-md-4">
-                <div class="arte rounded shadow-lg" style="background-image: url('arte2.jpg');"></div>
-            </div>
-            <div class="col-md-4">
-                <div class="arte rounded shadow-lg" style="background-image: url('arte3.jpg');"></div>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Sandro Hoffmann</h1>
+            <h2>Desenvolvedor de Software</h2>
+            <p>Construindo aplicações web sólidas, escaláveis e focadas na experiência do usuário. Abaixo, uma seleção de projetos que demonstram domínio em manipulação de DOM, gerenciamento de estado e APIs nativas.</p>
+            <div class="social-links">
+                <a href="https://github.com/sanjrhoff" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="sobre" class="container py-5">
-        <h2>Sobre</h2>
-        <p class="fs-5">Sou um artista apaixonado por expressar criatividade através de diferentes formas de arte.</p>
-    </section>
+    <main class="portfolio-section">
+        <h3 class="section-title">Projetos em Destaque</h3>
+        <div class="projects-grid">
+            
+            <article class="project-card">
+                <div class="card-content">
+                    <div class="project-header">
+                        <i class="fas fa-sticky-note project-icon"></i>
+                        <h4>Markdown Notes App</h4>
+                    </div>
+                    <p class="project-desc">Sistema de anotações com CRUD completo, persistência via LocalStorage, suporte a conversão de Markdown para HTML em tempo real e reordenação (Drag and Drop).</p>
+                    <div class="tech-stack">
+                        <span class="tag">HTML5</span>
+                        <span class="tag">CSS3</span>
+                        <span class="tag">Vanilla JS</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="./portfolio-notes-app/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
+                    <a href="https://github.com/SEU_USUARIO/SEU_REPOSITORIO/tree/main/portfolio-notes-app" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
+                </div>
+            </article>
 
-    <section id="contato" class="container py-5">
-        <h2>Contato</h2>
-        <form class="bg-secondary p-4 rounded shadow-lg w-50 mx-auto">
-            <div class="mb-3">
-                <label for="nome" class="form-label">Nome:</label>
-                <input type="text" id="nome" name="nome" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email:</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="mensagem" class="form-label">Mensagem:</label>
-                <textarea id="mensagem" name="mensagem" class="form-control" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-warning fw-bold">Enviar</button>
-        </form>
-    </section>
+            <article class="project-card">
+                <div class="card-content">
+                    <div class="project-header">
+                        <i class="fas fa-stopwatch project-icon"></i>
+                        <h4>Pomodoro Timer Pro</h4>
+                    </div>
+                    <p class="project-desc">Gerenciador de tempo avançado com ciclos automáticos (foco/pausa), transições dinâmicas de tema e integração com a moderna API Document Picture-in-Picture.</p>
+                    <div class="tech-stack">
+                        <span class="tag">HTML5</span>
+                        <span class="tag">CSS3</span>
+                        <span class="tag">Vanilla JS</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="./portfolio-pomodoro-app/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
+                    <a href="https://github.com/SEU_USUARIO/SEU_REPOSITORIO/tree/main/portfolio-pomodoro-app" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
+                </div>
+            </article>
 
-    <footer class="bg-black text-center p-3 fixed-bottom">
-        <p class="m-0">&copy; 2025 Meu Nome - Todos os direitos reservados.</p>
+            <article class="project-card">
+                <div class="card-content">
+                    <div class="project-header">
+                        <i class="fas fa-brain project-icon"></i>
+                        <h4>Quiz Master Pro</h4>
+                    </div>
+                    <p class="project-desc">Aplicação reativa de múltiplas escolhas com gerenciamento de estado complexo, simulação de banco de dados, dashboard de usuário e persistência de sessão.</p>
+                    <div class="tech-stack">
+                        <span class="tag">HTML5</span>
+                        <span class="tag">CSS3</span>
+                        <span class="tag">Vanilla JS</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <a href="./portfolio-quiz-app/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
+                    <a href="https://github.com/SEU_USUARIO/SEU_REPOSITORIO/tree/main/portfolio-quiz-app" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 Sandro Hoffmann. Construído com foco nos fundamentos da web.</p>
     </footer>
-
-    <style>
-        .arte {
-            width: 100%;
-            height: 300px;
-            background-size: cover;
-            background-position: center;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        .arte:hover {
-            transform: scale(1.05);
-            box-shadow: 0px 8px 16px rgba(255, 165, 0, 0.6);
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

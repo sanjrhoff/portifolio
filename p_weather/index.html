@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Weather App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="day-theme"> <div class="glass-container">
+        <header>
+            <h1>Clima Agora</h1>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="city-input" placeholder="Digite a cidade e aperte Enter..." autocomplete="off">
+            </div>
+        </header>
+
+        <main id="weather-display" class="hidden">
+            <h2 id="city-name">--</h2>
+            <div class="temp-box">
+                <img id="weather-icon" src="" alt="Ícone do Clima">
+                <div class="temp-value">
+                    <span id="temperature">0</span><span class="celsius">°C</span>
+                </div>
+            </div>
+            <p id="condition">--</p>
+            <div id="day-night-indicator"></div>
+        </main>
+
+        <div id="loading" class="hidden">
+            <i class="fas fa-circle-notch fa-spin"></i> Buscando dados...
+        </div>
+        <div id="error-message" class="hidden">
+            Cidade não encontrada. Tente novamente.
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
