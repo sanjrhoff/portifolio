@@ -2,8 +2,9 @@
 // Define que a resposta será em formato JSON
 header('Content-Type: application/json');
 
-// Crie uma conta em openweathermap.org para pegar a sua.
-$apiKey = '1085b3ae861bcff8e498c4cfa76815b9';
+// Lê o arquivo .env que está na mesma pasta (__DIR__) e pega a chave
+$env = parse_ini_file(__DIR__ . '/.env');
+$apiKey = $env['OPENWEATHER_API_KEY'];
 
 // Verifica se o JavaScript enviou o nome da cidade
 if (!isset($_GET['city']) || empty($_GET['city'])) {
