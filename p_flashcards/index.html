@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>Flashcards</h1>
+        <button id="btn-toggle-form" class="btn primary">Criar Novo Cartão</button>
+    </header>
+
+    <main class="container">
+        <section id="form-section" class="form-container hidden">
+            <h2>Novo Flashcard</h2>
+            <form id="flashcard-form">
+                <div class="input-group">
+                    <label for="question">Pergunta (Frente):</label>
+                    <input type="text" id="question" required placeholder="Ex: O que é a Classificação Decimal Universal (CDU)?">
+                </div>
+                <div class="input-group">
+                    <label for="answer">Resposta (Verso):</label>
+                    <textarea id="answer" required placeholder="Ex: Sistema de classificação bibliográfica que organiza o conhecimento..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn success">Salvar Cartão</button>
+                    <button type="button" id="btn-cancel" class="btn danger">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="cards-grid" class="cards-grid">
+            </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

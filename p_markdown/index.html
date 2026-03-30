@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Previewer</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-titles">
+            <h1>Markdown Previewer</h1>
+            <p>GitHub Flavored Markdown</p>
+        </div>
+        <div class="header-actions">
+            <button id="btn-clear" class="btn danger">Limpar</button>
+            <button id="btn-download" class="btn primary">Baixar .md</button>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <section class="editor-pane">
+            <div class="pane-header">Editor</div>
+            <textarea id="editor" placeholder="Digite seu Markdown aqui..."></textarea>
+        </section>
+
+        <section class="preview-pane">
+            <div class="pane-header">Preview</div>
+            <div id="preview" class="markdown-body"></div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

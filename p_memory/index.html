@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Memory Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>Tavern's Memory</h1>
+            <div class="dashboard">
+                <div class="stat">
+                    <span class="label">Tempo:</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Movimentos:</span>
+                    <span id="moves">0</span>
+                </div>
+                <button id="btn-restart" class="btn-primary">Reiniciar Missão</button>
+            </div>
+        </header>
+
+        <main>
+            <section class="memory-board" id="memory-board">
+                </section>
+
+            <aside class="history-section">
+                <div class="history-header">
+                    <h2>Pergaminho de Registros</h2>
+                    <button id="btn-clear-history" class="btn-danger">Limpar Registros</button>
+                </div>
+                <ul id="history-list" class="history-list">
+                    </ul>
+            </aside>
+        </main>
+    </div>
+
+    <div id="win-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Missão Concluída! 🏆</h2>
+            <p>Você encontrou todos os pares.</p>
+            <p>Tempo final: <span id="final-time"></span></p>
+            <p>Total de movimentos: <span id="final-moves"></span></p>
+            <button id="btn-play-again" class="btn-primary">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
