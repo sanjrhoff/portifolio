@@ -98,7 +98,7 @@ body {
 }
 
 .card {
-    perspective: 1000px; /
+    perspective: 1000px; 
     height: 200px;
 }
 
