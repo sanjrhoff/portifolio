@@ -208,12 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
      4. TELEMETRIA TÉCNICA NO CONSOLE DO DESENVOLVEDOR
      ========================================================================== */
   console.info(
-    '%c Sandro // Software Engineer & Physicist Portfolio %c 14 Live Apps • Zero Runtime Deps ',
+    '%c Sandro // Software Engineer & Physicist Portfolio %c 16 Live Apps • Zero Runtime Deps ',
     'background: #09090b; color: #06b6d4; font-weight: 700; padding: 4px 8px; border: 1px solid #27272a; border-radius: 4px;',
     'background: #10b981; color: #09090b; font-weight: 700; padding: 4px 8px; border-radius: 4px;'
   );
   console.info(
-    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (15):\n' +
+    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (16):\n' +
     '1. SQL-to-ERD Schema Analyzer (AST Parser, Dynamic Bézier SVG)\n' +
     '2. Zero-Knowledge Secret Vault (Web Crypto API, AES-GCM 256, PBKDF2)\n' +
     '3. Pomodoro Timer Pro (Document PiP API, Web Audio API)\n' +
@@ -228,7 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
     '12. WaveLab 2D (2D Wave Equation FDTD, Young Double Slit & Mach Shockwaves)\n' +
     '13. FieldLorentz (RK4 Electric Streamlines, Boris Lorentz Integrator & Cyclotron)\n' +
     '14. ChaosPendulum (Euler-Lagrange Double Pendulum, 100-Swarm Chaos & Phase Space)\n' +
-    '15. QuantumLab 1D (1D TDSE, Crank-Nicolson O(N), Complex Thomas TDMA & Tunneling)'
+    '15. QuantumLab 1D (1D TDSE, Crank-Nicolson O(N), Complex Thomas TDMA & Tunneling)\n' +
+    '16. CyberSec Lab (OWASP Top 10, AST Grammar Parser, TLS 1.3 Handshake, JWT Web Crypto & Hashes)'
   );
 
 });

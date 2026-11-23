@@ -13,9 +13,9 @@ Todo o projeto foi concebido para rodar **100% no navegador (Client-Side)**, com
 
 ---
 
-## 🚀 Vitrine de Aplicações (15 Projetos Vivos)
+## 🚀 Vitrine de Aplicações (16 Projetos Vivos)
 
-O repositório reúne 15 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica avançada e arquitetura web:
+O repositório reúne 16 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica avançada e arquitetura web:
 
 | # | Aplicação | Categoria | Destaques Técnicos & Desafios de Engenharia | Demonstração | Código-Fonte |
 | :-: | :--- | :--- | :--- | :---: | :---: |
@@ -34,6 +34,7 @@ O repositório reúne 15 aplicações funcionais completas, cobrindo diferentes 
 | **13** | **FieldLorentz** | Eletromagnetismo & Partículas | Traçado contínuo de linhas de campo elétrico via integração **Runge-Kutta 4 (RK4)**, superfícies equipotenciais, câmara de **Força de Lorentz** $\vec{F} = q(\vec{E} + \vec{v}\times\vec{B})$ com **Algoritmo de Boris**, Acelerador Ciclotron e Espectrômetro de Massa. | [Demo](https://sanjrhoff.github.io/portifolio/p_field/index.html) | [`p_field/`](./p_field/) |
 | **14** | **ChaosPendulum** | Mecânica Não-Linear & Caos | Pêndulo Duplo acoplado com equações de **Euler-Lagrange** integradas via RK4 de alta precisão, demonstração do **Efeito Borboleta com Enxame de 100 Pêndulos** ($\Delta\theta = 10^{-6}\text{ rad}$) e cálculo em tempo real do **Espaço de Fase** $(\omega_1, \theta_1)$ e do **Expoente de Lyapunov**. | [Demo](https://sanjrhoff.github.io/portifolio/p_chaos/index.html) | [`p_chaos/`](./p_chaos/) |
 | **15** | **QuantumLab 1D** | Física Computacional & Mecânica Quântica | Resolução da **Equação de Schrödinger Dependente do Tempo (1D TDSE)** via **Crank-Nicolson Cayley O(N)** estritamente unitário ($\int |\psi|^2 dx = 1.000000$). Algoritmo de **Thomas (TDMA) Complexo**, mapeamento de fase espectral HSL ($\arg\psi$), **Tunelamento Quântico**, Diodo RTD ressonante, oscilador harmônico coerente e pincel interativo de potencial $V(x)$. | [Demo](https://sanjrhoff.github.io/portifolio/p_quantum/index.html) | [`p_quantum/`](./p_quantum/) |
+| **16** | **CyberSec Lab** | Segurança da Informação & Criptografia | Laboratório prático de AppSec executado com a **Web Crypto API nativa**. Simulações reais de **SQL Injection com AST Parser visual**, **Cross-Site Scripting (XSS)** com sandbox isolada e defesa CSP, **TLS 1.3 Handshake** em raias de sequência com **Diffie-Hellman Efêmero (ECDHE)**, **JWT Inspector tricolor** com HMAC-SHA256 e teste de resistência de hashes contra **Rainbow Tables** e força bruta. | [Demo](https://sanjrhoff.github.io/portifolio/p_cybersec/index.html) | [`p_cybersec/`](./p_cybersec/) |
 
 ---
 
@@ -71,6 +72,7 @@ portifolio/
 ├── p_field/                # FieldLorentz — Eletromagnetismo RK4 & Câmara de Lorentz
 ├── p_chaos/                # ChaosPendulum — Pêndulo Duplo Lagrangiano & Teoria do Caos
 ├── p_quantum/              # QuantumLab 1D — Simulador TDSE & Crank-Nicolson O(N)
+├── p_cybersec/             # CyberSec Lab — OWASP Top 10, AST Parser, TLS 1.3 & Criptografia
 └── docs/                   # Especificações, Design System e Relatórios de QA
 ```
 
