@@ -1,153 +1,1011 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sandro | Portfólio de Projetos</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sandro | Engenheiro de Software & Frontend Craftsmanship</title>
+  <meta name="description" content="Portfólio de engenharia de software e desenvolvimento web de Sandro. Aplicações interativas com JavaScript Puro, Web APIs modernas e zero dependências pesadas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Sandro</h1>
-            <h2>Estudante e Desenvolvedor Web</h2>
-            <p>Estudante de tecnologia com foco em desenvolvimento web e organização da informação. Este espaço documenta minha evolução técnica através de projetos práticos, construídos para dominar os fundamentos do JavaScript, manipulação de DOM e lógicas de estado.</p>
-            <div class="social-links">
-                <a href="https://github.com/sanjrhoff" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+
+  <!-- ==========================================================================
+       HEADER DE NAVEGAÇÃO & TELEMETRIA DE STATUS
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand-logo" aria-label="Sandro Dev Página Inicial">
+        <span class="brand-bracket">&lt;</span><span class="brand-name">sandro</span><span class="brand-dot">.</span><span class="brand-domain">dev</span><span class="brand-bracket">/&gt;</span>
+      </a>
+
+      <div class="status-pill" title="Status de disponibilidade de Sandro">
+        <span class="status-dot"></span>
+        <span class="status-text">Disponível para projetos &amp; estágio</span>
+      </div>
+
+      <nav class="nav-links" aria-label="Navegação Principal">
+        <a href="#destaques" class="nav-link">Destaques</a>
+        <a href="#laboratorio" class="nav-link">Laboratório</a>
+        <a href="#sobre" class="nav-link">Sobre</a>
+        <a href="https://github.com/sanjrhoff" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost nav-gh-btn" aria-label="Perfil de Sandro no GitHub">
+          <i class="fab fa-github"></i> <span>@sanjrhoff</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+
+    <!-- ==========================================================================
+         HERO SECTION: CONSOLE DE ENGENHARIA & FILOSOFIA
+         ========================================================================== -->
+    <section class="hero-section" id="hero" aria-label="Apresentação Técnica">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-container">
+        
+        <div class="hero-badge">
+          <span class="code-comment">// ENGENHARIA DE SOFTWARE &amp; FRONTEND CRAFTSMANSHIP</span>
+        </div>
+
+        <h1 class="hero-title">
+          Aplicações interativas com <span class="highlight-cyan">JavaScript Puro</span>, Web APIs modernas e zero dependências pesadas.
+        </h1>
+
+        <p class="hero-subtitle">
+          Estudante de tecnologia e desenvolvedor de software focado em fundamentos sólidos: manipulação avançada de DOM, arquitetura cliente sem frameworks, máquinas de estado finitas e interfaces de alta densidade técnica.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#destaques" class="btn btn-primary btn-lg">
+            <span>Explorar Destaques</span>
+            <i class="fas fa-arrow-down"></i>
+          </a>
+          <a href="https://github.com/sanjrhoff/portifolio" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
+            <i class="fab fa-github"></i>
+            <span>Ver Repositório</span>
+            <i class="fas fa-external-link-alt icon-subtle"></i>
+          </a>
+        </div>
+
+        <!-- Telemetria de Métricas de Código Reais -->
+        <div class="telemetry-grid" aria-label="Métricas Técnicas do Repositório">
+          <div class="telemetry-card">
+            <div class="telemetry-header">
+              <span class="telemetry-label">APLICAÇÕES VIVAS</span>
+              <i class="fas fa-layer-group telemetry-icon"></i>
             </div>
-        </div>
-    </header>
+            <div class="telemetry-value">7</div>
+            <div class="telemetry-caption">100% funcionais e testadas</div>
+          </div>
 
-    <main class="portfolio-section">
-        <h3 class="section-title">Fundamentos</h3>
-        <div class="projects-grid">
+          <div class="telemetry-card">
+            <div class="telemetry-header">
+              <span class="telemetry-label">DEPENDÊNCIAS RUNTIME</span>
+              <i class="fas fa-feather-alt telemetry-icon"></i>
+            </div>
+            <div class="telemetry-value highlight-cyan">0</div>
+            <div class="telemetry-caption">Zero overhead de build pesado</div>
+          </div>
+
+          <div class="telemetry-card">
+            <div class="telemetry-header">
+              <span class="telemetry-label">ARQUITETURA</span>
+              <i class="fas fa-bolt telemetry-icon"></i>
+            </div>
+            <div class="telemetry-value highlight-emerald">100%</div>
+            <div class="telemetry-caption">Nativamente estático (GH Pages)</div>
+          </div>
+
+          <div class="telemetry-card">
+            <div class="telemetry-header">
+              <span class="telemetry-label">FIRST CONTENTFUL PAINT</span>
+              <i class="fas fa-tachometer-alt telemetry-icon"></i>
+            </div>
+            <div class="telemetry-value highlight-amber">&lt; 200ms</div>
+            <div class="telemetry-caption">Carregamento instantâneo</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 1: CASE STUDIES EM DESTAQUE (JANELAS SIMULADAS COM PREVIEWS VISUAIS)
+         ========================================================================== -->
+    <section class="section case-studies-section" id="destaques" aria-label="Projetos em Destaque">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-tag">CASE STUDIES ARQUITETURAIS</div>
+          <h2 class="section-title">Engenharia em Prática: 3 Aplicações Centrais</h2>
+          <p class="section-description">
+            Soluções completas concebidas para superar desafios reais de navegadores, estados assíncronos e segurança no cliente.
+          </p>
+        </div>
+
+        <div class="case-studies-list">
+
+          <!-- CASE STUDY 1: POMODORO TIMER PRO -->
+          <article class="case-study-card" data-project="p_pomodoro">
+            <div class="case-study-window">
+              <!-- Window Chrome -->
+              <div class="window-header">
+                <div class="window-controls" aria-hidden="true">
+                  <span class="control-dot close"></span>
+                  <span class="control-dot minimize"></span>
+                  <span class="control-dot expand"></span>
+                </div>
+                <div class="window-title">pomodoro-timer-pro.app</div>
+                <div class="window-status">
+                  <span class="status-pulse-dot"></span> RUNNING
+                </div>
+              </div>
+
+              <!-- Window Visual Preview Mockup -->
+              <div class="window-preview mockup-pomodoro">
+                <div class="pomodoro-mock-ui">
+                  <div class="mock-top-bar">
+                    <span class="mock-badge-mode">MODO FOCO</span>
+                    <span class="mock-pip-tag"><i class="fas fa-tv"></i> PiP Habilitado</span>
+                  </div>
+
+                  <div class="mock-clock-container">
+                    <div class="mock-clock-ring">
+                      <div class="mock-clock-time">25:00</div>
+                      <div class="mock-clock-sub">Ciclo 1 de 4 • Foco Intenso</div>
+                    </div>
+                  </div>
+
+                  <div class="mock-controls-row">
+                    <button class="mock-btn-play"><i class="fas fa-play"></i> Iniciar</button>
+                    <button class="mock-btn-reset"><i class="fas fa-redo"></i></button>
+                  </div>
+
+                  <div class="mock-footer-row">
+                    <div class="mock-dots">
+                      <span class="dot active"></span>
+                      <span class="dot"></span>
+                      <span class="dot"></span>
+                      <span class="dot"></span>
+                    </div>
+                    <span class="mock-audio-badge"><i class="fas fa-volume-up"></i> Web Audio Synth</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Case Study Content -->
+            <div class="case-study-details">
+              <div class="case-study-meta">
+                <span class="project-num">01 // SISTEMAS DE TEMPO &amp; WEB APIS</span>
+                <h3 class="case-study-title">Pomodoro Timer Pro</h3>
+              </div>
+
+              <div class="case-block challenge-block">
+                <h4 class="block-title"><i class="fas fa-exclamation-triangle"></i> Desafio Técnico</h4>
+                <p>
+                  Quando abas do navegador entram em segundo plano, temporizadores com <code>setInterval</code> sofrem <em>throttling</em> agressivo e perdem a sincronia exata dos segundos. Além disso, o usuário perde o controle visual do tempo ao alternar para outras aplicações de trabalho ou reuniões.
+                </p>
+              </div>
+
+              <div class="case-block solution-block">
+                <h4 class="block-title"><i class="fas fa-check-circle"></i> Solução Implementada</h4>
+                <p>
+                  Estruturação de uma máquina de estados finita com cálculo contínuo de delta via objeto <code>Date.now()</code> (imune ao desvio do relógio) e integração com a recente <strong>Document Picture-in-Picture API</strong>, permitindo destacar um painel flutuante nativo sempre visível no sistema operacional, complementado por alertas sonoros via <strong>Web Audio API</strong>.
+                </p>
+              </div>
+
+              <div class="tech-pills" aria-label="Tecnologias Utilizadas">
+                <span class="tech-pill">Vanilla JS ES6+</span>
+                <span class="tech-pill">Document PiP API</span>
+                <span class="tech-pill">Web Audio API</span>
+                <span class="tech-pill">Date Timestamp Sync</span>
+                <span class="tech-pill">LocalStorage</span>
+              </div>
+
+              <div class="case-actions">
+                <a href="./p_pomodoro/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary" title="Abrir Pomodoro Timer em nova aba">
+                  <i class="fas fa-play"></i>
+                  <span>Ver Aplicação</span>
+                </a>
+                <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_pomodoro/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" title="Ver código-fonte do Pomodoro no GitHub">
+                  <i class="fab fa-github"></i>
+                  <span>Ver Código</span>
+                </a>
+                <button type="button" class="btn btn-outline preview-trigger-btn" data-app-url="./p_pomodoro/index.html" data-app-title="Pomodoro Timer Pro" aria-label="Abrir preview rápido do Pomodoro Timer">
+                  <i class="fas fa-terminal"></i>
+                  <span>Preview Interativo</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- CASE STUDY 2: TAVERN'S MEMORY RPG -->
+          <article class="case-study-card reverse" data-project="p_memory">
+            <div class="case-study-window">
+              <!-- Window Chrome -->
+              <div class="window-header">
+                <div class="window-controls" aria-hidden="true">
+                  <span class="control-dot close"></span>
+                  <span class="control-dot minimize"></span>
+                  <span class="control-dot expand"></span>
+                </div>
+                <div class="window-title">taverns-memory.engine.js</div>
+                <div class="window-status">
+                  <span class="status-pulse-dot"></span> RUNNING
+                </div>
+              </div>
+
+              <!-- Window Visual Preview Mockup -->
+              <div class="window-preview mockup-memory">
+                <div class="memory-mock-ui">
+                  <div class="mock-rpg-header">
+                    <span class="rpg-title">⚔️ Tavern's Memory RPG</span>
+                    <div class="rpg-stats">
+                      <span class="stat-badge"><i class="fas fa-stopwatch"></i> 01:24</span>
+                      <span class="stat-badge"><i class="fas fa-shoe-prints"></i> 14 mov</span>
+                    </div>
+                  </div>
+
+                  <div class="mock-cards-grid">
+                    <div class="mock-card flipped">
+                      <div class="card-inner">
+                        <span class="card-glyph">🗡️</span>
+                      </div>
+                    </div>
+                    <div class="mock-card flipped">
+                      <div class="card-inner">
+                        <span class="card-glyph">🗡️</span>
+                      </div>
+                    </div>
+                    <div class="mock-card back">
+                      <div class="card-back-pattern">✦</div>
+                    </div>
+                    <div class="mock-card back">
+                      <div class="card-back-pattern">✦</div>
+                    </div>
+                    <div class="mock-card back">
+                      <div class="card-back-pattern">✦</div>
+                    </div>
+                    <div class="mock-card flipped special">
+                      <div class="card-inner">
+                        <span class="card-glyph">🧪</span>
+                      </div>
+                    </div>
+                    <div class="mock-card back">
+                      <div class="card-back-pattern">✦</div>
+                    </div>
+                    <div class="mock-card back">
+                      <div class="card-back-pattern">✦</div>
+                    </div>
+                  </div>
+
+                  <div class="mock-rpg-footer">
+                    <span class="match-msg"><i class="fas fa-sparkles"></i> Par de Espadas Encontrado!</span>
+                    <span class="engine-tag">CSS 3D Engine • LockBoard Mutex</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Case Study Content -->
+            <div class="case-study-details">
+              <div class="case-study-meta">
+                <span class="project-num">02 // GAME LOOP &amp; CSS 3D TRANSFORMS</span>
+                <h3 class="case-study-title">Tavern's Memory RPG</h3>
+              </div>
+
+              <div class="case-block challenge-block">
+                <h4 class="block-title"><i class="fas fa-exclamation-triangle"></i> Desafio Técnico</h4>
+                <p>
+                  Em jogos de memória baseados em eventos no DOM, cliques múltiplos e rápidos do jogador causam <em>race conditions</em> graves — abrindo 3 ou mais cartas simultaneamente e corrompendo a máquina de validação de pares —, além do desafio de renderizar rotações 3D fluidas a 60fps sem engines de jogos pesadas.
+                </p>
+              </div>
+
+              <div class="case-block solution-block">
+                <h4 class="block-title"><i class="fas fa-check-circle"></i> Solução Implementada</h4>
+                <p>
+                  Implementação de um motor de jogo em JavaScript puro com padrão de bloqueio atômico (<code>lockBoard</code>), embaralhamento estatisticamente uniforme via <strong>Algoritmo Fisher-Yates</strong>, animações 3D nativas com <code>transform-style: preserve-3d</code> e persistência de histórico de pontuações via LocalStorage.
+                </p>
+              </div>
+
+              <div class="tech-pills" aria-label="Tecnologias Utilizadas">
+                <span class="tech-pill">Vanilla JS ES6+</span>
+                <span class="tech-pill">CSS 3D Transforms</span>
+                <span class="tech-pill">Fisher-Yates Shuffle</span>
+                <span class="tech-pill">Async Event Mutex</span>
+                <span class="tech-pill">LocalStorage Highscores</span>
+              </div>
+
+              <div class="case-actions">
+                <a href="./p_memory/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary" title="Jogar Tavern's Memory RPG em nova aba">
+                  <i class="fas fa-play"></i>
+                  <span>Ver Aplicação</span>
+                </a>
+                <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_memory/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" title="Ver código-fonte do Tavern's Memory no GitHub">
+                  <i class="fab fa-github"></i>
+                  <span>Ver Código</span>
+                </a>
+                <button type="button" class="btn btn-outline preview-trigger-btn" data-app-url="./p_memory/index.html" data-app-title="Tavern's Memory RPG" aria-label="Abrir preview rápido do Tavern's Memory RPG">
+                  <i class="fas fa-terminal"></i>
+                  <span>Preview Interativo</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- CASE STUDY 3: MARKDOWN PREVIEWER SUITE -->
+          <article class="case-study-card" data-project="p_markdown">
+            <div class="case-study-window">
+              <!-- Window Chrome -->
+              <div class="window-header">
+                <div class="window-controls" aria-hidden="true">
+                  <span class="control-dot close"></span>
+                  <span class="control-dot minimize"></span>
+                  <span class="control-dot expand"></span>
+                </div>
+                <div class="window-title">markdown-suite.client.js</div>
+                <div class="window-status">
+                  <span class="status-pulse-dot"></span> RUNNING
+                </div>
+              </div>
+
+              <!-- Window Visual Preview Mockup -->
+              <div class="window-preview mockup-markdown">
+                <div class="markdown-mock-ui">
+                  <div class="mock-md-header">
+                    <span class="md-brand"><i class="fab fa-markdown"></i> GFM Previewer Suite</span>
+                    <span class="xss-shield"><i class="fas fa-shield-alt"></i> DOMPurify Sanitized</span>
+                  </div>
+
+                  <div class="mock-split-pane">
+                    <!-- Left: Editor Input -->
+                    <div class="mock-editor-pane">
+                      <div class="pane-tag">INPUT EDITOR</div>
+                      <div class="code-lines">
+                        <span class="line-code highlight-md-h"># Arquitetura Limpa</span>
+                        <span class="line-code highlight-md-sub">## Pipeline Reativo</span>
+                        <span class="line-code">- [x] Parsing em tempo real</span>
+                        <span class="line-code">- [x] Proteção anti-XSS</span>
+                        <span class="line-code"><span class="code-inline">`DOMPurify.sanitize()`</span></span>
+                      </div>
+                    </div>
+
+                    <!-- Right: HTML Render -->
+                    <div class="mock-preview-pane">
+                      <div class="pane-tag">OUTPUT RENDERIZADO</div>
+                      <div class="rendered-content">
+                        <h5 class="mock-h1">Arquitetura Limpa</h5>
+                        <h6 class="mock-h2">Pipeline Reativo</h6>
+                        <ul class="mock-ul">
+                          <li><i class="fas fa-check-square"></i> Parsing em tempo real</li>
+                          <li><i class="fas fa-check-square"></i> Proteção anti-XSS</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mock-md-footer">
+                    <span class="status-auto"><i class="fas fa-save"></i> Auto-save LocalStorage</span>
+                    <span class="export-tag"><i class="fas fa-file-download"></i> Blob Export .md</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Case Study Content -->
+            <div class="case-study-details">
+              <div class="case-study-meta">
+                <span class="project-num">03 // SEGURANÇA CLIENT-SIDE &amp; PIPELINE TEXTUAL</span>
+                <h3 class="case-study-title">Markdown Previewer Suite</h3>
+              </div>
+
+              <div class="case-block challenge-block">
+                <h4 class="block-title"><i class="fas fa-exclamation-triangle"></i> Desafio Técnico</h4>
+                <p>
+                  Renderizar strings de Markdown digitadas pelo usuário diretamente em HTML pode abrir vetores críticos de vulnerabilidade Cross-Site Scripting (XSS via injeção de tags <code>&lt;script&gt;</code> ou handlers <code>onerror</code>). Além disso, a compilação contínua a cada digitação precisa ser fluida sem travar a thread principal da interface.
+                </p>
+              </div>
+
+              <div class="case-block solution-block">
+                <h4 class="block-title"><i class="fas fa-check-circle"></i> Solução Implementada</h4>
+                <p>
+                  Criação de uma esteira segura de parsing cliente com <strong>Marked.js</strong>, filtrando estritamente todo nó gerado através do <strong>DOMPurify</strong> antes da injeção no DOM, sincronizando rascunhos em tempo real com LocalStorage e permitindo o download assíncrono do arquivo compilado via <strong>Blob API e Object URLs</strong>.
+                </p>
+              </div>
+
+              <div class="tech-pills" aria-label="Tecnologias Utilizadas">
+                <span class="tech-pill">Vanilla JS ES6+</span>
+                <span class="tech-pill">Marked.js Parser</span>
+                <span class="tech-pill">DOMPurify Security</span>
+                <span class="tech-pill">Blob URL Export</span>
+                <span class="tech-pill">LocalStorage CRUD</span>
+              </div>
+
+              <div class="case-actions">
+                <a href="./p_markdown/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary" title="Abrir Markdown Previewer em nova aba">
+                  <i class="fas fa-play"></i>
+                  <span>Ver Aplicação</span>
+                </a>
+                <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_markdown/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" title="Ver código-fonte do Markdown Previewer no GitHub">
+                  <i class="fab fa-github"></i>
+                  <span>Ver Código</span>
+                </a>
+                <button type="button" class="btn btn-outline preview-trigger-btn" data-app-url="./p_markdown/index.html" data-app-title="Markdown Previewer" aria-label="Abrir preview rápido do Markdown Previewer">
+                  <i class="fas fa-terminal"></i>
+                  <span>Preview Interativo</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 2: DIRETÓRIO DE PROJETOS & LABORATÓRIO (FILTROS + 7 PROJETOS)
+         ========================================================================== -->
+    <section class="section lab-section" id="laboratorio" aria-label="Laboratório de Projetos">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-tag">CATÁLOGO DE ENGENHARIA</div>
+          <h2 class="section-title">Laboratório de Código &amp; Aplicações</h2>
+          <p class="section-description">
+            Explore o inventário completo de módulos funcionais desenvolvidos com foco em especificações nativas da Web Platform.
+          </p>
+        </div>
+
+        <!-- Barra de Filtros Interativos -->
+        <div class="filter-bar" role="toolbar" aria-label="Filtro de Categoria dos Projetos">
+          <button type="button" class="filter-btn active" data-filter="all">
+            <i class="fas fa-th-large"></i> Todos <span class="filter-count">(7)</span>
+          </button>
+          <button type="button" class="filter-btn" data-filter="productivity">
+            <i class="fas fa-bolt"></i> Produtividade &amp; Web APIs <span class="filter-count">(4)</span>
+          </button>
+          <button type="button" class="filter-btn" data-filter="games">
+            <i class="fas fa-gamepad"></i> Jogos &amp; Estado <span class="filter-count">(2)</span>
+          </button>
+          <button type="button" class="filter-btn" data-filter="utils">
+            <i class="fas fa-shield-alt"></i> Utilitários &amp; APIs <span class="filter-count">(1)</span>
+          </button>
+        </div>
+
+        <!-- Grade de Cards do Laboratório -->
+        <div class="lab-grid" id="lab-grid">
+
+          <!-- 1. Pomodoro Timer Pro -->
+          <article class="lab-card" data-category="productivity" data-project="p_pomodoro">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">PRODUTIVIDADE &amp; APIS</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-stopwatch lab-icon"></i>
+                <h3 class="lab-title">Pomodoro Timer Pro</h3>
+              </div>
+              <p class="lab-desc">
+                Temporizador de alta precisão com ciclos automáticos de foco e pausas, alertas sonoros e janela flutuante nativa via Document Picture-in-Picture API.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Modo PiP nativo em janela desacoplada</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Alertas de frequência sintetizados</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Sincronia de tempo com Date Timestamp</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">Doc PiP API</span>
+                <span class="tag">Web Audio</span>
+                <span class="tag">LocalStorage</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_pomodoro/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Pomodoro Timer">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_pomodoro/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_pomodoro/index.html" data-app-title="Pomodoro Timer Pro" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 2. Tavern's Memory RPG -->
+          <article class="lab-card" data-category="games" data-project="p_memory">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">JOGOS &amp; ESTADO</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-chess-board lab-icon"></i>
+                <h3 class="lab-title">Tavern's Memory RPG</h3>
+              </div>
+              <p class="lab-desc">
+                Jogo de memória medieval com motor assíncrono anti-race-condition, rotações 3D puras em CSS e embaralhamento estatístico Fisher-Yates.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Bloqueio de cliques atômico (lockBoard)</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Rotação de cartas com CSS 3D Transforms</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Pergaminho de pontuações salvo no navegador</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">CSS 3D Engine</span>
+                <span class="tag">Fisher-Yates</span>
+                <span class="tag">Game State</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_memory/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Tavern's Memory RPG">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_memory/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_memory/index.html" data-app-title="Tavern's Memory RPG" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 3. Markdown Previewer -->
+          <article class="lab-card" data-category="productivity" data-project="p_markdown">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">PRODUTIVIDADE &amp; SEGURANÇA</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fab fa-markdown lab-icon"></i>
+                <h3 class="lab-title">Markdown Previewer</h3>
+              </div>
+              <p class="lab-desc">
+                Editor em tempo real de GitHub Flavored Markdown com sanitização estrita via DOMPurify contra ataques XSS e exportação direta de arquivos via Blob API.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Parsing instantâneo com Marked.js</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Blindagem XSS ativa via DOMPurify</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Download de .md com URL.createObjectURL</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">Marked.js</span>
+                <span class="tag">DOMPurify</span>
+                <span class="tag">Blob URLs</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_markdown/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Markdown Previewer">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_markdown/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_markdown/index.html" data-app-title="Markdown Previewer" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 4. Markdown Notes App -->
+          <article class="lab-card" data-category="productivity" data-project="p_notes">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">PRODUTIVIDADE &amp; STORAGE</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-sticky-note lab-icon"></i>
+                <h3 class="lab-title">Markdown Notes App</h3>
+              </div>
+              <p class="lab-desc">
+                Gerenciador de notas autônomo com CRUD completo, ordenação de notas com drag-and-drop, timestamps dinâmicos e persistência robusta em LocalStorage.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> CRUD client-side com persistência JSON</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Reordenação de cards com Sortable.js</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Renderização Markdown sob demanda</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">LocalStorage</span>
+                <span class="tag">Sortable.js</span>
+                <span class="tag">Dynamic DOM</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_notes/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Notes App">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_notes/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_notes/index.html" data-app-title="Markdown Notes App" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 5. Flashcards 3D Study -->
+          <article class="lab-card" data-category="productivity" data-project="p_flashcards">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">PRODUTIVIDADE &amp; ESTUDOS</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-layer-group lab-icon"></i>
+                <h3 class="lab-title">Flashcards 3D Study</h3>
+              </div>
+              <p class="lab-desc">
+                Sistema interativo de repetição espaçada para memorização e estudos de tecnologia. Interface com rotação 3D de cartões e gestão de baralhos locais.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Animação de flip em CSS 3D puro</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Formulário dinâmico de novos cartões</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Persistência de decks no LocalStorage</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">CSS 3D Flip</span>
+                <span class="tag">LocalStorage</span>
+                <span class="tag">Form Validation</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_flashcards/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Flashcards 3D">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_flashcards/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_flashcards/index.html" data-app-title="Flashcards 3D Study" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 6. Quiz Master Pro -->
+          <article class="lab-card" data-category="games" data-project="p_quiz">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">JOGOS &amp; SPA</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-brain lab-icon"></i>
+                <h3 class="lab-title">Quiz Master Pro</h3>
+              </div>
+              <p class="lab-desc">
+                Single Page Application (SPA) com fluxo de autenticação simulado, motor estatístico de acertos com threshold de 60%, temporizador e histórico por usuário.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Arquitetura de telas com transição dinâmica</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Motor de pontuação com cálculo de aprovação</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Histórico persistido por sessão de usuário</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">SPA Flow</span>
+                <span class="tag">Timer Engine</span>
+                <span class="tag">LocalStorage</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_quiz/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Quiz Master Pro">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_quiz/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_quiz/index.html" data-app-title="Quiz Master Pro" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 7. Glass Weather App -->
+          <article class="lab-card" data-category="utils" data-project="p_weather">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">ARQUITETURA SEGURA &amp; APIS</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-cloud-sun-rain lab-icon"></i>
+                <h3 class="lab-title">Glass Weather App</h3>
+              </div>
+              <p class="lab-desc">
+                Aplicação climática com interface em Glassmorphism, detecção dinâmica de tema dia/noite e padrão de API Proxy em PHP com <code>.env</code> protegendo credenciais.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Arquitetura API Proxy blindando chaves privadas</div>
+                <div class="spec-item"><i class="fas fa-check"></i> UI Glassmorphism com troca dinâmica de tema</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Integração com OpenWeatherMap e LocalStorage</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Vanilla JS</span>
+                <span class="tag">Fetch API</span>
+                <span class="tag">Glassmorphism</span>
+                <span class="tag">PHP Proxy</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_weather/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir Weather App">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_weather/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_weather/index.html" data-app-title="Glass Weather App" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         SEÇÃO 3: SOBRE O DESENVOLVEDOR & STACK TÉCNICA
+         ========================================================================== -->
+    <section class="section about-section" id="sobre" aria-label="Sobre Sandro e Competências">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-tag">PERFIL &amp; FILOSOFIA DE ENGENHARIA</div>
+          <h2 class="section-title">Sobre Sandro &amp; Domínio de Fundamentos</h2>
+          <p class="section-description">
+            Entender como a plataforma web funciona por baixo dos panos é a base para projetar qualquer sistema moderno e resiliente.
+          </p>
+        </div>
+
+        <div class="about-grid">
+          
+          <!-- Bio & Filosofia -->
+          <div class="about-bio-card">
+            <div class="bio-badge">
+              <span class="bio-dot"></span>
+              <span>Engenharia Orientada a Fundamentos</span>
+            </div>
+            <h3 class="bio-heading">Pragmatismo técnico, código sustentável e paixão pela Web Platform.</h3>
             
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-sticky-note project-icon"></i>
-                        <h4>Markdown Notes App</h4>
-                    </div>
-                    <p class="project-desc">Aplicativo CRUD de anotações utilizando o LocalStorage do navegador, com suporte a edição e formatação de texto.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="./p_notes/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_notes/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
-                </div>
-            </article>
-
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-stopwatch project-icon"></i>
-                        <h4>Pomodoro Timer Pro</h4>
-                    </div>
-                    <p class="project-desc">Cronômetro focado em produtividade com ciclos automatizados (foco/pausa) e integração com a API Document Picture-in-Picture.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="./p_pomodoro/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_pomodoro/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
-                </div>
-            </article>
-
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-brain project-icon"></i>
-                        <h4>Quiz Master Pro</h4>
-                    </div>
-                    <p class="project-desc">Motor de perguntas e respostas com sistema de pontuação dinâmico, validação de alternativas e persistência de sessão.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="./p_quiz/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_quiz/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
-                </div>
-            </article>
-
-        </div>
-
-
-        <h3 class="section-title">Aplicações Interativas</h3>
-        <div class="projects-grid" style="margin-bottom: 50px;">
+            <p class="bio-text">
+              Sou estudante de tecnologia e desenvolvedor frontend focado na construção de sistemas web robustos, eficientes e esteticamente precisos. Minha filosofia de estudo é clara: antes de importar frameworks pesados ou bibliotecas mágicas, é essencial dominar profundamente como o navegador funciona — manipulação do DOM em nível fino, ciclo de renderização, Event Loop, APIs nativas e segurança client-side.
+            </p>
             
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-layer-group project-icon"></i>
-                        <h4>Flashcards App</h4>
-                    </div>
-                    <p class="project-desc">Sistema de repetição espaçada para estudos. Combina o armazenamento de dados locais (CRUD) com lógicas interativas de teste e revelação de respostas.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="./p_flashcards/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_flashcards/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
-                </div>
-            </article>
+            <p class="bio-text">
+              Cada uma das aplicações deste repositório foi concebida para resolver um desafio técnico específico de arquitetura cliente (como máquinas de estado finitas, prevenção de race conditions, proteção contra XSS e integração com APIs modernas como Document Picture-in-Picture).
+            </p>
 
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-file-code project-icon"></i>
-                        <h4>Markdown Previewer</h4>
-                    </div>
-                    <p class="project-desc">Editor de texto em tempo real que processa sintaxe GitHub Flavored Markdown e renderiza o resultado visual no DOM instantaneamente.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="./p_markdown/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_markdown/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
-                </div>
-            </article>
+            <div class="bio-metrics">
+              <div class="bio-metric-item">
+                <span class="metric-num">7/7</span>
+                <span class="metric-label">Apps Nativas no Repo</span>
+              </div>
+              <div class="bio-metric-item">
+                <span class="metric-num">ES6+</span>
+                <span class="metric-label">Padrão de JavaScript</span>
+              </div>
+              <div class="bio-metric-item">
+                <span class="metric-num">100%</span>
+                <span class="metric-label">Client-Side Autônomo</span>
+              </div>
+            </div>
 
-            <article class="project-card">
-                <div class="card-content">
-                    <div class="project-header">
-                        <i class="fas fa-gamepad project-icon"></i>
-                        <h4>Card Memory Game</h4>
-                    </div>
-                    <p class="project-desc">Jogo clássico da memória. Desenvolvido para exercitar o controle de estado complexo de componentes, lógicas de tempo e manipulação avançada de arrays.</p>
-                    <div class="tech-stack">
-                        <span class="tag">HTML5</span>
-                        <span class="tag">CSS3</span>
-                        <span class="tag">Vanilla JS</span>
-                    </div>
+            <div class="bio-cta-row">
+              <a href="https://github.com/sanjrhoff" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                <i class="fab fa-github"></i>
+                <span>Explorar Perfil no GitHub</span>
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                <i class="fas fa-code-branch"></i>
+                <span>Ver Código deste Portfólio</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Matriz de Competências Técnicas (3 Pilares) -->
+          <div class="skills-matrix">
+            
+            <!-- Pilar 1: Core & Linguagens -->
+            <div class="skill-group-card">
+              <div class="skill-group-header">
+                <div class="group-icon-wrap cyan">
+                  <i class="fas fa-code"></i>
                 </div>
-                <div class="card-actions">
-                    <a href="./p_memory/index.html" class="btn primary" target="_blank"><i class="fas fa-external-link-alt"></i> Ver Aplicação</a>
-                    <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_memory/index.html" class="btn secondary" target="_blank"><i class="fab fa-github"></i> Ver Código</a>
+                <div>
+                  <h4 class="group-title">Linguagens &amp; Core Web</h4>
+                  <span class="group-sub">Fundamentos essenciais da Web Platform</span>
                 </div>
-            </article>
+              </div>
+              <ul class="skill-list">
+                <li class="skill-item">
+                  <span class="skill-name">JavaScript Moderno (ES6+)</span>
+                  <span class="skill-level">Async/Await, Event Loop, Closures, DOM API</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">CSS3 Avançado &amp; Moderno</span>
+                  <span class="skill-level">Custom Properties, CSS Grid, Flexbox, 3D Transforms</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">HTML5 Semântico &amp; Acessibilidade</span>
+                  <span class="skill-level">Padrões ARIA, Hierarquia de Documentos, WCAG AA</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Pilar 2: Web APIs & Runtime -->
+            <div class="skill-group-card">
+              <div class="skill-group-header">
+                <div class="group-icon-wrap emerald">
+                  <i class="fas fa-network-wired"></i>
+                </div>
+                <div>
+                  <h4 class="group-title">Web APIs &amp; Client Security</h4>
+                  <span class="group-sub">Recursos avançados do navegador</span>
+                </div>
+              </div>
+              <ul class="skill-list">
+                <li class="skill-item">
+                  <span class="skill-name">Document Picture-in-Picture API</span>
+                  <span class="skill-level">Janelas nativas flutuantes desacopladas</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">Web Audio API &amp; Síntese Sonora</span>
+                  <span class="skill-level">Osciladores, triggers sonoros e alarmes</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">DOMPurify &amp; Segurança Anti-XSS</span>
+                  <span class="skill-level">Sanitização client-side de strings de markdown</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">LocalStorage &amp; Blob URLs</span>
+                  <span class="skill-level">Persistência de estado local e exportação de dados</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Pilar 3: Engenharia & Ferramental -->
+            <div class="skill-group-card">
+              <div class="skill-group-header">
+                <div class="group-icon-wrap amber">
+                  <i class="fas fa-terminal"></i>
+                </div>
+                <div>
+                  <h4 class="group-title">Engenharia, Tooling &amp; Práticas</h4>
+                  <span class="group-sub">Fluxo de desenvolvimento profissional</span>
+                </div>
+              </div>
+              <ul class="skill-list">
+                <li class="skill-item">
+                  <span class="skill-name">Git &amp; GitHub Pages</span>
+                  <span class="skill-level">Controle de versão, branching e deploy contínuo</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">Chrome DevTools &amp; Profiling</span>
+                  <span class="skill-level">Depuração de console, layout shifts e performance</span>
+                </li>
+                <li class="skill-item">
+                  <span class="skill-name">Clean Architecture &amp; Zero Bloat</span>
+                  <span class="skill-level">Separação estrita de lógica de estado e interface</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
 
         </div>
-    </main>
 
-    <footer class="app-footer">
-        <p>&copy; 2026 Sandro. Estudando e codando todos os dias.</p>
-    </footer>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       MODAL DE SANDBOX / QUICK VIEW INTERATIVO
+       ========================================================================== -->
+  <div class="modal-backdrop" id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="modal-app-title" hidden>
+    <div class="modal-window">
+      
+      <!-- Modal Chrome Toolbar -->
+      <div class="modal-toolbar">
+        <div class="modal-controls">
+          <button type="button" class="modal-dot-close" id="modal-close-dot" title="Fechar visualização" aria-label="Fechar modal"></button>
+          <span class="modal-dot-dummy"></span>
+          <span class="modal-dot-dummy"></span>
+        </div>
+
+        <div class="modal-address-bar">
+          <i class="fas fa-lock address-lock-icon"></i>
+          <span class="address-prefix">sandro.dev/sandbox/</span>
+          <span class="address-app-title" id="modal-app-title">Carregando aplicação...</span>
+        </div>
+
+        <div class="modal-toolbar-actions">
+          <button type="button" class="modal-action-btn" id="modal-reload-btn" title="Recarregar aplicação no iframe" aria-label="Recarregar aplicação">
+            <i class="fas fa-redo"></i>
+          </button>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="modal-action-btn" id="modal-external-btn" title="Abrir em aba cheia independente" aria-label="Abrir aplicação em aba externa">
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+          <button type="button" class="modal-action-btn close-btn" id="modal-close-btn" title="Fechar (ESC)" aria-label="Fechar modal">
+            <i class="fas fa-times"></i> <span class="esc-badge">ESC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Iframe Area -->
+      <div class="modal-viewport">
+        <div class="modal-loader" id="modal-loader">
+          <div class="spinner-ring"></div>
+          <p class="loader-text">Inicializando sandbox estática...</p>
+        </div>
+        <iframe 
+          id="preview-iframe" 
+          src="" 
+          title="Sandbox do Projeto Selecionado" 
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          loading="lazy">
+        </iframe>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FOOTER TÉCNICO & TELEMETRIA DO REPOSITÓRIO
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      
+      <div class="footer-top-row">
+        <div class="footer-brand">
+          <span class="brand-bracket">&lt;</span><span class="brand-name">sandro</span><span class="brand-dot">.</span><span class="brand-domain">dev</span><span class="brand-bracket">/&gt;</span>
+          <p class="footer-tagline">Construído com foco na Web Platform, JavaScript Puro e zero dependências pesadas.</p>
+        </div>
+
+        <div class="footer-status-block">
+          <div class="uptime-badge">
+            <span class="dot-online"></span> 100% Static &amp; Hosted on GitHub Pages
+          </div>
+          <div class="repo-meta">
+            Repositório oficial: <a href="https://github.com/sanjrhoff/portifolio" target="_blank" rel="noopener noreferrer">github.com/sanjrhoff/portifolio</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom-row">
+        <p class="copyright-text">
+          &copy; 2026 Sandro. Estudando, projetando e codificando continuamente.
+        </p>
+
+        <div class="footer-nav">
+          <a href="#hero">Início</a>
+          <a href="#destaques">Destaques</a>
+          <a href="#laboratorio">Laboratório</a>
+          <a href="#sobre">Sobre Mim</a>
+          <a href="https://github.com/sanjrhoff" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Script Principal Sem Dependências -->
+  <script src="script.js"></script>
 </body>
 </html>

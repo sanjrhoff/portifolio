@@ -29,6 +29,7 @@ cityInput.addEventListener('keypress', (e) => {
 
 /**
  * Função principal: Faz a chamada para o NOSSO arquivo PHP
+ * Em ambientes puramente estáticos (ex: GitHub Pages), inclui fallback de demonstração.
  */
 async function fetchWeather(city) {
     try {
@@ -38,10 +39,19 @@ async function fetchWeather(city) {
 
         // CHAMA O BACKEND LOCAL 
         const response = await fetch(`weather-proxy.php?city=${encodeURI(city)}`);
-        const data = await response.json();
+        const text = await response.text();
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (jsonErr) {
+            // Em servidores estáticos (como GitHub Pages), o PHP não é interpretado
+            console.warn("Ambiente estático detectado (GitHub Pages). Exibindo dados de demonstração na UI Glassmorphism.");
+            data = generateMockWeatherData(city);
+        }
 
         // O PHP repassa o código 404 se a cidade não existir
-        if (!response.ok) {
+        if (data && data.cod && (data.cod === '404' || data.cod === 404)) {
             throw new Error(data.message || 'Cidade não encontrada.');
         }
 
@@ -57,6 +67,22 @@ async function fetchWeather(city) {
     } finally {
         loadingEl.classList.add('hidden');
     }
+}
+
+function generateMockWeatherData(city) {
+    const formatted = city.charAt(0).toUpperCase() + city.slice(1);
+    const hour = new Date().getHours();
+    const isNight = hour < 6 || hour >= 18;
+    return {
+        name: `${formatted} (Demo)`,
+        main: { temp: 24 },
+        weather: [
+            {
+                description: isNight ? 'Céu estrelado e brisa noturna' : 'Parcialmente ensolarado e agradável',
+                icon: isNight ? '01n' : '02d'
+            }
+        ]
+    };
 }
 
 function updateUI(data) {
