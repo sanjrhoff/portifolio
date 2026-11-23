@@ -669,7 +669,285 @@ code {
   justify-content: center;
 }
 
-/* Mockup 1: Pomodoro UI */
+/* ==========================================================================
+   MOCKUP 1: SQL-to-ERD Schema Analyzer (p_sqlerd)
+   ========================================================================== */
+.mockup-sqlerd {
+  background: #09090c;
+  padding: 18px;
+  min-height: 280px;
+  display: flex;
+  align-items: stretch;
+}
+
+.mock-erd-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.mock-erd-code-col {
+  background: #111115;
+  border: 1px solid #23232a;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mock-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.mock-code-badge {
+  background: var(--accent-cyan-bg);
+  color: var(--accent-cyan);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  font-weight: 600;
+}
+
+.mock-sql-pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #c9d1d9;
+  overflow: hidden;
+}
+
+.sql-kw { color: #ff7b72; font-weight: 600; }
+.sql-tbl { color: #79c0ff; font-weight: 600; }
+.sql-col { color: #d2a8ff; }
+.sql-type { color: #ffa657; }
+.sql-pk { color: #f59e0b; font-weight: 600; }
+.sql-fk { color: #06b6d4; font-weight: 600; }
+
+.mock-erd-canvas-col {
+  position: relative;
+  background: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 14px 14px;
+  background-color: #0c0c10;
+  border: 1px solid #23232a;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.mock-canvas-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.mock-table-card {
+  width: 140px;
+  background: #141419;
+  border: 1px solid #2d2d38;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  z-index: 2;
+}
+
+.table-users { align-self: flex-start; }
+.table-orders { align-self: flex-end; }
+
+.mock-tbl-hdr {
+  background: #1c1c24;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  padding: 5px 8px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom: 1px solid #2d2d38;
+}
+
+.mock-tbl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.mock-tbl-row.pk-row { color: #fbbf24; font-weight: 500; }
+.mock-tbl-row.fk-row { color: #22d3ee; }
+.type-tag { font-size: 9px; color: var(--text-muted); }
+
+.mock-erd-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   MOCKUP 2: Zero-Knowledge Secret Vault (p_vault)
+   ========================================================================== */
+.mockup-vault {
+  background: #0a0a0d;
+  padding: 20px;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mock-vault-ui {
+  width: 100%;
+  max-width: 480px;
+  background: #121217;
+  border: 1px solid #23232b;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.mock-vault-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #1f1f26;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.mock-vault-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #34d399;
+  font-weight: 500;
+}
+
+.mock-autolock-tag {
+  color: var(--text-muted);
+}
+
+.mock-vault-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.mock-secret-item {
+  background: #17171f;
+  border: 1px solid #282833;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.secret-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.secret-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-cat {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.secret-mask-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.masked-dots {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+}
+
+.mock-copy-btn {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mock-entropy-container {
+  background: #0d0d12;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  border: 1px solid #1a1a22;
+}
+
+.mock-entropy-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+}
+
+.mock-entropy-track {
+  height: 5px;
+  background: #1f1f28;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mock-entropy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 99px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.text-emerald { color: #34d399 !important; }
+.text-cyan { color: #06b6d4 !important; }
+.text-amber { color: #f59e0b !important; }
+
+.status-pulse-dot.emerald {
+  background-color: #10b981;
+}
+
+/* Mockup 3: Pomodoro UI */
 .pomodoro-mock-ui {
   width: 100%;
   max-width: 320px;
@@ -1120,7 +1398,8 @@ code {
   margin-bottom: 2.5rem;
 }
 
-.filter-btn {
+.filter-btn,
+.filter-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -1133,15 +1412,19 @@ code {
   border-radius: var(--radius-full);
   color: var(--text-secondary);
   transition: all var(--transition-normal);
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.filter-btn:hover {
+.filter-btn:hover,
+.filter-pill:hover {
   background-color: var(--bg-surface-hover);
   border-color: var(--border-focus);
   color: var(--text-primary);
 }
 
-.filter-btn.active {
+.filter-btn.active,
+.filter-pill.active {
   background-color: var(--accent-cyan-bg);
   border-color: var(--accent-cyan);
   color: var(--accent-cyan-hover);
@@ -1840,8 +2123,13 @@ code {
     -webkit-overflow-scrolling: touch;
   }
 
-  .filter-btn {
+  .filter-btn,
+  .filter-pill {
     flex-shrink: 0;
+  }
+
+  .mock-erd-layout {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -124,16 +124,20 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      2. FILTROS POR CATEGORIA NO LABORATÓRIO / DIRETÓRIO TÉCNICO
      ========================================================================== */
-  const filterButtons = document.querySelectorAll('.filter-btn');
+  const filterButtons = document.querySelectorAll('.filter-btn, .filter-pill');
   const labCards = document.querySelectorAll('.lab-card');
 
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const selectedFilter = btn.getAttribute('data-filter');
+      const selectedFilter = btn.getAttribute('data-filter') || btn.getAttribute('data-category');
 
-      // Atualiza estado ativo dos botões
-      filterButtons.forEach(b => b.classList.remove('active'));
+      // Atualiza estado ativo dos botões e ARIA
+      filterButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
 
       // Filtra os cards
       labCards.forEach(card => {
@@ -204,12 +208,21 @@ document.addEventListener('DOMContentLoaded', () => {
      4. TELEMETRIA TÉCNICA NO CONSOLE DO DESENVOLVEDOR
      ========================================================================== */
   console.info(
-    '%c Sandro // Software Engineer Portfolio %c 100% Static & Native ',
+    '%c Sandro // Software Engineer Portfolio %c 9 Live Apps • Zero Runtime Deps ',
     'background: #09090b; color: #06b6d4; font-weight: 700; padding: 4px 8px; border: 1px solid #27272a; border-radius: 4px;',
     'background: #10b981; color: #09090b; font-weight: 700; padding: 4px 8px; border-radius: 4px;'
   );
   console.info(
-    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados: Pomodoro PiP, Tavern Memory 3D, Markdown Suite, Notes App, Flashcards 3D, Quiz Master, Glass Weather.'
+    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (9):\n' +
+    '1. SQL-to-ERD Schema Analyzer (AST Parser, Dynamic Bézier SVG)\n' +
+    '2. Zero-Knowledge Secret Vault (Web Crypto API, AES-GCM 256, PBKDF2)\n' +
+    '3. Pomodoro Timer Pro (Document PiP API, Web Audio API)\n' +
+    '4. Tavern\'s Memory RPG (CSS 3D Engine, Fisher-Yates, Mutex Lock)\n' +
+    '5. Markdown Previewer Suite (Marked.js, DOMPurify Anti-XSS, Blob URLs)\n' +
+    '6. Markdown Notes App (CRUD LocalStorage, Sortable Drag-and-Drop)\n' +
+    '7. Flashcards 3D Study (CSS 3D Flip, Deck Management)\n' +
+    '8. Quiz Master Pro (SPA Flow, Timed Scored Engine)\n' +
+    '9. Glass Weather App (Glassmorphism, PHP API Proxy Architecture)'
   );
 
 });

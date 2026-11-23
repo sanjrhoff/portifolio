@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL-to-ERD Schema Analyzer | Sandro Engenharia</title>
+  <meta name="description" content="Visualizador e analisador interativo de esquemas de banco de dados SQL DDL para diagramas entidade-relacionamento (ERD) vetoriais com parsing nativo em JavaScript puro.">
+  
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="sqlerd-body">
+  <!-- Barra de Navegação Superior / Header da IDE -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-project-diagram"></i>
+        </div>
+        <div class="brand-text">
+          <h1>SQL-to-ERD <span class="tag-version">v2.4 AST</span></h1>
+          <p class="brand-subtitle">Schema Analyzer & Relational Graph Visualizer</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Central de Telemetria e Status -->
+    <div class="header-telemetry" id="header-telemetry">
+      <span class="telemetry-pill">
+        <i class="fas fa-microchip text-cyan"></i>
+        <span id="stat-tables-count">0 Tabelas</span>
+      </span>
+      <span class="telemetry-divider">•</span>
+      <span class="telemetry-pill">
+        <i class="fas fa-code-branch text-amber"></i>
+        <span id="stat-relations-count">0 Relações</span>
+      </span>
+      <span class="telemetry-divider">•</span>
+      <span class="telemetry-status-badge live" id="parser-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="status-text">Parser Pronto</span>
+      </span>
+    </div>
+
+    <!-- Ações e Atalhos no Topo -->
+    <div class="header-actions">
+      <!-- Seletor de Presets -->
+      <div class="dropdown-container">
+        <button class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-layer-group text-cyan"></i>
+          <span>Exemplos Prontos</span>
+          <i class="fas fa-chevron-down arrow-icon"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <button class="dropdown-item" data-preset="ecommerce">
+            <i class="fas fa-shopping-cart text-cyan"></i>
+            <div class="preset-info">
+              <strong>E-Commerce & Pagamentos</strong>
+              <span>Users, Orders, Products, Payments</span>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="streaming">
+            <i class="fas fa-play-circle text-emerald"></i>
+            <div class="preset-info">
+              <strong>Plataforma de Streaming</strong>
+              <span>Users, Plans, Content, Watch History</span>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="biblioteca">
+            <i class="fas fa-book text-amber"></i>
+            <div class="preset-info">
+              <strong>Biblioteca & Empréstimos</strong>
+              <span>Authors, Books, Categories, Members, Loans</span>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="lms">
+            <i class="fas fa-graduation-cap text-purple"></i>
+            <div class="preset-info">
+              <strong>Portal Educacional / LMS</strong>
+              <span>Instructors, Courses, Students, Lessons</span>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="tasks">
+            <i class="fas fa-tasks text-rose"></i>
+            <div class="preset-info">
+              <strong>Gestão Ágil de Tarefas</strong>
+              <span>Workspaces, Projects, Sprints, Issues</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Exportações -->
+      <div class="dropdown-container">
+        <button class="btn btn-secondary dropdown-toggle" id="btn-export-toggle" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-download"></i>
+          <span>Exportar</span>
+          <i class="fas fa-chevron-down arrow-icon"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" id="export-dropdown-menu">
+          <button class="dropdown-item" id="btn-export-svg">
+            <i class="fas fa-file-code text-cyan"></i>
+            <div class="preset-info">
+              <strong>Exportar SVG Vetorial</strong>
+              <span>Diagrama nítido para documentações</span>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-export-png">
+            <i class="fas fa-file-image text-emerald"></i>
+            <div class="preset-info">
+              <strong>Exportar Imagem PNG (2x Retina)</strong>
+              <span>Alta resolução para apresentações</span>
+            </div>
+          </button>
+          <button class="dropdown-item" id="btn-copy-json">
+            <i class="fas fa-copy text-amber"></i>
+            <div class="preset-info">
+              <strong>Copiar AST Schema (JSON)</strong>
+              <span>Interoperabilidade com APIs</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Link para o Código -->
+      <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_sqlerd/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" title="Ver Código no GitHub">
+        <i class="fab fa-github"></i>
+        <span class="desktop-only">Código</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Workspace Principal (Layout Dual-Pane) -->
+  <main class="workspace-layout">
+    
+    <!-- Painel Lateral: Editor SQL DDL -->
+    <aside class="sidebar-editor" id="sidebar-editor">
+      <div class="sidebar-header">
+        <div class="editor-title-row">
+          <span class="editor-label">
+            <i class="fas fa-terminal text-cyan"></i>
+            <span>DDL Input</span>
+          </span>
+          <span class="dialect-badge">PostgreSQL • MySQL • SQLite</span>
+        </div>
+
+        <div class="editor-quick-actions">
+          <button class="icon-btn" id="btn-format-sql" title="Formatar / Indentar SQL">
+            <i class="fas fa-align-left"></i>
+          </button>
+          <button class="icon-btn" id="btn-clear-sql" title="Limpar Editor">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Container do Editor de Código com Numeração de Linhas -->
+      <div class="code-editor-wrapper">
+        <div class="line-numbers" id="line-numbers" aria-hidden="true">1</div>
+        <textarea 
+          id="sql-textarea" 
+          class="sql-code-input" 
+          placeholder="Cole ou digite instruções CREATE TABLE com chaves primárias e estrangeiras aqui...&#10;&#10;Exemplo:&#10;CREATE TABLE users (&#10;  id BIGINT PRIMARY KEY,&#10;  email VARCHAR(255) NOT NULL&#10;);&#10;&#10;CREATE TABLE orders (&#10;  id BIGINT PRIMARY KEY,&#10;  user_id BIGINT REFERENCES users(id)&#10;);" 
+          spellcheck="false" 
+          autocapitalize="none" 
+          autocomplete="off"></textarea>
+      </div>
+
+      <!-- Banner de Feedback Diagnóstico -->
+      <div class="diagnostic-banner" id="diagnostic-banner">
+        <div class="diagnostic-content">
+          <i class="fas fa-check-circle diagnostic-icon" id="diagnostic-icon"></i>
+          <span class="diagnostic-text" id="diagnostic-text">Pronto para analisar instruções DDL. Pressione Ctrl + Enter.</span>
+        </div>
+      </div>
+
+      <!-- Footer do Painel com Botão Primário -->
+      <div class="sidebar-footer">
+        <button class="btn btn-primary btn-generate" id="btn-generate-diagram">
+          <i class="fas fa-play"></i>
+          <span>Gerar Diagrama</span>
+          <kbd class="shortcut-key">Ctrl + Enter</kbd>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Barra de Redimensionamento Horizontal (Splitter) -->
+    <div class="workspace-resizer" id="workspace-resizer" title="Arraste para redimensionar painéis"></div>
+
+    <!-- Painel Principal: Canvas ERD Interativo -->
+    <section class="canvas-section" id="canvas-section">
+      
+      <!-- Viewport Interativo com Pan & Zoom -->
+      <div class="canvas-viewport" id="canvas-viewport">
+        <!-- Container do Mundo (Recebe transform: translate(x,y) scale(z)) -->
+        <div class="canvas-world" id="canvas-world">
+          <!-- Camada Vetorial SVG para Conectores Bézier -->
+          <svg class="erd-connections-svg" id="erd-connections-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Marcador de Seta Ciano para Chaves Estrangeiras -->
+              <marker id="arrow-fk" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 9 5 L 0 9 z" fill="#06b6d4" />
+              </marker>
+              <!-- Marcador de Ponto de Conexão Ciano -->
+              <marker id="dot-fk" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                <circle cx="5" cy="5" r="4" fill="#06b6d4" />
+              </marker>
+              <!-- Marcador Dourado para Chaves Primárias -->
+              <marker id="dot-pk" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                <circle cx="5" cy="5" r="4" fill="#f59e0b" />
+              </marker>
+              <!-- Gradiente Linear Ciano para Linhas -->
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.95" />
+              </linearGradient>
+            </defs>
+            <g id="svg-paths-group"></g>
+          </svg>
+
+          <!-- Camada de Cards de Tabelas (Nós HTML Draggables) -->
+          <div class="erd-nodes-layer" id="erd-nodes-layer">
+            <!-- Cards de tabelas são inseridos dinamicamente aqui -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado Vazio / Dica Inicial -->
+      <div class="canvas-empty-state" id="canvas-empty-state" style="display: none;">
+        <div class="empty-state-card">
+          <i class="fas fa-bezier-curve empty-icon"></i>
+          <h3>Nenhuma tabela no diagrama</h3>
+          <p>Digite ou cole instruções <code>CREATE TABLE</code> no editor lateral ou escolha um dos <strong>Exemplos Prontos</strong> no menu superior.</p>
+          <button class="btn btn-secondary" id="btn-load-quick-preset">
+            <i class="fas fa-magic text-cyan"></i> Carregar E-Commerce Preset
+          </button>
+        </div>
+      </div>
+
+      <!-- HUD Flutuante de Controles do Canvas -->
+      <div class="canvas-hud-toolbar" id="canvas-hud">
+        <!-- Busca de Entidades / Filtro Rápido -->
+        <div class="hud-search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="hud-search-input" placeholder="Buscar tabela ou coluna..." autocomplete="off">
+          <button class="btn-clear-search" id="btn-clear-search" style="display: none;">&times;</button>
+        </div>
+
+        <div class="hud-divider"></div>
+
+        <!-- Controles de Zoom & Viewport -->
+        <div class="hud-zoom-controls">
+          <button class="hud-btn" id="btn-zoom-out" title="Reduzir Zoom (-)">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button class="hud-btn hud-zoom-label" id="btn-zoom-reset" title="Restaurar Zoom (100%)">
+            <span id="zoom-percentage-text">100%</span>
+          </button>
+          <button class="hud-btn" id="btn-zoom-in" title="Aumentar Zoom (+)">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button class="hud-btn" id="btn-fit-screen" title="Enquadrar Todas as Tabelas">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="hud-btn" id="btn-auto-layout" title="Reorganizar Layout em Grid">
+            <i class="fas fa-th-large"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Legenda de Tipos e Cores do ERD -->
+      <div class="canvas-legend">
+        <span class="legend-item"><span class="legend-badge pk-badge"><i class="fas fa-key"></i> PK</span> Primary Key</span>
+        <span class="legend-item"><span class="legend-badge fk-badge"><i class="fas fa-link"></i> FK</span> Foreign Key</span>
+        <span class="legend-item"><span class="legend-dot line-dot"></span> Relacionamento 1:N</span>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Notificações Toast Flutuantes -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Script Modular -->
+  <script src="script.js"></script>
+</body>
+</html>

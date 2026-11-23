@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zero-Knowledge Secret Vault | Sandro Engenharia</title>
+  <meta name="description" content="Cofre de credenciais e segredos de conhecimento zero com Web Crypto API nativa (PBKDF2 100k + AES-GCM 256-bit). Segurança militar isolada em memória volátil (RAM-only).">
+  
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="vault-body">
+  
+  <!-- HEADER GLOBAL -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon shield-glow">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Zero-Knowledge Vault <span class="tag-crypto">AES-GCM 256</span></h1>
+          <p class="brand-subtitle">Web Crypto API • PBKDF2 100k • RAM-Only</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria & Status (visível quando logado) -->
+    <div class="header-status-bar" id="header-status-bar" style="display: none;">
+      <span class="status-chip chip-security">
+        <i class="fas fa-lock text-emerald"></i>
+        <span>Memória Volátil (RAM)</span>
+      </span>
+      <span class="status-divider">•</span>
+      <div class="status-autolock" id="autolock-indicator" title="Clique para resetar timer de inatividade">
+        <i class="fas fa-stopwatch text-amber"></i>
+        <span>Auto-Lock: <strong id="autolock-timer-text" class="font-mono">05:00</strong></span>
+      </div>
+    </div>
+
+    <!-- Ações do Header -->
+    <div class="header-actions">
+      <!-- Botão Trancar (visível quando logado) -->
+      <button class="btn btn-secondary" id="btn-lock-now" style="display: none;">
+        <i class="fas fa-lock"></i>
+        <span class="desktop-only">Trancar Cofre</span>
+      </button>
+
+      <!-- Dropdown Backup -->
+      <div class="dropdown-container" id="dropdown-backup-container">
+        <button class="btn btn-secondary dropdown-toggle" id="btn-backup-toggle" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-database text-cyan"></i>
+          <span>Backup</span>
+          <i class="fas fa-chevron-down arrow-icon"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" id="backup-dropdown-menu">
+          <button class="dropdown-item" id="btn-menu-export-vault">
+            <i class="fas fa-file-export text-emerald"></i>
+            <div class="item-info">
+              <strong>Exportar Cofre (.vault)</strong>
+              <span>Backup criptografado para download</span>
+            </div>
+          </button>
+          <label class="dropdown-item file-upload-item" for="input-import-vault">
+            <i class="fas fa-file-import text-cyan"></i>
+            <div class="item-info">
+              <strong>Restaurar Backup (.vault)</strong>
+              <span>Carregar arquivo seguro existente</span>
+            </div>
+            <input type="file" id="input-import-vault" accept=".vault,.json" style="display: none;">
+          </label>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item text-danger" id="btn-menu-reset-vault">
+            <i class="fas fa-trash-alt"></i>
+            <div class="item-info">
+              <strong>Apagar Cofre deste Navegador</strong>
+              <span>Limpar dados armazenados localmente</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Link GitHub -->
+      <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_vault/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" title="Ver Código no GitHub">
+        <i class="fab fa-github"></i>
+        <span class="desktop-only">Código</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTAINER PRINCIPAL: GESTÃO DE ESTADOS -->
+  <main class="vault-main-viewport">
+    
+    <!-- ====================================================================
+         ESTADO 1: ONBOARDING / SETUP (CRIAR COFRE SEGURO)
+         ==================================================================== -->
+    <section class="screen-view setup-screen" id="screen-setup" style="display: none;">
+      <div class="setup-container">
+        <div class="setup-hero-icon">
+          <div class="shield-halo">
+            <i class="fas fa-shield-virus"></i>
+          </div>
+        </div>
+
+        <div class="setup-header-text">
+          <h2>Inicializar Cofre Zero-Knowledge</h2>
+          <p>Seus segredos são protegidos com derivação PBKDF2 de 100.000 iterações e cifragem simétrica AES-GCM de 256 bits antes de qualquer persistência local.</p>
+        </div>
+
+        <!-- Alerta Zero-Knowledge Mandatório -->
+        <div class="alert-box alert-warning">
+          <i class="fas fa-exclamation-triangle alert-icon"></i>
+          <div class="alert-content">
+            <strong>Arquitetura de Conhecimento Zero Inegociável:</strong>
+            <p>Não há servidores, não há contas na nuvem e não há chaves mestras de recuperação. Se você esquecer a Senha Mestra, seus dados estarão criptograficamente perdidos para sempre.</p>
+          </div>
+        </div>
+
+        <!-- Formulário de Inicialização -->
+        <form class="setup-form" id="form-setup-vault">
+          <div class="form-group">
+            <label for="setup-password">Definir Senha Mestra</label>
+            <div class="input-password-wrapper">
+              <input type="password" id="setup-password" class="form-control font-mono" placeholder="Digite uma senha forte e memorável..." required autocomplete="new-password">
+              <button type="button" class="btn-toggle-password" data-target="setup-password" title="Revelar Senha">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+
+            <!-- Medidor de Entropia em Tempo Real -->
+            <div class="entropy-meter-container">
+              <div class="entropy-labels">
+                <span class="entropy-title">Força Criptográfica:</span>
+                <span class="entropy-score" id="setup-entropy-text">0 bits • Insuficiente</span>
+              </div>
+              <div class="entropy-track">
+                <div class="entropy-fill level-0" id="setup-entropy-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="setup-password-confirm">Confirmar Senha Mestra</label>
+            <div class="input-password-wrapper">
+              <input type="password" id="setup-password-confirm" class="form-control font-mono" placeholder="Repita exatamente a mesma senha..." required autocomplete="new-password">
+              <button type="button" class="btn-toggle-password" data-target="setup-password-confirm" title="Revelar Senha">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-full-width" id="btn-create-vault">
+              <i class="fas fa-key"></i>
+              <span>Criar Cofre Criptografado</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="setup-footer-restore">
+          <span>Já possui um arquivo seguro?</span>
+          <label for="input-import-vault-setup" class="link-btn">Restaurar Backup (.vault)</label>
+          <input type="file" id="input-import-vault-setup" accept=".vault,.json" style="display: none;">
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         ESTADO 2: TELA DE BLOQUEIO (LOCK SCREEN)
+         ==================================================================== -->
+    <section class="screen-view lock-screen" id="screen-lock" style="display: none;">
+      <div class="lock-card" id="lock-card-box">
+        <div class="lock-badge-top">
+          <i class="fas fa-fingerprint text-emerald"></i>
+          <span>COFRE TRANCADO</span>
+        </div>
+
+        <div class="lock-icon-wrap">
+          <i class="fas fa-lock"></i>
+        </div>
+
+        <h2>Desbloquear Bunker</h2>
+        <p class="lock-sub">Digite sua Senha Mestra para decodificar o estado volátil em memória RAM.</p>
+
+        <form class="lock-form" id="form-unlock-vault">
+          <div class="form-group">
+            <div class="input-password-wrapper">
+              <input type="password" id="unlock-password" class="form-control font-mono" placeholder="Senha Mestra do Cofre..." required autofocus autocomplete="current-password">
+              <button type="button" class="btn-toggle-password" data-target="unlock-password" title="Revelar Senha">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="error-msg-box" id="unlock-error-msg" style="display: none;">
+              <i class="fas fa-times-circle"></i>
+              <span>Senha incorreta. Falha de autenticação AES-GCM.</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full-width" id="btn-unlock-submit">
+            <i class="fas fa-unlock-alt"></i>
+            <span id="btn-unlock-text">Desbloquear Cofre</span>
+          </button>
+        </form>
+
+        <div class="lock-card-footer">
+          <span class="security-stamp font-mono"><i class="fas fa-check-shield text-emerald"></i> Web Crypto AES-GCM 256-bit</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         ESTADO 3: DASHBOARD DO COFRE DESBLOQUEADO (WORKSPACE)
+         ==================================================================== -->
+    <section class="screen-view dashboard-screen" id="screen-dashboard" style="display: none;">
+      
+      <!-- SUB-BARRA: BUSCA, FILTROS E AÇÕES -->
+      <div class="dashboard-toolbar">
+        <div class="toolbar-search-wrap">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="vault-search-input" placeholder="Buscar por título, usuário, categoria ou host..." autocomplete="off">
+          <button type="button" class="btn-clear-search" id="btn-clear-vault-search" style="display: none;">&times;</button>
+        </div>
+
+        <!-- Filtros por Categoria -->
+        <div class="category-filters" id="category-filters">
+          <button class="filter-btn active" data-category="all">
+            <i class="fas fa-th"></i>
+            <span>Todos</span>
+            <span class="filter-count" id="count-all">0</span>
+          </button>
+          <button class="filter-btn" data-category="login">
+            <i class="fas fa-user-lock text-cyan"></i>
+            <span>Logins</span>
+            <span class="filter-count" id="count-login">0</span>
+          </button>
+          <button class="filter-btn" data-category="api">
+            <i class="fas fa-key text-amber"></i>
+            <span>API Keys</span>
+            <span class="filter-count" id="count-api">0</span>
+          </button>
+          <button class="filter-btn" data-category="server">
+            <i class="fas fa-server text-emerald"></i>
+            <span>Servidores</span>
+            <span class="filter-count" id="count-server">0</span>
+          </button>
+          <button class="filter-btn" data-category="note">
+            <i class="fas fa-sticky-note text-purple"></i>
+            <span>Notas</span>
+            <span class="filter-count" id="count-note">0</span>
+          </button>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="toolbar-action-buttons">
+          <button class="btn btn-secondary" id="btn-open-generator-modal" title="Abrir Gerador de Senhas">
+            <i class="fas fa-dice text-emerald"></i>
+            <span class="desktop-only">Gerador</span>
+          </button>
+          <button class="btn btn-primary" id="btn-add-credential">
+            <i class="fas fa-plus"></i>
+            <span>Nova Credencial</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- GRID DE CARDS DE CREDENCIAIS -->
+      <div class="credentials-container">
+        <!-- Grid Dinâmico -->
+        <div class="credentials-grid" id="credentials-grid">
+          <!-- Cards injetados via JS -->
+        </div>
+
+        <!-- Estado Vazio / Nenhum Segredo Encontrado -->
+        <div class="empty-credentials-state" id="empty-credentials-state" style="display: none;">
+          <div class="empty-box">
+            <i class="fas fa-folder-open empty-icon"></i>
+            <h3>Nenhum segredo encontrado</h3>
+            <p id="empty-state-text">Seu cofre está vazio ou nenhuma credencial corresponde aos filtros atuais.</p>
+            <button class="btn btn-primary" id="btn-empty-add-cred">
+              <i class="fas fa-plus"></i> Cadastrar Primeira Credencial
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       MODAL 1: CADASTRAR / EDITAR CREDENCIAL
+       ====================================================================== -->
+  <div class="modal-backdrop" id="modal-credential-backdrop" style="display: none;">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fas fa-shield-alt text-cyan"></i>
+          <h3 id="modal-cred-title">Nova Credencial Segura</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-cred-modal">&times;</button>
+      </div>
+
+      <form id="form-credential" class="modal-form">
+        <input type="hidden" id="cred-id">
+
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="cred-name">Título / Nome do Serviço <span class="req">*</span></label>
+            <input type="text" id="cred-name" class="form-control" placeholder="Ex: AWS Production, GitHub Token, Banco Postgres" required>
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="cred-category">Categoria <span class="req">*</span></label>
+            <select id="cred-category" class="form-control" required>
+              <option value="login">Login / Web</option>
+              <option value="api">API Key / Token</option>
+              <option value="server">Servidor / Banco</option>
+              <option value="note">Nota Confidencial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="cred-username">Usuário / Identificador</label>
+            <input type="text" id="cred-username" class="form-control font-mono" placeholder="Ex: admin@empresa.com, arn:aws:iam...">
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="cred-url">URL / Host / Endereço</label>
+            <input type="text" id="cred-url" class="form-control font-mono" placeholder="Ex: https://app.com ou 10.0.4.15:5432">
+          </div>
+        </div>
+
+        <!-- Campo de Senha / Segredo com Atalho de Geração Inline -->
+        <div class="form-group">
+          <div class="label-with-action">
+            <label for="cred-secret">Senha / Segredo Criptografado <span class="req">*</span></label>
+            <button type="button" class="btn-inline-generate" id="btn-inline-generate-pwd">
+              <i class="fas fa-magic text-emerald"></i> Gerar Senha Forte
+            </button>
+          </div>
+          <div class="input-password-wrapper">
+            <input type="password" id="cred-secret" class="form-control font-mono" placeholder="Segredo que será cifrado com AES-GCM..." required>
+            <button type="button" class="btn-toggle-password" data-target="cred-secret" title="Revelar Segredo">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+
+          <!-- Medidor de Entropia Inline -->
+          <div class="entropy-meter-container">
+            <div class="entropy-labels">
+              <span class="entropy-title">Entropia:</span>
+              <span class="entropy-score" id="cred-entropy-text">0 bits</span>
+            </div>
+            <div class="entropy-track">
+              <div class="entropy-fill level-0" id="cred-entropy-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cred-notes">Notas Confidenciais / Detalhes</label>
+          <textarea id="cred-notes" class="form-control font-mono" rows="3" placeholder="Informações adicionais, comandos SSH, chaves de recuperação..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-cred">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-cred">
+            <i class="fas fa-save"></i>
+            <span>Salvar Segredo</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 2: GERADOR DE SENHAS INDEPENDENTE & MEDIDOR DE ENTROPIA
+       ====================================================================== -->
+  <div class="modal-backdrop" id="modal-generator-backdrop" style="display: none;">
+    <div class="modal-window modal-generator-window">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fas fa-dice text-emerald"></i>
+          <h3>Gerador Criptográfico & Medidor de Entropia</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-gen-modal">&times;</button>
+      </div>
+
+      <div class="generator-content">
+        <!-- Display de Senha com Sintaxe Colorida -->
+        <div class="generator-display-box">
+          <div class="generated-password-colored font-mono" id="gen-password-display">••••••••••••</div>
+          <div class="display-actions">
+            <button class="icon-action-btn" id="btn-regen-pwd" title="Gerar Nova Senha">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="icon-action-btn" id="btn-copy-gen-pwd" title="Copiar Senha">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Métrica de Entropia e Tempo de Força Bruta -->
+        <div class="entropy-card">
+          <div class="entropy-header">
+            <div class="entropy-stats">
+              <span class="entropy-bits-val font-mono" id="gen-bits-val">128 bits</span>
+              <span class="entropy-verdict-badge level-military" id="gen-verdict-badge">Nível Militar</span>
+            </div>
+            <div class="entropy-time-estimate" id="gen-time-estimate">
+              <i class="fas fa-bolt text-amber"></i> Tempo de quebra: > 14 trilhões de anos
+            </div>
+          </div>
+          <div class="entropy-track">
+            <div class="entropy-fill level-military" id="gen-entropy-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- Controles de Configuração -->
+        <div class="generator-controls">
+          <div class="length-control-row">
+            <div class="length-label">
+              <span>Comprimento:</span>
+              <strong id="gen-length-val" class="font-mono">24</strong> caracteres
+            </div>
+            <input type="range" id="gen-length-slider" min="8" max="64" value="24" class="slider-control">
+          </div>
+
+          <div class="toggles-grid">
+            <label class="toggle-item">
+              <input type="checkbox" id="gen-opt-upper" checked>
+              <span class="toggle-custom"></span>
+              <span class="toggle-text">Maiúsculas (A-Z)</span>
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" id="gen-opt-lower" checked>
+              <span class="toggle-custom"></span>
+              <span class="toggle-text">Minúsculas (a-z)</span>
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" id="gen-opt-digits" checked>
+              <span class="toggle-custom"></span>
+              <span class="toggle-text">Números (0-9)</span>
+            </label>
+            <label class="toggle-item">
+              <input type="checkbox" id="gen-opt-symbols" checked>
+              <span class="toggle-custom"></span>
+              <span class="toggle-text">Símbolos (!@#$%^&*)</span>
+            </label>
+            <label class="toggle-item full-width-toggle">
+              <input type="checkbox" id="gen-opt-avoid-ambiguous">
+              <span class="toggle-custom"></span>
+              <span class="toggle-text">Evitar caracteres ambíguos (0, O, l, 1, I)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-close-gen-btn">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btn-apply-gen-pwd" style="display: none;">
+            <i class="fas fa-check"></i>
+            <span>Usar no Formulário</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE TOASTS -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPT MODULAR DA APLICAÇÃO -->
+  <script src="script.js"></script>
+</body>
+</html>
