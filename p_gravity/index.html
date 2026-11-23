@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrbitN | Simulador Gravitacional de N-Corpos &amp; Dinâmica Orbital</title>
+  <meta name="description" content="Simulador astrofísico de gravitação universal para sistemas de N-corpos com integrador simplético Velocity Verlet, conservação de energia mecânica, colisões inelásticas e presets dos Três Corpos e Figura de Oito.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gravity-body">
+  <!-- Header de Telemetria e Console Orbital -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-satellite text-solar"></i>
+        </div>
+        <div class="brand-text">
+          <h1>OrbitN <span class="tag-version">VERLET O(Δt²)</span></h1>
+          <p class="brand-subtitle">Simulador Gravitacional de N-Corpos &amp; Mecânica Celeste</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Temporal e Presets -->
+    <div class="header-controls">
+      <!-- Controle de Fluxo de Tempo -->
+      <div class="time-control-group">
+        <button class="btn btn-icon" id="btn-toggle-play" title="Play / Pause (Espaço)" aria-label="Pausar ou Retomar">
+          <i class="fas fa-pause" id="icon-play-pause"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-step" title="Passo Único no Tempo (S)" aria-label="Avançar um passo">
+          <i class="fas fa-step-forward"></i>
+        </button>
+        
+        <!-- Pílulas de Velocidade Temporal -->
+        <div class="speed-selector" role="radiogroup" aria-label="Velocidade da Simulação">
+          <button type="button" class="speed-pill" data-speed="0.25">0.25×</button>
+          <button type="button" class="speed-pill" data-speed="0.5">0.5×</button>
+          <button type="button" class="speed-pill active" data-speed="1.0">1.0×</button>
+          <button type="button" class="speed-pill" data-speed="2.0">2.0×</button>
+          <button type="button" class="speed-pill" data-speed="5.0">5.0×</button>
+        </div>
+      </div>
+
+      <!-- Presets Clássicos da Mecânica Celeste -->
+      <div class="dropdown-container">
+        <button class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar configurações de mecânica celeste">
+          <i class="fas fa-globe-americas"></i>
+          <span>Presets Orbitais</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <div class="dropdown-header">SISTEMAS GRAVITACIONAIS (1-5)</div>
+          <button class="dropdown-item" data-preset="solar">
+            <i class="fas fa-sun text-solar"></i>
+            <div class="item-info">
+              <strong>Sistema Solar Interno</strong>
+              <small>Sol central, Mercúrio, Terra com Lua e Marte</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="three-body">
+            <i class="fas fa-atom text-cyan"></i>
+            <div class="item-info">
+              <strong>Três Corpos Caótico</strong>
+              <small>Sensibilidade extrema às condições iniciais (Caos)</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="figure-eight">
+            <i class="fas fa-infinity text-emerald"></i>
+            <div class="item-info">
+              <strong>Figura em 8 (Moore-Chenciner)</strong>
+              <small>Solução coreográfica periódica estável de 3 corpos</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="galaxy-collision">
+            <i class="fas fa-meteor text-violet"></i>
+            <div class="item-info">
+              <strong>Colisão de Duas Galáxias</strong>
+              <small>Interação gravitacional de maré e fusão de núcleos</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="binary-star">
+            <i class="fas fa-ring text-amber"></i>
+            <div class="item-info">
+              <strong>Estrela Binária ("Tatooine")</strong>
+              <small>Duas estrelas com planeta circumbinário estável</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botões Utilitários -->
+      <div class="btn-group">
+        <button class="btn btn-icon" id="btn-toggle-trails" title="Alternar Rastros Orbitais (T)" aria-pressed="true">
+          <i class="fas fa-bezier-curve"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-toggle-barycenter" title="Alternar Marcador de Baricentro" aria-pressed="true">
+          <i class="fas fa-crosshairs"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-center-camera" title="Centralizar Câmera no Baricentro" aria-label="Centralizar Câmera">
+          <i class="fas fa-compress-arrows-alt"></i>
+        </button>
+      </div>
+
+      <!-- Limpar Espaço -->
+      <button class="btn btn-danger-soft" id="btn-clear-space" title="Remover todos os corpos ativos (C)">
+        <i class="fas fa-trash-alt"></i>
+        <span class="hide-mobile">Limpar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Observatório Principal: Canvas + HUDs Científicos -->
+  <main class="space-main">
+    <!-- HUD de Telemetria Científica em Tempo Real (Canto Superior Esquerdo) -->
+    <aside class="hud-telemetry-panel" aria-label="Telemetria Orbital">
+      <div class="hud-header">
+        <i class="fas fa-microchip text-cyan"></i>
+        <span>TELEMETRIA ORBITAL</span>
+        <span class="hud-fps-pill" id="hud-fps">60.0 FPS</span>
+      </div>
+
+      <div class="hud-metrics-grid">
+        <div class="hud-metric-card">
+          <span class="metric-label">Corpos Vivos</span>
+          <span class="metric-val text-bright" id="telemetry-bodies-count">0</span>
+        </div>
+        <div class="hud-metric-card">
+          <span class="metric-label">Colisões / Fusões</span>
+          <span class="metric-val text-amber" id="telemetry-collisions-count">0</span>
+        </div>
+        <div class="hud-metric-card full-width">
+          <div class="metric-row">
+            <span class="metric-label">Energia Total (E = K + U)</span>
+            <span class="metric-val mono-sm" id="telemetry-energy-val">0.00 J</span>
+          </div>
+          <div class="energy-conservation-row">
+            <span class="conservation-label">Desvio de Conservação ΔE/E₀:</span>
+            <span class="conservation-badge good" id="telemetry-delta-energy">0.000%</span>
+          </div>
+        </div>
+        <div class="hud-metric-card full-width">
+          <div class="metric-row">
+            <span class="metric-label">Baricentro (X, Y)</span>
+            <span class="metric-val mono-sm" id="telemetry-barycenter-val">(0.0, 0.0)</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Canvas Espacial Central -->
+    <div class="space-viewport" id="space-viewport">
+      <canvas id="gravity-canvas"></canvas>
+
+      <!-- Overlay de Instruções de Lançamento e Câmera -->
+      <div class="space-instructions" id="space-instructions">
+        <span><i class="fas fa-hand-pointer"></i> <strong>Clique e arraste</strong> para lançar corpo em órbita • <strong>Scroll</strong>: Zoom • <strong>Botão Direito/Meio</strong>: Pan • <strong>Espaço</strong>: Pausa</span>
+      </div>
+
+      <!-- HUD Dinâmico de Lançamento (acompanha o cursor durante o drag) -->
+      <div class="launch-aim-hud" id="launch-aim-hud" style="display: none;">
+        <span id="launch-aim-v">v: 0.00 km/s</span>
+        <span id="launch-aim-angle">θ: 0.0°</span>
+      </div>
+    </div>
+
+    <!-- Painel de Parâmetros Físicos e Injeção Celeste (Canto Superior Direito) -->
+    <aside class="hud-parameters-panel" aria-label="Parâmetros Físicos">
+      <div class="hud-header">
+        <i class="fas fa-sliders-h text-solar"></i>
+        <span>PARÂMETROS FÍSICOS</span>
+      </div>
+
+      <div class="panel-body">
+        <!-- Injeção Celeste: Massa do Próximo Corpo -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <label for="input-next-mass">Massa do Próximo Corpo</label>
+            <span class="mono-val text-bright" id="val-next-mass">10</span>
+          </div>
+
+          <!-- Pílulas de Classes Celestes -->
+          <div class="celestial-classes-pills">
+            <button type="button" class="celestial-pill" data-mass="1" data-radius="4" data-type="asteroid">
+              <i class="fas fa-circle text-muted"></i> Asteroide (1)
+            </button>
+            <button type="button" class="celestial-pill active" data-mass="10" data-radius="6" data-type="terrestrial">
+              <i class="fas fa-globe-americas text-emerald"></i> Terra (10)
+            </button>
+            <button type="button" class="celestial-pill" data-mass="50" data-radius="10" data-type="gas-giant">
+              <i class="fas fa-circle text-cyan"></i> Gigante (50)
+            </button>
+            <button type="button" class="celestial-pill" data-mass="1000" data-radius="18" data-type="star">
+              <i class="fas fa-sun text-solar"></i> Estrela (1000)
+            </button>
+          </div>
+
+          <input type="range" id="input-next-mass" min="1" max="2500" step="1" value="10" class="custom-slider solar-track">
+        </div>
+
+        <!-- Constantes Cosmológicas -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <label for="input-gravity-g">Constante Gravitacional (G)</label>
+            <span class="mono-val highlight-solar" id="val-gravity-g">1.00</span>
+          </div>
+          <input type="range" id="input-gravity-g" min="0.10" max="5.00" step="0.05" value="1.00" class="custom-slider">
+          <div class="slider-ticks">
+            <span>0.1×</span>
+            <span>1.0× (Normal)</span>
+            <span>5.0×</span>
+          </div>
+        </div>
+
+        <div class="param-group">
+          <div class="param-label-row">
+            <label for="input-softening-eps" title="Parâmetro de suavização de Plummer para prevenir forças infinitas">Plummer Softening (ε)</label>
+            <span class="mono-val text-cyan" id="val-softening-eps">15 px</span>
+          </div>
+          <input type="range" id="input-softening-eps" min="2" max="40" step="1" value="15" class="custom-slider">
+          <div class="slider-ticks">
+            <span>2 px (Quase pontual)</span>
+            <span>15 px (Estável)</span>
+            <span>40 px</span>
+          </div>
+        </div>
+
+        <!-- Configurações de Rastro -->
+        <div class="param-group">
+          <div class="param-label-row">
+            <label for="input-trail-length">Buffer de Rastro Orbital</label>
+            <span class="mono-val text-bright" id="val-trail-length">200 pts</span>
+          </div>
+          <input type="range" id="input-trail-length" min="50" max="400" step="25" value="200" class="custom-slider">
+        </div>
+
+        <!-- Ações e Atalhos -->
+        <div class="panel-footer-actions">
+          <button class="btn btn-secondary w-full" id="btn-toggle-shortcuts" title="Ver Guia de Atalhos">
+            <i class="fas fa-keyboard"></i> Atalhos &amp; Teclas
+          </button>
+          <button class="btn btn-secondary w-full mt-2" id="btn-reset-preset" title="Recarregar preset atual">
+            <i class="fas fa-redo-alt"></i> Resetar Posições
+          </button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal de Guia de Atalhos e Teclas -->
+  <div class="modal-backdrop" id="shortcuts-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-satellite text-solar"></i>
+          <h3>OrbitN — Teclas de Operação Astrofísica</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="shortcuts-table">
+          <thead>
+            <tr>
+              <th>Atalho</th>
+              <th>Ação</th>
+              <th>Descrição</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><kbd>Espaço</kbd></td>
+              <td>Play / Pause</td>
+              <td>Congela a integração temporal de Verlet</td>
+            </tr>
+            <tr>
+              <td><kbd>S</kbd></td>
+              <td>Passo Único (Step)</td>
+              <td>Avança exatamente um ciclo Δt</td>
+            </tr>
+            <tr>
+              <td><kbd>T</kbd></td>
+              <td>Rastros Orbitais</td>
+              <td>Ativa ou oculta os caminhos de trajetória</td>
+            </tr>
+            <tr>
+              <td><kbd>C</kbd></td>
+              <td>Limpar Espaço</td>
+              <td>Remove todos os corpos celestes</td>
+            </tr>
+            <tr>
+              <td><kbd>R</kbd></td>
+              <td>Resetar Preset</td>
+              <td>Recarrega as condições iniciais do sistema</td>
+            </tr>
+            <tr>
+              <td><kbd>1</kbd> - <kbd>5</kbd></td>
+              <td>Presets Orbitais</td>
+              <td>Solar, 3-Corpos, Figura 8, Galáxias, Binário</td>
+            </tr>
+            <tr>
+              <td><kbd>Mouse Drag</kbd></td>
+              <td>Injetar Corpo</td>
+              <td>Linha de mira vetorial de velocidade v₀</td>
+            </tr>
+            <tr>
+              <td><kbd>Scroll Mouse</kbd></td>
+              <td>Zoom In / Out</td>
+              <td>Escala a visão em torno do cursor</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="modal-footer-note">
+          <i class="fas fa-info-circle text-solar"></i>
+          <span>Integrador simplético Velocity Verlet de 2ª ordem com conservação rigorosa de energia mecânica e momento linear total na colisão.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Script Modular -->
+  <script src="script.js"></script>
+</body>
+</html>

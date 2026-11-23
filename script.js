@@ -208,12 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
      4. TELEMETRIA TÉCNICA NO CONSOLE DO DESENVOLVEDOR
      ========================================================================== */
   console.info(
-    '%c Sandro // Software Engineer Portfolio %c 9 Live Apps • Zero Runtime Deps ',
+    '%c Sandro // Software Engineer Portfolio %c 11 Live Apps • Zero Runtime Deps ',
     'background: #09090b; color: #06b6d4; font-weight: 700; padding: 4px 8px; border: 1px solid #27272a; border-radius: 4px;',
     'background: #10b981; color: #09090b; font-weight: 700; padding: 4px 8px; border-radius: 4px;'
   );
   console.info(
-    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (9):\n' +
+    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (11):\n' +
     '1. SQL-to-ERD Schema Analyzer (AST Parser, Dynamic Bézier SVG)\n' +
     '2. Zero-Knowledge Secret Vault (Web Crypto API, AES-GCM 256, PBKDF2)\n' +
     '3. Pomodoro Timer Pro (Document PiP API, Web Audio API)\n' +
@@ -222,7 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
     '6. Markdown Notes App (CRUD LocalStorage, Sortable Drag-and-Drop)\n' +
     '7. Flashcards 3D Study (CSS 3D Flip, Deck Management)\n' +
     '8. Quiz Master Pro (SPA Flow, Timed Scored Engine)\n' +
-    '9. Glass Weather App (Glassmorphism, PHP API Proxy Architecture)'
+    '9. Glass Weather App (Glassmorphism, PHP API Proxy Architecture)\n' +
+    '10. RayLens Lab (Geometrical Optics, Snell-Descartes & Cauchy Ray Tracing 2D)\n' +
+    '11. OrbitN (N-Body Symplectic Velocity Verlet Integrator & Inelastic Merging)'
   );
 
 });

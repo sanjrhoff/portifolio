@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RayLens Lab | Bancada Ótica & Traçado de Raios 2D</title>
+  <meta name="description" content="Simulador interativo de ótica geométrica e ray tracing 2D a 60 FPS com renderização luminescente, refração de Snell-Descartes, reflexão interna total (TIR) e dispersão cromática.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="optics-body">
+  <!-- Barra de Navegação Superior / Header de Instrumentação -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-microscope text-cyan"></i>
+        </div>
+        <div class="brand-text">
+          <h1>RayLens Lab <span class="tag-version">OPTICS 2D</span></h1>
+          <p class="brand-subtitle">Traçado de Raios &amp; Ótica Geométrica no Navegador</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central do Experimento -->
+    <div class="header-telemetry" id="header-telemetry">
+      <div class="telemetry-pill" title="Número de segmentos de raios propagados">
+        <i class="fas fa-bolt text-cyan"></i>
+        <span>Raios: <strong id="stat-rays" class="stat-num">0</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Reflexões Internas Totais (TIR) detectadas">
+        <i class="fas fa-shield-alt text-amber"></i>
+        <span>TIR: <strong id="stat-tir" class="stat-num">0</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Taxa de quadros de simulação e renderização">
+        <i class="fas fa-tachometer-alt text-emerald"></i>
+        <span><strong id="stat-fps" class="stat-num">60</strong> FPS</span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-status-badge live" id="sim-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="sim-status-text">Bancada Ativa</span>
+      </div>
+    </div>
+
+    <!-- Ações e Presets no Topo -->
+    <div class="header-actions">
+      <!-- Seletor de Presets Clássicos -->
+      <div class="dropdown-container">
+        <button class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar montagem experimental clássica">
+          <i class="fas fa-book-open"></i>
+          <span>Presets Didáticos</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <div class="dropdown-header">CENÁRIOS EXPERIMENTAIS (1-4)</div>
+          <button class="dropdown-item" data-preset="prism">
+            <i class="fas fa-mountain text-violet"></i>
+            <div class="item-info">
+              <strong>Prisma de Newton</strong>
+              <small>Dispersão espectral da luz branca em 7 componentes</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="lens">
+            <i class="fas fa-eye text-cyan"></i>
+            <div class="item-info">
+              <strong>Foco em Lente Biconvexa</strong>
+              <small>Feixe colimado convergindo no ponto focal real</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="fiber">
+            <i class="fas fa-wave-square text-emerald"></i>
+            <div class="item-info">
+              <strong>Fibra Ótica (Guia de Onda)</strong>
+              <small>Condução de sinal via Reflexão Interna Total (TIR)</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="telescope">
+            <i class="fas fa-satellite text-amber"></i>
+            <div class="item-info">
+              <strong>Telescópio Newtoniano</strong>
+              <small>Espelho côncavo primário e espelho plano a 45°</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggles Rápidos -->
+      <div class="btn-group">
+        <button class="btn btn-icon" id="btn-toggle-grid" title="Alternar Grade Milimétrica (G)" aria-pressed="true">
+          <i class="fas fa-border-all"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-toggle-normals" title="Alternar Vetores Normais das Faces (N)" aria-pressed="false">
+          <i class="fas fa-arrows-split-up-and-left"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-toggle-snap" title="Alternar Encaixe de Ângulo Snap 15° (Shift)" aria-pressed="false">
+          <i class="fas fa-magnet"></i>
+        </button>
+        <button class="btn btn-icon" id="btn-toggle-pause" title="Pausar/Retomar Traçado (Espaço)" aria-pressed="false">
+          <i class="fas fa-pause" id="icon-pause"></i>
+        </button>
+      </div>
+
+      <!-- Limpar Bancada -->
+      <button class="btn btn-danger-soft" id="btn-clear-bench" title="Limpar todos os elementos da bancada">
+        <i class="fas fa-trash-alt"></i>
+        <span class="hide-mobile">Limpar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Principal: Bancada + Painéis Flutuantes -->
+  <main class="workbench-main">
+    <!-- Toolbar Lateral Flutuante de Instrumentos Óticos -->
+    <aside class="floating-toolbar" aria-label="Ferramentas Óticas">
+      <div class="toolbar-title">
+        <i class="fas fa-tools"></i>
+        <span>Instrumentos</span>
+      </div>
+
+      <!-- Seção: Emissores -->
+      <div class="toolbar-section">
+        <span class="section-label">Fontes de Luz</span>
+        <button class="tool-btn" data-tool="emitter-laser" title="Laser Pontual Monocromático">
+          <i class="fas fa-minus text-red"></i>
+          <span>Laser Pontual</span>
+        </button>
+        <button class="tool-btn" data-tool="emitter-collimated" title="Feixe Paralelo Colimado">
+          <i class="fas fa-bars text-cyan"></i>
+          <span>Feixe Colimado</span>
+        </button>
+        <button class="tool-btn" data-tool="emitter-radial" title="Fonte de Luz Radial 360°">
+          <i class="fas fa-sun text-amber"></i>
+          <span>Fonte Radial</span>
+        </button>
+      </div>
+
+      <!-- Seção: Espelhos -->
+      <div class="toolbar-section">
+        <span class="section-label">Espelhos</span>
+        <button class="tool-btn" data-tool="mirror-plane" title="Espelho Plano com Reflexão Especular">
+          <i class="fas fa-slash text-bright"></i>
+          <span>Espelho Plano</span>
+        </button>
+        <button class="tool-btn" data-tool="mirror-curved" title="Espelho Côncavo / Convexo Esférico">
+          <i class="fas fa-moon text-bright"></i>
+          <span>Espelho Curvo</span>
+        </button>
+      </div>
+
+      <!-- Seção: Dioptros e Lentes -->
+      <div class="toolbar-section">
+        <span class="section-label">Refratores</span>
+        <button class="tool-btn" data-tool="refractor-block" title="Bloco de Vidro Retangular (Dioptro Plano Duplo)">
+          <i class="far fa-square text-cyan"></i>
+          <span>Bloco Vidro</span>
+        </button>
+        <button class="tool-btn" data-tool="refractor-lens-convex" title="Lente Biconvexa Esférica (Convergente)">
+          <i class="fas fa-circle-notch text-cyan"></i>
+          <span>Lente Convexa</span>
+        </button>
+        <button class="tool-btn" data-tool="refractor-lens-concave" title="Lente Bicôncava Esférica (Divergente)">
+          <i class="fas fa-expand text-cyan"></i>
+          <span>Lente Côncava</span>
+        </button>
+        <button class="tool-btn" data-tool="refractor-prism" title="Prisma Triangular com Dispersão Cromática">
+          <i class="fas fa-play text-violet fa-rotate-270"></i>
+          <span>Prisma Tri</span>
+        </button>
+      </div>
+
+      <!-- Seção de Ações de Ajuda -->
+      <div class="toolbar-footer">
+        <button class="btn btn-ghost btn-sm w-full" id="btn-toggle-shortcuts" title="Ver Guia de Teclas de Atalho">
+          <i class="fas fa-keyboard"></i>
+          <span>Atalhos</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Canvas Central da Bancada Ótica -->
+    <div class="canvas-viewport" id="canvas-viewport">
+      <canvas id="optics-canvas"></canvas>
+
+      <!-- Overlay de Instruções Rápidas -->
+      <div class="canvas-hint" id="canvas-hint">
+        <span><i class="fas fa-mouse-pointer"></i> <strong>Clique e arraste</strong> para mover • Puxe a <strong>alça circular azul</strong> para girar (segure <strong>Shift</strong> para 15°) • <strong>Espaço</strong>: Pausa</span>
+      </div>
+    </div>
+
+    <!-- Inspetor Flutuante de Propriedades do Elemento Selecionado -->
+    <aside class="floating-inspector" id="floating-inspector" aria-label="Propriedades do Elemento">
+      <!-- Estado Vazio (Nenhum elemento selecionado) -->
+      <div class="inspector-empty" id="inspector-empty">
+        <div class="empty-icon">
+          <i class="fas fa-crosshairs"></i>
+        </div>
+        <h3>Nenhum Elemento Selecionado</h3>
+        <p>Clique em qualquer emissor, espelho, lente ou prisma na bancada ótica para inspecionar e editar propriedades físicas.</p>
+        <div class="quick-tips">
+          <span class="tip-badge"><kbd>Del</kbd> Excluir</span>
+          <span class="tip-badge"><kbd>R</kbd> Reset Laser</span>
+          <span class="tip-badge"><kbd>1-4</kbd> Presets</span>
+        </div>
+      </div>
+
+      <!-- Formulário de Propriedades do Elemento Ativo -->
+      <div class="inspector-content" id="inspector-content" style="display: none;">
+        <div class="inspector-header">
+          <div class="inspector-title-wrap">
+            <span class="element-icon" id="inspector-icon"><i class="fas fa-cube"></i></span>
+            <div>
+              <h2 class="element-name" id="inspector-title">Lente Biconvexa</h2>
+              <span class="element-type-badge" id="inspector-type">Refrator Ótico</span>
+            </div>
+          </div>
+          <button class="btn-close-inspector" id="btn-close-inspector" title="Fechar inspetor">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="inspector-body">
+          <!-- Coordenadas Espaciais -->
+          <div class="property-group coords-group">
+            <div class="coords-row">
+              <label>X: <span id="prop-x-val" class="mono-val">0.0</span></label>
+              <label>Y: <span id="prop-y-val" class="mono-val">0.0</span></label>
+            </div>
+          </div>
+
+          <!-- Rotação Angular com Snap -->
+          <div class="property-group">
+            <div class="prop-label-row">
+              <label for="prop-rotation">Ângulo de Rotação (θ)</label>
+              <span class="prop-val mono-val" id="prop-rotation-val">0.0°</span>
+            </div>
+            <input type="range" id="prop-rotation" min="0" max="360" step="1" value="0" class="custom-slider">
+            <div class="slider-ticks">
+              <span>0°</span>
+              <span>90°</span>
+              <span>180°</span>
+              <span>270°</span>
+              <span>360°</span>
+            </div>
+          </div>
+
+          <!-- Bloco Refrator: Índice de Refração (n) -->
+          <div class="property-group" id="group-refraction" style="display: none;">
+            <div class="prop-label-row">
+              <label for="prop-refraction">Índice de Refração (n)</label>
+              <span class="prop-val mono-val highlight-cyan" id="prop-refraction-val">1.520</span>
+            </div>
+            <input type="range" id="prop-refraction" min="1.000" max="2.420" step="0.005" value="1.520" class="custom-slider cyan-track">
+            
+            <!-- Presets de Materiais Físicos Reais -->
+            <div class="material-pills" id="material-pills">
+              <button type="button" class="mat-pill" data-n="1.000" title="Ar ambiente / Vácuo (n = 1.000)">Ar (1.00)</button>
+              <button type="button" class="mat-pill" data-n="1.333" title="Água destilada a 20°C (n = 1.333)">Água (1.33)</button>
+              <button type="button" class="mat-pill active" data-n="1.520" title="Vidro Crown ótico clássico (n = 1.520)">Crown (1.52)</button>
+              <button type="button" class="mat-pill" data-n="1.660" title="Vidro Flint de alta densidade (n = 1.660)">Flint (1.66)</button>
+              <button type="button" class="mat-pill" data-n="2.417" title="Diamante lapidado (n = 2.417)">Diamante (2.42)</button>
+            </div>
+          </div>
+
+          <!-- Bloco Prisma: Dispersão Cromática de Cauchy -->
+          <div class="property-group" id="group-dispersion" style="display: none;">
+            <div class="toggle-row">
+              <div>
+                <strong class="toggle-title">Dispersão Cromática</strong>
+                <p class="toggle-desc">Separação de Cauchy de acordo com λ</p>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="prop-dispersion-toggle">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Bloco Emissor: Comprimento de Onda & Luz Branca -->
+          <div class="property-group" id="group-wavelength" style="display: none;">
+            <div class="prop-label-row">
+              <label for="prop-wavelength">Comprimento de Onda (λ)</label>
+              <div class="wavelength-badge" id="prop-wl-badge">
+                <span class="color-swatch" id="prop-wl-swatch"></span>
+                <span class="mono-val" id="prop-wavelength-val">532 nm</span>
+              </div>
+            </div>
+            <input type="range" id="prop-wavelength" min="380" max="750" step="1" value="532" class="custom-slider spectrum-track">
+
+            <!-- Toggle de Luz Branca Espectral -->
+            <div class="toggle-row mt-3">
+              <div>
+                <strong class="toggle-title">Luz Branca Espectral</strong>
+                <p class="toggle-desc">Emite 7 feixes espectrais simultâneos</p>
+              </div>
+              <label class="switch-toggle">
+                <input type="checkbox" id="prop-white-light-toggle">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Bloco Emissor Colimado/Radial: Quantidade de Raios -->
+          <div class="property-group" id="group-ray-density" style="display: none;">
+            <div class="prop-label-row">
+              <label for="prop-ray-count">Densidade / Raios do Feixe</label>
+              <span class="prop-val mono-val" id="prop-ray-count-val">16</span>
+            </div>
+            <input type="range" id="prop-ray-count" min="3" max="48" step="1" value="16" class="custom-slider">
+          </div>
+
+          <!-- Bloco Curvatura: Raio de Curvatura R (Espelhos e Lentes) -->
+          <div class="property-group" id="group-curvature" style="display: none;">
+            <div class="prop-label-row">
+              <label for="prop-curvature-radius">Raio de Curvatura (R)</label>
+              <span class="prop-val mono-val" id="prop-curvature-val">180 px</span>
+            </div>
+            <input type="range" id="prop-curvature-radius" min="60" max="400" step="5" value="180" class="custom-slider">
+          </div>
+
+          <!-- Ações do Elemento: Duplicar e Remover -->
+          <div class="inspector-actions">
+            <button class="btn btn-secondary w-full" id="btn-duplicate-element">
+              <i class="fas fa-clone"></i> Duplicar Elemento
+            </button>
+            <button class="btn btn-danger w-full mt-2" id="btn-delete-element">
+              <i class="fas fa-trash-alt"></i> Excluir Elemento
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal de Ajuda & Atalhos de Teclado -->
+  <div class="modal-backdrop" id="shortcuts-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-keyboard text-cyan"></i>
+          <h3>Atalhos de Teclado &amp; Guia de Operação</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="shortcuts-table">
+          <thead>
+            <tr>
+              <th>Atalho</th>
+              <th>Ação</th>
+              <th>Efeito</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><kbd>Espaço</kbd></td>
+              <td>Pausar / Retomar</td>
+              <td>Congela o traçado computacional de raios</td>
+            </tr>
+            <tr>
+              <td><kbd>G</kbd></td>
+              <td>Grade Milimétrica</td>
+              <td>Alterna a malha de fundo de precisão</td>
+            </tr>
+            <tr>
+              <td><kbd>N</kbd></td>
+              <td>Vetores Normais</td>
+              <td>Exibe vetores unitários de incidência n̂</td>
+            </tr>
+            <tr>
+              <td><kbd>R</kbd></td>
+              <td>Resetar Emissor</td>
+              <td>Centraliza e orienta a fonte para 0°</td>
+            </tr>
+            <tr>
+              <td><kbd>Shift</kbd> (ao girar)</td>
+              <td>Snap Angular</td>
+              <td>Encaixa a rotação em múltiplos de 15°</td>
+            </tr>
+            <tr>
+              <td><kbd>Del</kbd> / <kbd>Backspace</kbd></td>
+              <td>Excluir</td>
+              <td>Remove o elemento ativo da bancada</td>
+            </tr>
+            <tr>
+              <td><kbd>1</kbd> - <kbd>4</kbd></td>
+              <td>Presets Didáticos</td>
+              <td>Carrega Prisma, Lente, Fibra ou Telescópio</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="modal-footer-note">
+          <i class="fas fa-info-circle text-cyan"></i>
+          <span>Motor determinístico 2D com conservação de Fresnel, cálculo de ângulo crítico e blend mode aditivo <code>lighter</code> para saturação incandescente real.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Script Modular da Aplicação -->
+  <script src="script.js"></script>
+</body>
+</html>
