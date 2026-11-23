@@ -46,10 +46,11 @@
     stepCount: 0,
     time: 0,
     shadingMode: 'cosmic', // 'cosmic' | 'bipolar' | 'magma' | 'neon'
+    contrastGain: 3.0,
     currentTool: 'wall-brush', // 'wall-brush' | 'wall-eraser' | 'pulse-drop' | 'harmonic-source' | 'doppler-source'
     brushSize: 4,
     frequency: 0.45,
-    amplitude: 0.85,
+    amplitude: 0.95,
     pmlEnabled: true,
 
     // Fonte Doppler
@@ -115,66 +116,78 @@
       const norm = (i / (LUT_SIZE - 1)) * 2 - 1;
       const absVal = Math.min(1.0, Math.abs(norm));
 
-      // 1. Deep Wave Cósmico: Cristas em Ciano (#67e8f9), Vales em Índigo (#1e1b4b), Zero em Quase-Preto
-      let rC = 8, gC = 9, bC = 13;
+      // 1. Oceano Ciano & Âmbar (Alto Contraste): Fundo ardósia escuro (#0e121c), Cristas em Ciano/Branco, Vales em Coral/Âmbar
+      let rC = 14, gC = 18, bC = 28;
       if (norm > 0) {
-        // Transição para ciano (#67e8f9: 103, 232, 249)
-        const t = Math.min(1.0, norm * 1.2);
-        rC = Math.round(8 + (103 - 8) * t);
-        gC = Math.round(9 + (232 - 9) * t);
-        bC = Math.round(13 + (249 - 13) * t);
+        const t = Math.min(1.0, norm);
+        if (t < 0.60) {
+          const f = t / 0.60;
+          rC = Math.round(14 + (34 - 14) * f);
+          gC = Math.round(18 + (211 - 18) * f);
+          bC = Math.round(28 + (238 - 28) * f);
+        } else {
+          const f = (t - 0.60) / 0.40;
+          rC = Math.round(34 + (255 - 34) * f);
+          gC = Math.round(211 + (255 - 211) * f);
+          bC = Math.round(238 + (255 - 238) * f);
+        }
       } else {
-        // Transição para azul/índigo (#1e1b4b: 30, 27, 75)
-        const t = Math.min(1.0, -norm * 1.2);
-        rC = Math.round(8 + (30 - 8) * t);
-        gC = Math.round(9 + (27 - 9) * t);
-        bC = Math.round(13 + (75 - 13) * t);
+        const t = Math.min(1.0, -norm);
+        if (t < 0.60) {
+          const f = t / 0.60;
+          rC = Math.round(14 + (244 - 14) * f);
+          gC = Math.round(18 + (63 - 18) * f);
+          bC = Math.round(28 + (94 - 28) * f);
+        } else {
+          const f = (t - 0.60) / 0.40;
+          rC = Math.round(244 + (251 - 244) * f);
+          gC = Math.round(63 + (191 - 63) * f);
+          bC = Math.round(94 + (36 - 94) * f);
+        }
       }
       luts.cosmic[i] = (255 << 24) | (bC << 16) | (gC << 8) | rC;
 
-      // 2. Interferometria Bipolar: Cristas em Vermelho (#ef4444), Vales em Ciano (#06b6d4)
-      let rB = 8, gB = 8, bB = 12;
+      // 2. Interferometria Cromática Bipolar: Cristas em Vermelho Rubro (#ef4444 -> branco), Vales em Ciano (#06b6d4 -> branco)
+      let rB = 14, gB = 15, bB = 22;
       if (norm > 0) {
-        const t = Math.min(1.0, norm * 1.3);
-        rB = Math.round(8 + (239 - 8) * t);
-        gB = Math.round(8 + (68 - 8) * t);
-        bB = Math.round(12 + (68 - 12) * t);
+        const t = Math.min(1.0, norm);
+        rB = Math.round(14 + (255 - 14) * t);
+        gB = Math.round(15 + (68 - 15) * t);
+        bB = Math.round(22 + (68 - 22) * t);
       } else {
-        const t = Math.min(1.0, -norm * 1.3);
-        rB = Math.round(8 + (6 - 8) * t);
-        gB = Math.round(8 + (182 - 8) * t);
-        bB = Math.round(12 + (212 - 12) * t);
+        const t = Math.min(1.0, -norm);
+        rB = Math.round(14 + (6 - 14) * t);
+        gB = Math.round(15 + (210 - 15) * t);
+        bB = Math.round(22 + (245 - 22) * t);
       }
       luts.bipolar[i] = (255 << 24) | (bB << 16) | (gB << 8) | rB;
 
-      // 3. Thermal Magma: Baseado em |u| (Preto -> Vermelho -> Âmbar -> Branco)
-      let rM = 0, gM = 0, bM = 0;
-      if (absVal < 0.35) {
-        const t = absVal / 0.35;
-        rM = Math.round(180 * t);
-        gM = Math.round(20 * t);
-        bM = Math.round(20 * t);
-      } else if (absVal < 0.75) {
-        const t = (absVal - 0.35) / 0.40;
-        rM = Math.round(180 + 75 * t);
-        gM = Math.round(20 + 138 * t);
-        bM = Math.round(20 + 10 * t);
+      // 3. Thermal Magma: Baseado em |u| (Ardósia escuro -> Violeta -> Laranja -> Branco)
+      let rM = 12, gM = 10, bM = 18;
+      if (absVal < 0.25) {
+        const t = absVal / 0.25;
+        rM = Math.round(12 + (120 - 12) * t);
+        gM = Math.round(10 + (20 - 10) * t);
+        bM = Math.round(18 + (120 - 18) * t);
+      } else if (absVal < 0.65) {
+        const t = (absVal - 0.25) / 0.40;
+        rM = Math.round(120 + (240 - 120) * t);
+        gM = Math.round(20 + (80 - 20) * t);
+        bM = Math.round(120 - 100 * t);
       } else {
-        const t = (absVal - 0.75) / 0.25;
+        const t = (absVal - 0.65) / 0.35;
         rM = 255;
-        gM = Math.round(158 + 97 * t);
-        bM = Math.round(30 + 225 * t);
+        gM = Math.round(80 + 175 * t);
+        bM = Math.round(20 + 235 * t);
       }
       luts.magma[i] = (255 << 24) | (bM << 16) | (gM << 8) | rM;
 
-      // 4. Laser Holográfico Neon: Verde esmeralda (#10b981) e ciano
-      let rN = 6, gN = 8, bN = 10;
-      if (absVal > 0.05) {
-        const t = Math.min(1.0, absVal * 1.4);
-        rN = Math.round(6 + (16 - 6) * t);
-        gN = Math.round(8 + (240 - 8) * t);
-        bN = Math.round(10 + (130 - 10) * t);
-      }
+      // 4. Laser Holográfico Neon: Verde esmeralda (#10b981) e ciano fluorescente
+      let rN = 10, gN = 14, bN = 18;
+      const tN = Math.min(1.0, absVal);
+      rN = Math.round(10 + (34 - 10) * tN);
+      gN = Math.round(14 + (245 - 14) * tN);
+      bN = Math.round(18 + (160 - 18) * tN);
       luts.neon[i] = (255 << 24) | (bN << 16) | (gN << 8) | rN;
     }
   }
@@ -461,7 +474,7 @@
   function renderTank() {
     const lut = luts[state.shadingMode];
     const wallColor = (255 << 24) | (70 << 16) | (63 << 8) | 63; // Cinza matte industrial #3f3f46
-    const pmlEdgeColor = (255 << 24) | (20 << 16) | (15 << 8) | 12;
+    const gain = state.contrastGain || 3.0;
 
     for (let i = 0; i < TOTAL_CELLS; i++) {
       if (walls[i]) {
@@ -469,9 +482,13 @@
         continue;
       }
 
-      // Mapeia amplitude u [-1.0, 1.0] para índice da LUT [0, 511]
-      let val = uCurr[i];
-      let lutIdx = Math.floor((val + 1.0) * 0.5 * (LUT_SIZE - 1));
+      // Aplica ganho de contraste e compressão perceptual não-linear (gama)
+      // para tornar perturbações tênues e franjas de difração imediatamente visíveis
+      const val = uCurr[i] * gain;
+      const sgn = val >= 0 ? 1 : -1;
+      const comp = sgn * Math.pow(Math.min(1.0, Math.abs(val)), 0.52);
+
+      let lutIdx = Math.floor((comp + 1.0) * 0.5 * (LUT_SIZE - 1));
       if (lutIdx < 0) lutIdx = 0;
       else if (lutIdx >= LUT_SIZE) lutIdx = LUT_SIZE - 1;
 
@@ -806,6 +823,13 @@
       vAmp.textContent = Number(state.amplitude).toFixed(2);
     }
 
+    const sGain = document.getElementById('slider-contrast-gain');
+    const vGain = document.getElementById('val-contrast-gain');
+    if (sGain && vGain) {
+      sGain.value = state.contrastGain;
+      vGain.textContent = `${Number(state.contrastGain).toFixed(1)}x`;
+    }
+
     const sDop = document.getElementById('slider-doppler-vel');
     const vDop = document.getElementById('val-doppler-vel');
     if (sDop && vDop) {
@@ -963,6 +987,15 @@
         state.amplitude = parseFloat(e.target.value);
         vAmp.textContent = state.amplitude.toFixed(2);
         for (let s of state.sources) s.amp = state.amplitude;
+      });
+    }
+
+    const sGain = document.getElementById('slider-contrast-gain');
+    const vGain = document.getElementById('val-contrast-gain');
+    if (sGain && vGain) {
+      sGain.addEventListener('input', (e) => {
+        state.contrastGain = parseFloat(e.target.value);
+        vGain.textContent = `${state.contrastGain.toFixed(1)}x`;
       });
     }
 

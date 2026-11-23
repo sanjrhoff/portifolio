@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body class="field-body">
   <!-- Header de Instrumentação e Controles Centrais -->
@@ -229,6 +229,66 @@
 
     <!-- Área Central da Câmara Eletromagnética -->
     <section class="chamber-viewport-container" aria-label="Câmara de Vácuo Eletromagnética">
+      <!-- Barra de Ações Rápidas do Feixe e Guia Interativo -->
+      <div class="chamber-quick-actions" id="chamber-quick-actions">
+        <button type="button" class="btn btn-sm btn-beam-stream active" id="btn-toggle-continuous" title="Alternar feixe contínuo automático de partículas">
+          <span class="stream-pulse"></span>
+          <span>Feixe Contínuo: <strong id="txt-stream-status">LIGADO</strong></span>
+        </button>
+        <div class="action-divider"></div>
+        <button type="button" class="btn btn-sm btn-quick-particle" id="btn-quick-electron" title="Disparar elétron (carga negativa)">
+          <i class="fas fa-bolt text-cyan"></i> + Elétron (e⁻)
+        </button>
+        <button type="button" class="btn btn-sm btn-quick-particle" id="btn-quick-proton" title="Disparar próton (carga positiva)">
+          <i class="fas fa-atom text-solar"></i> + Próton (p⁺)
+        </button>
+        <div class="action-divider"></div>
+        <button type="button" class="btn btn-sm btn-guide-toggle" id="btn-guide-toggle" title="Abrir/Fechar guia de testes da câmara">
+          <i class="fas fa-question-circle text-amber"></i> Como Testar?
+        </button>
+      </div>
+
+      <!-- Guia Rápido de Verificação Científica (Onboarding Flutuante) -->
+      <div class="chamber-test-guide" id="chamber-test-guide">
+        <div class="guide-header">
+          <div class="guide-title">
+            <i class="fas fa-flask text-amber"></i>
+            <span>Como verificar e testar este laboratório eletromagnético:</span>
+          </div>
+          <button type="button" class="guide-close-btn" id="btn-close-guide" title="Fechar guia">&times;</button>
+        </div>
+        <div class="guide-cards">
+          <div class="guide-card">
+            <div class="step-badge">1</div>
+            <div class="guide-card-content">
+              <strong>Campo Elétrico</strong>
+              <p>Arraste as cargas com o mouse ou adicione (+ / -) na barra lateral. As linhas de força RK4 se reorientam instantaneamente.</p>
+            </div>
+          </div>
+          <div class="guide-card">
+            <div class="step-badge">2</div>
+            <div class="guide-card-content">
+              <strong>Força de Lorentz</strong>
+              <p>O <em>Feixe Contínuo</em> já está ativo! Veja os <strong>elétrons (ciano)</strong> serem atraídos pelo polo (+) e os <strong>prótons (amarelo)</strong> pelo (-).</p>
+            </div>
+          </div>
+          <div class="guide-card">
+            <div class="step-badge">3</div>
+            <div class="guide-card-content">
+              <strong>Campo Magnético (B_z)</strong>
+              <p>Na barra lateral, clique em <code>⊗ -1.5 T</code> ou no slider B. A força F = q(v×B) curva as partículas em círculos (raio de Larmor)!</p>
+            </div>
+          </div>
+          <div class="guide-card">
+            <div class="step-badge">4</div>
+            <div class="guide-card-content">
+              <strong>Presets Científicos</strong>
+              <p>No menu superior, abra <em>Presets</em> e veja o <strong>Ciclotron</strong> (espiral acelerando) ou <strong>Espectrômetro</strong> (separação por massa).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="chamber-canvas-wrapper" id="chamber-wrapper">
         <canvas id="chamber-canvas"></canvas>
 
@@ -326,6 +386,6 @@
   </footer>
 
   <!-- Script Principal -->
-  <script src="script.js"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>

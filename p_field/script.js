@@ -24,6 +24,8 @@
   const state = {
     isRunning: true,
     time: 0,
+    continuousStream: true,
+    streamTimer: 0,
     currentTool: 'add-pos',      // 'add-pos' | 'add-neg' | 'select-move'
     chargeMagnitude: 5.0,
     seedsCount: 16,
@@ -340,6 +342,53 @@
     const startX = 60;
     const startY = canvas.height / 2;
     spawnParticle(startX, startY, speed, 0, type);
+  }
+
+  /* ==========================================================================
+     Emissão Contínua Automática (Feixe Contínuo para Verificação Imediata)
+     ========================================================================== */
+  let streamAlternator = 0;
+  function handleContinuousEmission() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const speed = state.particleSpeed * 0.05;
+
+    switch (state.activePreset) {
+      case 'cyclotron':
+        // A cada ~45 quadros (~0.75s), se tiver menos de 4 partículas, injeta no gap central
+        if (state.streamTimer % 45 === 0 && state.particles.length < 4) {
+          spawnParticle(cx - 5, cy, 32, 0, 'proton');
+        }
+        break;
+
+      case 'mass-spectrometer':
+        // A cada ~50 quadros (~0.8s), se tiver menos de 8 partículas, injeta par elétron + próton
+        if (state.streamTimer % 50 === 0 && state.particles.length < 8) {
+          spawnParticle(45, cy, 95, 0, 'electron');
+          spawnParticle(45, cy, 95, 0, 'proton');
+        }
+        break;
+
+      case 'exb-drift':
+        // A cada ~40 quadros, injeta par para ver a deriva cicloidal
+        if (state.streamTimer % 40 === 0 && state.particles.length < 6) {
+          spawnParticle(cx - 100, cy, 0, 0, 'proton');
+          spawnParticle(cx - 100, cy - 30, 0, 0, 'electron');
+        }
+        break;
+
+      default:
+        // Dipolo, Gaiola de Faraday ou montagem livre:
+        // A cada ~28 quadros (~0.45s), dispara partícula alternando entre Elétron e Próton
+        if (state.streamTimer % 28 === 0 && state.particles.length < 24) {
+          const pType = (streamAlternator % 2 === 0) ? 'electron' : 'proton';
+          streamAlternator++;
+          // Emite da margem esquerda com ligeira oscilação vertical para cobrir diferentes linhas
+          const startY = cy + Math.sin(state.time * 2.2) * 60;
+          spawnParticle(30, startY, speed, 0, pType);
+        }
+        break;
+    }
   }
 
   /* ==========================================================================
@@ -1115,6 +1164,42 @@
     // Disparar Feixe Central
     document.getElementById('btn-fire-particle')?.addEventListener('click', fireCentralBeam);
 
+    // Barra Rápida Superior da Câmara
+    const btnContinuous = document.getElementById('btn-toggle-continuous');
+    const txtStreamStatus = document.getElementById('txt-stream-status');
+    btnContinuous?.addEventListener('click', () => {
+      state.continuousStream = !state.continuousStream;
+      if (state.continuousStream) {
+        btnContinuous.classList.remove('off');
+        btnContinuous.classList.add('active');
+        if (txtStreamStatus) txtStreamStatus.textContent = 'LIGADO';
+      } else {
+        btnContinuous.classList.remove('active');
+        btnContinuous.classList.add('off');
+        if (txtStreamStatus) txtStreamStatus.textContent = 'DESLIGADO';
+      }
+    });
+
+    document.getElementById('btn-quick-electron')?.addEventListener('click', () => {
+      const speed = state.particleSpeed * 0.05;
+      spawnParticle(40, canvas.height / 2, speed, 0, 'electron');
+    });
+
+    document.getElementById('btn-quick-proton')?.addEventListener('click', () => {
+      const speed = state.particleSpeed * 0.05;
+      spawnParticle(40, canvas.height / 2, speed, 0, 'proton');
+    });
+
+    const guideBox = document.getElementById('chamber-test-guide');
+    document.getElementById('btn-guide-toggle')?.addEventListener('click', () => {
+      if (!guideBox) return;
+      guideBox.style.display = (guideBox.style.display === 'none') ? 'flex' : 'none';
+    });
+
+    document.getElementById('btn-close-guide')?.addEventListener('click', () => {
+      if (guideBox) guideBox.style.display = 'none';
+    });
+
     // Toggles no header
     const btnLines = document.getElementById('btn-toggle-lines');
     btnLines?.addEventListener('click', () => {
@@ -1253,6 +1338,12 @@
       const subDt = DT / SUB_STEPS;
       for (let s = 0; s < SUB_STEPS; s++) {
         stepParticles(subDt);
+      }
+
+      // Emissão contínua automática se ativo
+      if (state.continuousStream) {
+        state.streamTimer++;
+        handleContinuousEmission();
       }
     }
 

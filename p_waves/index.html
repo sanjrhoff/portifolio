@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body class="waves-body">
   <!-- Header de Instrumentação e Controles Centrais -->
@@ -116,19 +116,19 @@
           <div class="dropdown-header">MODOS DE SHADING</div>
           <button type="button" class="dropdown-item active" data-shading="cosmic">
             <i class="fas fa-circle text-cyan"></i>
-            <div class="item-info"><strong>Deep Wave Cósmico</strong><small>Ciano (cristas) / Indigo (vales)</small></div>
+            <div class="item-info"><strong>Oceano Ciano &amp; Âmbar (Alto Contraste)</strong><small>Ciano vivo (cristas) / Coral dourado (vales)</small></div>
           </button>
           <button type="button" class="dropdown-item" data-shading="bipolar">
             <i class="fas fa-circle text-red"></i>
-            <div class="item-info"><strong>Interferometria Bipolar</strong><small>Vermelho (+A) / Ciano (-A)</small></div>
+            <div class="item-info"><strong>Interferometria Cromática</strong><small>Vermelho (+A) / Ciano (-A)</small></div>
           </button>
           <button type="button" class="dropdown-item" data-shading="magma">
             <i class="fas fa-circle text-amber"></i>
-            <div class="item-info"><strong>Thermal Magma</strong><small>Branco / Âmbar / Escuro (|u|)</small></div>
+            <div class="item-info"><strong>Thermal Magma</strong><small>Branco / Âmbar / Violeta (|u|)</small></div>
           </button>
           <button type="button" class="dropdown-item" data-shading="neon">
             <i class="fas fa-circle text-emerald"></i>
-            <div class="item-info"><strong>Laser Holográfico</strong><small>Verde esmeralda fluorescente</small></div>
+            <div class="item-info"><strong>Laser Holográfico Neon</strong><small>Verde esmeralda fluorescente</small></div>
           </button>
         </div>
       </div>
@@ -201,6 +201,11 @@
         <div class="control-row">
           <label for="slider-amp">Amplitude A: <span id="val-amp" class="font-mono">0.85</span></label>
           <input type="range" id="slider-amp" min="0.10" max="1.00" value="0.85" step="0.05">
+        </div>
+
+        <div class="control-row">
+          <label for="slider-contrast-gain">Nitidez / Ganho Visual: <span id="val-contrast-gain" class="font-mono">3.0x</span></label>
+          <input type="range" id="slider-contrast-gain" min="1.0" max="6.0" value="3.0" step="0.5">
         </div>
       </div>
 
@@ -349,6 +354,6 @@
   </footer>
 
   <!-- Script Principal -->
-  <script src="script.js"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
