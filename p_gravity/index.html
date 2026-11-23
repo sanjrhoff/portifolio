@@ -100,6 +100,21 @@
               <small>Duas estrelas com planeta circumbinário estável</small>
             </div>
           </button>
+          <div class="dropdown-header">RELATIVIDADE &amp; BURACOS NEGROS (6-7)</div>
+          <button class="dropdown-item" data-preset="blackhole_accretion">
+            <i class="fas fa-circle-notch text-violet"></i>
+            <div class="item-info">
+              <strong>Buraco Negro &amp; Disco de Acreção (Gargantua)</strong>
+              <small>Singularidade central, disco kepleriano térmico e planeta estável</small>
+            </div>
+          </button>
+          <button class="dropdown-item" data-preset="blackhole_tde">
+            <i class="fas fa-meteor text-amber"></i>
+            <div class="item-info">
+              <strong>Espaguetificação Estelar (TDE)</strong>
+              <small>Rompimento por maré no Limite de Roche e fita de acreção</small>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -159,6 +174,16 @@
             <span class="metric-val mono-sm" id="telemetry-barycenter-val">(0.0, 0.0)</span>
           </div>
         </div>
+        <div class="hud-metric-card full-width relativistic-hud" id="hud-relativistic-card">
+          <div class="metric-row">
+            <span class="metric-label"><i class="fas fa-circle-notch text-violet"></i> Singularidade (R_s / R_ph)</span>
+            <span class="metric-val mono-sm text-cyan" id="telemetry-schwarzschild-val">Inativo</span>
+          </div>
+          <div class="energy-conservation-row">
+            <span class="conservation-label">Debris de Acreção / TDE:</span>
+            <span class="conservation-badge good" id="telemetry-debris-count">0 partículas</span>
+          </div>
+        </div>
       </div>
     </aside>
 
@@ -207,9 +232,12 @@
             <button type="button" class="celestial-pill" data-mass="1000" data-radius="18" data-type="star">
               <i class="fas fa-sun text-solar"></i> Estrela (1000)
             </button>
+            <button type="button" class="celestial-pill pill-blackhole" data-mass="4000" data-radius="22" data-type="black-hole">
+              <i class="fas fa-circle-notch text-violet"></i> Buraco Negro (4000)
+            </button>
           </div>
 
-          <input type="range" id="input-next-mass" min="1" max="2500" step="1" value="10" class="custom-slider solar-track">
+          <input type="range" id="input-next-mass" min="1" max="8000" step="1" value="10" class="custom-slider solar-track">
         </div>
 
         <!-- Constantes Cosmológicas -->
@@ -309,9 +337,9 @@
               <td>Recarrega as condições iniciais do sistema</td>
             </tr>
             <tr>
-              <td><kbd>1</kbd> - <kbd>5</kbd></td>
+              <td><kbd>1</kbd> - <kbd>7</kbd></td>
               <td>Presets Orbitais</td>
-              <td>Solar, 3-Corpos, Figura 8, Galáxias, Binário</td>
+              <td>Solar, 3-Corpos, Fig 8, Galáxias, Binário, Gargantua, TDE</td>
             </tr>
             <tr>
               <td><kbd>Mouse Drag</kbd></td>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChaosPendulum | Pêndulo Duplo, Teoria do Caos &amp; Enxame de Lyapunov</title>
+  <meta name="description" content="Simulador analítico do pêndulo duplo resolvendo as equações de Euler-Lagrange via Runge-Kutta 4 (RK4). Retrato no espaço de fase, estimativa do Expoente de Lyapunov e enxame de 100 pêndulos demonstrando o Efeito Borboleta.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="chaos-body">
+  <!-- Header de Instrumentação e Controles Centrais -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-infinity text-violet"></i>
+        </div>
+        <div class="brand-text">
+          <h1>ChaosPendulum <span class="tag-version">LAGRANGE RK4</span></h1>
+          <p class="brand-subtitle">Pêndulo Duplo, Atrator Caótico &amp; Efeito Borboleta</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central -->
+    <div class="header-telemetry" id="header-telemetry">
+      <div class="telemetry-pill" title="Pêndulos simulados simultaneamente">
+        <i class="fas fa-layer-group text-violet"></i>
+        <span>Pêndulos: <strong id="stat-pendulums" class="stat-num">1</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Conservação da energia mecânica total (dE/E0)">
+        <i class="fas fa-shield-alt text-emerald"></i>
+        <span>ΔE/E₀: <strong id="stat-energy-drift" class="stat-num">&lt; 0.001%</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Maior Expoente de Lyapunov estimado">
+        <i class="fas fa-chart-line text-amber"></i>
+        <span>λ: <strong id="stat-lyapunov" class="stat-num">+1.42 bit/s</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-status-badge live" id="sim-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="sim-status-text">Regime Caótico</span>
+      </div>
+    </div>
+
+    <!-- Ações e Presets no Topo -->
+    <div class="header-actions">
+      <!-- Botão Hero: Soltar Enxame Caótico (100) -->
+      <button type="button" class="btn btn-hero" id="btn-hero-swarm" title="Disparar 100 pêndulos com micro-perturbação dθ = 1e-6 rad">
+        <i class="fas fa-wind"></i>
+        <span>Soltar Enxame (100)</span>
+      </button>
+
+      <!-- Seletor de Presets Clássicos -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar configurações de energia e condições iniciais">
+          <i class="fas fa-compass"></i>
+          <span>Regimes Dinâmicos</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <div class="dropdown-header">CONDIÇÕES INICIAIS (1-5)</div>
+          <button type="button" class="dropdown-item" data-preset="linear">
+            <i class="fas fa-wave-square text-emerald"></i>
+            <div class="item-info">
+              <strong>Pequenas Oscilações (Regime Linear)</strong>
+              <small>θ₁ = 15°, θ₂ = 15° • Movimento quase-harmônico regular</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="moderate">
+            <i class="fas fa-random text-amber"></i>
+            <div class="item-info">
+              <strong>Caos Moderado (Lançamento Horizontal)</strong>
+              <small>θ₁ = 90°, θ₂ = 90° • Inversões alternadas e batimentos</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="extreme">
+            <i class="fas fa-bolt text-red"></i>
+            <div class="item-info">
+              <strong>Caos Extremo (Loops de 360°)</strong>
+              <small>θ₁ = 175°, θ₂ = 175° • Rotações completas e alta energia</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="swarm">
+            <i class="fas fa-spray-can text-cyan"></i>
+            <div class="item-info">
+              <strong>Enxame Efeito Borboleta (100 Pêndulos)</strong>
+              <small>Δθ = 10⁻⁶ rad • Divergência exponencial cromática</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="resonance">
+            <i class="fas fa-exchange-alt text-violet"></i>
+            <div class="item-info">
+              <strong>Ressonância Não Linear (1:2)</strong>
+              <small>Transferência contínua de energia entre os dois elos</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggles de Visualização -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-icon active" id="btn-toggle-trail" title="Alternar Rastro Fotográfico (T)" aria-pressed="true">
+          <i class="fas fa-history"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-toggle-ghosts" title="Alternar Linhas Guia e Fantasmas" aria-pressed="false">
+          <i class="fas fa-ghost"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-toggle-play" title="Play / Pause (Espaço)" aria-label="Play ou Pause">
+          <i class="fas fa-pause" id="icon-play"></i>
+        </button>
+      </div>
+
+      <!-- Reset / Limpeza -->
+      <button type="button" class="btn btn-danger-soft" id="btn-clear-trails" title="Limpar rastros acumulados (C)">
+        <i class="fas fa-eraser"></i>
+        <span class="hide-mobile">Limpar Rastro</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Principal -->
+  <main class="workbench-main">
+    <!-- Toolbar Lateral de Parâmetros Físicos e Geometria -->
+    <aside class="floating-toolbar" aria-label="Parâmetros do Pêndulo Duplo">
+      <div class="toolbar-title">
+        <i class="fas fa-sliders-h"></i>
+        <span>Geometria Mecânica</span>
+      </div>
+
+      <!-- Seção: Comprimentos das Hastes -->
+      <div class="toolbar-section">
+        <span class="section-label">Comprimento das Hastes</span>
+        <div class="control-row">
+          <label for="slider-l1">Haste 1 (L₁): <span id="val-l1" class="font-mono">130 px</span></label>
+          <input type="range" id="slider-l1" min="60" max="220" value="130" step="5">
+        </div>
+        <div class="control-row">
+          <label for="slider-l2">Haste 2 (L₂): <span id="val-l2" class="font-mono">130 px</span></label>
+          <input type="range" id="slider-l2" min="60" max="220" value="130" step="5">
+        </div>
+      </div>
+
+      <!-- Seção: Massas Pontuais -->
+      <div class="toolbar-section">
+        <span class="section-label">Massas Concentradas</span>
+        <div class="control-row">
+          <label for="slider-m1">Massa 1 (m₁): <span id="val-m1" class="font-mono">2.0 kg</span></label>
+          <input type="range" id="slider-m1" min="0.5" max="10.0" value="2.0" step="0.5">
+        </div>
+        <div class="control-row">
+          <label for="slider-m2">Massa 2 (m₂): <span id="val-m2" class="font-mono">2.0 kg</span></label>
+          <input type="range" id="slider-m2" min="0.5" max="10.0" value="2.0" step="0.5">
+        </div>
+      </div>
+
+      <!-- Seção: Gravidade e Amortecimento -->
+      <div class="toolbar-section">
+        <span class="section-label">Campo &amp; Dissipação</span>
+        <div class="control-row">
+          <label for="slider-g">Gravidade (g): <span id="val-g" class="font-mono">9.81 m/s²</span></label>
+          <input type="range" id="slider-g" min="0.0" max="25.0" value="9.81" step="0.5">
+        </div>
+        <div class="control-row">
+          <label for="slider-damping">Amortecimento (γ): <span id="val-damping" class="font-mono">0.000 (Conservativo)</span></label>
+          <input type="range" id="slider-damping" min="0.000" max="0.020" value="0.000" step="0.001">
+        </div>
+      </div>
+
+      <!-- Seção: Rastro Fotográfico -->
+      <div class="toolbar-section">
+        <span class="section-label">Rastro Fotográfico</span>
+        <div class="control-row">
+          <label for="slider-trail-len">Comprimento do Rastro: <span id="val-trail-len" class="font-mono">600 pts</span></label>
+          <input type="range" id="slider-trail-len" min="100" max="1500" value="600" step="50">
+        </div>
+      </div>
+
+      <!-- Dica de Interação -->
+      <div class="instruction-box">
+        <i class="fas fa-hand-pointer text-violet"></i>
+        <span>Clique e arraste qualquer uma das esferas (m₁ ou m₂) na viewport para definir o ângulo inicial de soltura!</span>
+      </div>
+    </aside>
+
+    <!-- Viewport Central: O Pêndulo Duplo em Movimento -->
+    <section class="pendulum-viewport-container" aria-label="Viewport do Pêndulo Duplo">
+      <div class="pendulum-canvas-wrapper" id="pendulum-wrapper">
+        <canvas id="pendulum-canvas"></canvas>
+
+        <!-- HUD Flutuante de Coordenadas Angulares -->
+        <div class="pendulum-hud-angles" id="pendulum-hud-angles">
+          <span class="hud-item">θ₁: <strong id="hud-theta1">0.0°</strong></span>
+          <span class="hud-item">ω₁: <strong id="hud-omega1">0.00 rad/s</strong></span>
+          <span class="hud-divider">|</span>
+          <span class="hud-item">θ₂: <strong id="hud-theta2">0.0°</strong></span>
+          <span class="hud-item">ω₂: <strong id="hud-omega2">0.00 rad/s</strong></span>
+        </div>
+
+        <!-- Indicador de Enxame -->
+        <div class="swarm-active-badge" id="swarm-active-badge" style="display: none;">
+          <span class="pulse-dot-violet"></span>
+          <span>Enxame Caótico Ativo: <strong id="swarm-count-text">100 pêndulos</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Painel Lateral Direito: Espaço de Fase & Telemetria Caótica -->
+    <aside class="sensor-panel" aria-label="Espaço de Fase e Telemetria de Caos">
+      <div class="sensor-panel-header">
+        <div class="sensor-title">
+          <i class="fas fa-circle-notch text-violet"></i>
+          <span>Espaço de Fase &amp; Caos</span>
+        </div>
+        <span class="sensor-badge">Euler-Lagrange</span>
+      </div>
+
+      <!-- Retrato no Espaço de Fase: ω1 vs θ1 -->
+      <div class="sensor-graph-container">
+        <div class="graph-header-meta">
+          <span>Retrato no Espaço de Fase (ω₁ vs θ₁)</span>
+          <span class="graph-legend"><span class="legend-dot-violet"></span> Atrator</span>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="phasespace-canvas" width="240" height="150"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico do Expoente de Lyapunov: ln(d/d0) vs Tempo -->
+      <div class="sensor-graph-container">
+        <div class="graph-header-meta">
+          <span>Divergência de Trajetórias ln(d/d₀)</span>
+          <span class="graph-legend"><span class="legend-dot-amber"></span> Inclinação λ</span>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="lyapunov-canvas" width="240" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- Telemetria Numérica Rigorosa -->
+      <div class="sensor-metrics">
+        <div class="metric-card">
+          <span class="metric-label">Energia Total (E = T + V)</span>
+          <span class="metric-val text-violet" id="metric-total-energy">54.21 J</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Erro Conservação (ΔE/E₀)</span>
+          <span class="metric-val text-emerald" id="metric-drift">0.0001%</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Expoente Lyapunov (λ)</span>
+          <span class="metric-val text-amber" id="metric-lambda">+1.42 bit/s</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Distância de Fase d(t)</span>
+          <span class="metric-val text-cyan" id="metric-divergence">1.00 d₀</span>
+        </div>
+      </div>
+
+      <!-- Caixa de Equação Analítica de Euler-Lagrange -->
+      <div class="formula-box">
+        <div class="formula-header">EQUAÇÕES DE EULER-LAGRANGE ACUPLADAS</div>
+        <div class="formula-math">
+          d/dt (∂L/∂θ̇ᵢ) - ∂L/∂θᵢ = 0
+        </div>
+        <div class="formula-desc">
+          O sistema de 2ª ordem acoplado para θ̈₁ e θ̈₂ é integrado via Runge-Kutta de 4ª Ordem (RK4) com 8 subpassos por quadro.
+        </div>
+      </div>
+
+      <!-- Explicação do Regime Dinâmico -->
+      <div class="preset-info-card" id="preset-info-card">
+        <div class="preset-info-title" id="preset-info-title">Regime de Caos Determinístico</div>
+        <p class="preset-info-desc" id="preset-info-desc">
+          Embora as leis da mecânica newtoniana e analítica sejam 100% determinísticas, a não-linearidade geométrica produz divergência exponencial de trajetórias inicialmente vizinhas (Efeito Borboleta).
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Rodapé / Status Bar -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="footer-status-pill online"><span class="dot-online"></span> RK4 Hamiltoniano Estável</span>
+      <span class="footer-item">Subpassos: <strong>8 / frame</strong></span>
+      <span class="footer-item">Passo: <strong>Δt = 0.002s</strong></span>
+    </div>
+    <div class="footer-right">
+      <span class="footer-item"><kbd>Espaço</kbd> Pause</span>
+      <span class="footer-item"><kbd>T</kbd> Rastro</span>
+      <span class="footer-item"><kbd>C</kbd> Limpar</span>
+      <span class="footer-item"><kbd>1-5</kbd> Presets</span>
+      <span class="footer-item">Sandro • Física Computacional UFES</span>
+    </div>
+  </footer>
+
+  <!-- Script Principal -->
+  <script src="script.js"></script>
+</body>
+</html>

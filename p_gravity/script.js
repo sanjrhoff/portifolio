@@ -59,6 +59,12 @@
   }
 
   /* ==========================================================================
+     Constantes Físico-Relativísticas
+     ========================================================================== */
+  const C_SIM = 14.1421356;    // Velocidade da luz na simulação (unidades/s)
+  const C_SIM_SQ = 200.0;      // c_sim² para cálculo de Schwarzschild r_s = 2GM / c²
+
+  /* ==========================================================================
      Partícula de Poeira / Explosão de Colisão Estelar
      ========================================================================== */
   class SparkParticle {
@@ -96,6 +102,121 @@
   }
 
   /* ==========================================================================
+     Partícula de Acreção e Debris de Espaguetificação (TDE)
+     ========================================================================== */
+  class AccretionDebris {
+    constructor(x, y, vx, vy, color, options = {}) {
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+      this.color = color || '#fbbf24';
+      this.mass = options.mass || 0.08;
+      this.size = options.size || (Math.random() * 2.2 + 1.2);
+      this.life = options.life || (options.isPermanent ? 999999 : Math.floor(Math.random() * 550 + 400));
+      this.maxLife = this.life;
+      this.isPermanent = options.isPermanent || false;
+      this.trail = [];
+      this.maxTrail = 6;
+      this.trailCounter = 0;
+    }
+
+    update(dt, blackHoles, G) {
+      // Atração gravitacional dos buracos negros com amortecimento viscoso
+      for (let i = 0; i < blackHoles.length; i++) {
+        const bh = blackHoles[i];
+        const dx = bh.x - this.x;
+        const dy = bh.y - this.y;
+        const distSq = dx * dx + dy * dy + 25; // Softening mínimo
+        const dist = Math.sqrt(distSq);
+        const force = (G * bh.mass) / (distSq * dist);
+        this.vx += dx * force * dt;
+        this.vy += dy * force * dt;
+      }
+
+      // Viscosidade hidrodinâmica do disco (decaimento tangencial lento)
+      const visc = this.isPermanent ? 0.99992 : 0.9997;
+      this.vx *= visc;
+      this.vy *= visc;
+
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+
+      if (!this.isPermanent) {
+        this.life -= dt;
+      }
+
+      // Amostragem de rastro térmico
+      this.trailCounter++;
+      if (this.trailCounter % 2 === 0) {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > this.maxTrail) {
+          this.trail.shift();
+        }
+      }
+    }
+
+    draw(ctx, nearestBh, rs, rph) {
+      const alpha = this.isPermanent ? 0.92 : Math.max(0, Math.min(1, this.life / 60));
+      if (alpha <= 0.01) return;
+
+      let distToBh = 1000;
+      let dopplerFactor = 1.0;
+
+      if (nearestBh) {
+        const dx = this.x - nearestBh.x;
+        const dy = this.y - nearestBh.y;
+        distToBh = Math.hypot(dx, dy);
+
+        // Beaming Relativístico (Efeito Doppler):
+        // Partículas que se movem no sentido de aproximação recebem boost (1.6x), o oposto atenuado
+        dopplerFactor = this.vx < 0 ? 1.55 : 0.48;
+      }
+
+      // Gradiente Térmico de Corpo Negro proporcional à distância radial:
+      let thermalColor = '#fbbf24';
+      if (distToBh < rph + 18) {
+        thermalColor = '#ffffff'; // Plasma térmico ultra-quente (>10^7 K)
+      } else if (distToBh < rph + 55) {
+        thermalColor = '#fef08a'; // Amarelo incandescente
+      } else if (distToBh < rph + 110) {
+        thermalColor = '#fbbf24'; // Ouro solar
+      } else if (distToBh < rph + 180) {
+        thermalColor = '#f97316'; // Âmbar
+      } else {
+        thermalColor = '#dc2626'; // Carmesim escuro / gás frio
+      }
+
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      // Rastro térmico
+      if (this.trail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(this.trail[0].x, this.trail[0].y);
+        for (let i = 1; i < this.trail.length; i++) {
+          ctx.lineTo(this.trail[i].x, this.trail[i].y);
+        }
+        ctx.strokeStyle = thermalColor;
+        ctx.globalAlpha = Math.min(1.0, alpha * 0.45 * dopplerFactor);
+        ctx.lineWidth = Math.max(0.8, this.size * 0.7);
+        ctx.stroke();
+      }
+
+      // Ponto de plasma com glow térmico
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = thermalColor;
+      ctx.globalAlpha = Math.min(1.0, alpha * dopplerFactor);
+      ctx.shadowColor = thermalColor;
+      ctx.shadowBlur = 7;
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  /* ==========================================================================
      Modelo de Corpo Celeste
      ========================================================================== */
   let nextBodyId = 1;
@@ -111,9 +232,26 @@
       this.ax = 0;
       this.ay = 0;
       this.mass = options.mass || 10;
-      this.radius = options.radius || this.calculateRadius(this.mass);
-      this.color = options.color || this.determineColor(this.mass);
-      this.isStar = options.isStar || (this.mass >= 500);
+      this.type = options.type || (this.mass >= 3000 ? 'black-hole' : (this.mass >= 500 ? 'star' : 'planet'));
+      this.isBlackHole = (this.type === 'black-hole');
+      this.isStar = options.isStar || (this.mass >= 500 && !this.isBlackHole);
+
+      // Parâmetros Relativísticos de Schwarzschild
+      if (this.isBlackHole) {
+        this.rs = options.rs || (2 * 1.0 * this.mass) / C_SIM_SQ;
+        this.rph = 1.5 * this.rs;
+        this.radius = options.radius || Math.max(12, this.rs);
+        this.color = '#000000';
+        this.pulseTime = Math.random() * 10;
+        this.absorptionFlash = 0;
+      } else {
+        this.radius = options.radius || this.calculateRadius(this.mass);
+        this.color = options.color || this.determineColor(this.mass);
+        this.rs = 0;
+        this.rph = 0;
+        this.deformation = 1.0;
+        this.deformationAngle = 0;
+      }
 
       // Buffer circular de rastro orbital pré-alocado (sem memory leak)
       this.maxTrail = options.maxTrail || 200;
@@ -125,9 +263,20 @@
     }
 
     calculateRadius(mass) {
+      if (this.isBlackHole) {
+        return Math.max(12, (2 * 1.0 * mass) / C_SIM_SQ);
+      }
       // R ∝ M^(1/3) com limites visuais
       const r = Math.cbrt(mass) * 1.8;
       return Math.max(3.5, Math.min(36, r));
+    }
+
+    recalcSchwarzschild(G) {
+      if (this.isBlackHole) {
+        this.rs = (2 * G * this.mass) / C_SIM_SQ;
+        this.rph = 1.5 * this.rs;
+        this.radius = Math.max(12, this.rs);
+      }
     }
 
     determineColor(mass) {
@@ -183,6 +332,113 @@
     draw(ctx) {
       ctx.save();
 
+      // RENDERIZAÇÃO RELATIVÍSTICA DE BURACO NEGRO (Gargantua / Singularidade)
+      if (this.isBlackHole) {
+        // 1. Lente Gravitacional Falsa: Círculo translúcido com distorção óptica ao redor do horizonte
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.rs * 3.4, 0, Math.PI * 2);
+        const lensGrad = ctx.createRadialGradient(
+          this.x, this.y, this.rs * 0.95,
+          this.x, this.y, this.rs * 3.4
+        );
+        lensGrad.addColorStop(0, 'rgba(0, 0, 0, 0.98)');
+        lensGrad.addColorStop(0.28, 'rgba(12, 10, 24, 0.45)');
+        lensGrad.addColorStop(0.65, 'rgba(6, 182, 212, 0.08)');
+        lensGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = lensGrad;
+        ctx.fill();
+
+        // 2. Esfera de Fótons (r_ph = 1.5 r_s): Anel luminescente fino com pulso senoidal
+        this.pulseTime = (this.pulseTime || 0) + 0.05;
+        const photonAlpha = 0.65 + 0.20 * Math.sin(3.5 * this.pulseTime);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.rph, 0, Math.PI * 2);
+        ctx.strokeStyle = '#67e8f9';
+        ctx.lineWidth = 1.6;
+        ctx.globalAlpha = photonAlpha;
+        ctx.shadowColor = '#06b6d4';
+        ctx.shadowBlur = 18;
+        ctx.stroke();
+
+        // Halo secundário ciano-violeta
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.rph * 1.03, 0, Math.PI * 2);
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 1.0;
+        ctx.globalAlpha = photonAlpha * 0.55;
+        ctx.shadowColor = '#8b5cf6';
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.restore();
+
+        // Flash de absorção de matéria no horizonte de eventos
+        if (this.absorptionFlash > 0) {
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.rs + this.absorptionFlash * 8, 0, Math.PI * 2);
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2.4;
+          ctx.globalAlpha = Math.min(1.0, this.absorptionFlash);
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 24;
+          ctx.stroke();
+          ctx.restore();
+          this.absorptionFlash -= 0.035;
+        }
+
+        // 3. Horizonte de Eventos (r_s): Círculo preto absoluto puro (#000000)
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.rs, 0, Math.PI * 2);
+        ctx.fillStyle = '#000000';
+        ctx.globalAlpha = 1.0;
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.fill();
+
+        // Borda nítida de corte
+        ctx.strokeStyle = 'rgba(103, 232, 249, 0.45)';
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+
+        ctx.restore();
+        return;
+      }
+
+      // CORPOS NORMAIS (Estrelas, Planetas, Asteroides)
+      // Se sofrer distorção elipsoidal por maré relativística próxima ao Limite de Roche:
+      if (this.deformation && this.deformation > 1.05) {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.deformationAngle);
+
+        const a = this.radius * this.deformation;
+        const b = this.radius / Math.sqrt(this.deformation);
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, a, b, 0, 0, Math.PI * 2);
+
+        const tidalGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, a);
+        tidalGrad.addColorStop(0, '#ffffff');
+        tidalGrad.addColorStop(0.3, this.color);
+        tidalGrad.addColorStop(0.75, '#f59e0b');
+        tidalGrad.addColorStop(1, '#ef4444');
+        ctx.fillStyle = tidalGrad;
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 14;
+        ctx.fill();
+
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+        ctx.restore();
+        ctx.restore();
+        return;
+      }
+
       // Se for estrela: corona e brilho estelar
       if (this.isStar) {
         ctx.beginPath();
@@ -229,6 +485,7 @@
     constructor() {
       this.bodies = [];
       this.particles = [];
+      this.accretionDebris = [];
       this.G = 1.0;
       this.softening = 15.0; // Plummer softening ε
       this.totalCollisions = 0;
@@ -236,9 +493,13 @@
       this.currentEnergy = 0;
       this.deltaEnergyPercent = 0;
       this.barycenter = new Vec2();
+      this.activeBlackHole = null;
     }
 
     addBody(body) {
+      if (body.isBlackHole) {
+        body.recalcSchwarzschild(this.G);
+      }
       this.bodies.push(body);
       this.recalculateInitialEnergy();
     }
@@ -246,10 +507,12 @@
     clear() {
       this.bodies = [];
       this.particles = [];
+      this.accretionDebris = [];
       this.totalCollisions = 0;
       this.initialEnergy = 0;
       this.currentEnergy = 0;
       this.deltaEnergyPercent = 0;
+      this.activeBlackHole = null;
     }
 
     // Calcula acelerações gravitacionais instantâneas com Plummer Softening
@@ -290,7 +553,7 @@
     // Algoritmo Simplético Velocity Verlet de 2ª Ordem
     integrate(dt) {
       const n = this.bodies.length;
-      if (n === 0) return;
+      if (n === 0 && this.accretionDebris.length === 0) return;
 
       // 1. Passo de Posição: x(t + dt) = x(t) + v(t)*dt + 0.5*a(t)*dt²
       for (let i = 0; i < n; i++) {
@@ -308,13 +571,16 @@
         oldAy[i] = this.bodies[i].ay;
       }
 
-      // 2. Detecção de Colisão Inelástica e Fusão de Massas
+      // 2. Interações Relativísticas de Schwarzschild & Limite de Roche
+      this.updateRelativisticPhysics(dt);
+
+      // 3. Detecção de Colisão Inelástica Clássica e Fusão de Massas
       this.handleCollisions();
 
-      // 3. Recalcula acelerações nas novas posições a(t + dt)
+      // 4. Recalcula acelerações nas novas posições a(t + dt)
       this.computeAccelerations();
 
-      // 4. Passo de Velocidade: v(t + dt) = v(t) + 0.5*[a(t) + a(t + dt)]*dt
+      // 5. Passo de Velocidade: v(t + dt) = v(t) + 0.5*[a(t) + a(t + dt)]*dt
       const currentN = this.bodies.length;
       for (let i = 0; i < currentN; i++) {
         const b = this.bodies[i];
@@ -325,11 +591,164 @@
         b.vy += 0.5 * (prevAy + b.ay) * dt;
       }
 
-      // 5. Atualização de Telemetria (Energia e Baricentro)
+      // 6. Atualização de Telemetria (Energia e Baricentro)
       this.updateTelemetry();
 
-      // 6. Atualização de partículas visuais
+      // 7. Atualização de partículas visuais
       this.updateParticles();
+    }
+
+    // Módulo Relativístico de Buracos Negros: Schwarzschild, Fótons, Roche e Acreção
+    updateRelativisticPhysics(dt) {
+      // Identifica singularidades ativas
+      const blackHoles = [];
+      for (let i = 0; i < this.bodies.length; i++) {
+        const b = this.bodies[i];
+        if (b.isBlackHole) {
+          b.recalcSchwarzschild(this.G);
+          blackHoles.push(b);
+        }
+      }
+
+      if (blackHoles.length > 0) {
+        const bodiesToRemove = new Set();
+
+        for (let i = 0; i < this.bodies.length; i++) {
+          const body = this.bodies[i];
+          if (body.isBlackHole) continue;
+
+          for (let j = 0; j < blackHoles.length; j++) {
+            const bh = blackHoles[j];
+            const dx = body.x - bh.x;
+            const dy = body.y - bh.y;
+            const dist = Math.hypot(dx, dy);
+
+            // A. Absorção direta no Horizonte de Eventos (r <= r_s)
+            if (dist <= bh.rs) {
+              this.absorbBodyInBlackHole(bh, body);
+              bodiesToRemove.add(i);
+              break;
+            }
+
+            // B. Limite de Roche: d_Roche = R * (2 * M_BH / m)^(1/3)
+            const rocheLimit = body.radius * Math.cbrt((2 * bh.mass) / Math.max(0.1, body.mass));
+
+            // Espaguetificação / Tidal Disruption Event (TDE)
+            if (dist <= rocheLimit) {
+              this.spawnTdeDebris(body, bh, dist);
+              bodiesToRemove.add(i);
+              break;
+            }
+
+            // Distorção Elipsoidal Preliminar
+            if (dist <= rocheLimit * 1.5) {
+              const factor = (rocheLimit * 1.5 - dist) / (rocheLimit * 0.5);
+              body.deformation = 1.0 + 1.2 * (factor * factor);
+              body.deformationAngle = Math.atan2(bh.y - body.y, bh.x - body.x);
+            } else {
+              body.deformation = 1.0;
+            }
+          }
+        }
+
+        if (bodiesToRemove.size > 0) {
+          this.bodies = this.bodies.filter((_, idx) => !bodiesToRemove.has(idx));
+        }
+      }
+
+      // Atualização dos debris de acreção e absorção no horizonte de eventos
+      const maxDebris = 360;
+      for (let i = this.accretionDebris.length - 1; i >= 0; i--) {
+        const debris = this.accretionDebris[i];
+        debris.update(dt, blackHoles, this.G);
+
+        let absorbed = false;
+        for (let j = 0; j < blackHoles.length; j++) {
+          const bh = blackHoles[j];
+          const distToBh = Math.hypot(debris.x - bh.x, debris.y - bh.y);
+
+          // Consumido pela singularidade no horizonte de eventos
+          if (distToBh <= bh.rs) {
+            bh.mass += debris.mass;
+            bh.recalcSchwarzschild(this.G);
+            bh.absorptionFlash = Math.max(bh.absorptionFlash, 0.45);
+            absorbed = true;
+            break;
+          }
+        }
+
+        if (absorbed || debris.life <= 0) {
+          this.accretionDebris.splice(i, 1);
+        }
+      }
+
+      // Limita quantidade máxima para garantir 60 FPS contínuo
+      if (this.accretionDebris.length > maxDebris) {
+        this.accretionDebris.splice(0, this.accretionDebris.length - maxDebris);
+      }
+    }
+
+    absorbBodyInBlackHole(bh, body) {
+      this.totalCollisions++;
+      const totalMass = bh.mass + body.mass;
+
+      // Conservação estrita de Momento Linear
+      bh.vx = (bh.mass * bh.vx + body.mass * body.vx) / totalMass;
+      bh.vy = (bh.mass * bh.vy + body.mass * body.vy) / totalMass;
+
+      // Centro de massa
+      bh.x = (bh.mass * bh.x + body.mass * body.x) / totalMass;
+      bh.y = (bh.mass * bh.y + body.mass * body.y) / totalMass;
+      bh.mass = totalMass;
+      bh.recalcSchwarzschild(this.G);
+      bh.absorptionFlash = 1.0;
+
+      // Flash e ejeção pontual
+      this.spawnCollisionExplosion(bh.x, bh.y, '#67e8f9');
+
+      if (window.orbitNApp && window.orbitNApp.showToast) {
+        window.orbitNApp.showToast(`Singularidade absorveu ${body.name} (M = ${Math.round(body.mass)})! Novo Rs: ${bh.rs.toFixed(1)} px`);
+      }
+    }
+
+    spawnTdeDebris(body, bh, dist) {
+      this.totalCollisions++;
+      const debrisCount = Math.min(110, Math.max(55, Math.round(body.mass * 2.8) + 40));
+      const radAngle = Math.atan2(body.y - bh.y, body.x - bh.x);
+      const tangAngle = radAngle + Math.PI / 2;
+
+      // Velocidade diferencial de maré
+      const tideSpd = Math.sqrt((2 * this.G * bh.mass * body.radius) / (dist * dist + 10));
+
+      for (let i = 0; i < debrisCount; i++) {
+        // Dispersão ao longo do filamento de espaguete
+        const offsetR = (Math.random() - 0.5) * body.radius * 2.8;
+        const offsetT = (Math.random() - 0.5) * body.radius * 0.7;
+
+        const px = body.x + Math.cos(radAngle) * offsetR + Math.cos(tangAngle) * offsetT;
+        const py = body.y + Math.sin(radAngle) * offsetR + Math.sin(tangAngle) * offsetT;
+
+        // Dispersão de velocidade tangencial e radial de maré
+        const vTide = (offsetR / (body.radius * 1.5)) * tideSpd * 1.25;
+        const vStoch = (Math.random() - 0.5) * 0.75;
+
+        const pvx = body.vx + Math.cos(radAngle) * (vTide * 0.45) + Math.cos(tangAngle) * (vTide + vStoch);
+        const pvy = body.vy + Math.sin(radAngle) * (vTide * 0.45) + Math.sin(tangAngle) * (vTide + vStoch);
+
+        this.accretionDebris.push(new AccretionDebris(
+          px, py, pvx, pvy, body.color, {
+            mass: body.mass / debrisCount,
+            size: Math.random() * 2.0 + 1.2,
+            life: Math.floor(Math.random() * 600 + 450)
+          }
+        ));
+      }
+
+      this.spawnCollisionExplosion(body.x, body.y, body.color);
+
+      if (window.orbitNApp && window.orbitNApp.showToast) {
+        window.orbitNApp.showToast(`Espaguetificação (TDE) de ${body.name}: Rompimento no Limite de Roche!`);
+      }
     }
 
     // Fusão Inelástica com Conservação Estrita de Momento Linear
@@ -448,6 +867,7 @@
         this.barycenter.set(0, 0);
         this.currentEnergy = 0;
         this.deltaEnergyPercent = 0;
+        this.activeBlackHole = null;
         return;
       }
 
@@ -456,11 +876,15 @@
       let sumX = 0;
       let sumY = 0;
 
+      this.activeBlackHole = null;
       for (let i = 0; i < n; i++) {
         const b = this.bodies[i];
         totalMass += b.mass;
         sumX += b.mass * b.x;
         sumY += b.mass * b.y;
+        if (b.isBlackHole && !this.activeBlackHole) {
+          this.activeBlackHole = b;
+        }
       }
 
       if (totalMass > 0) {
@@ -549,6 +973,8 @@
       this.telemetryEnergyVal = document.getElementById('telemetry-energy-val');
       this.telemetryDeltaEnergy = document.getElementById('telemetry-delta-energy');
       this.telemetryBarycenterVal = document.getElementById('telemetry-barycenter-val');
+      this.telemetrySchwarzschildVal = document.getElementById('telemetry-schwarzschild-val');
+      this.telemetryDebrisCount = document.getElementById('telemetry-debris-count');
 
       // Aim HUD
       this.launchAimHud = document.getElementById('launch-aim-hud');
@@ -793,6 +1219,12 @@
           case '5':
             this.loadPreset('binary-star');
             break;
+          case '6':
+            this.loadPreset('blackhole_accretion');
+            break;
+          case '7':
+            this.loadPreset('blackhole_tde');
+            break;
           case 'Escape':
             this.shortcutsModal.style.display = 'none';
             break;
@@ -803,9 +1235,28 @@
     setNextMass(m) {
       this.nextBodyMass = m;
       this.valNextMass.textContent = m;
+
+      // Determina tipo e raio aproximado com base na massa
+      if (m >= 3000) {
+        this.nextBodyType = 'black-hole';
+        this.nextBodyRadius = Math.max(14, (2 * 1.0 * m) / C_SIM_SQ);
+      } else if (m >= 500) {
+        this.nextBodyType = 'star';
+        this.nextBodyRadius = 18;
+      } else if (m >= 40) {
+        this.nextBodyType = 'gas-giant';
+        this.nextBodyRadius = 10;
+      } else if (m >= 8) {
+        this.nextBodyType = 'terrestrial';
+        this.nextBodyRadius = 6;
+      } else {
+        this.nextBodyType = 'asteroid';
+        this.nextBodyRadius = 4;
+      }
+
       this.celestialPills.forEach(p => {
-        const pMass = parseFloat(p.getAttribute('data-mass'));
-        p.classList.toggle('active', Math.abs(pMass - m) < 0.1);
+        const pType = p.getAttribute('data-type');
+        p.classList.toggle('active', pType === this.nextBodyType);
       });
     }
 
@@ -894,19 +1345,23 @@
         const vx = dragVector.x * velocityScale;
         const vy = dragVector.y * velocityScale;
 
-        // Injeta novo corpo celeste no simulador
+        // Injeta novo corpo celeste no simulador (com suporte a Buraco Negro)
+        const isBH = (this.nextBodyType === 'black-hole') || (this.nextBodyMass >= 3000);
         const newBody = new CelestialBody({
+          name: isBH ? `Singularidade #${this.engine.bodies.length + 1}` : undefined,
           x: this.aimOrigin.x,
           y: this.aimOrigin.y,
           vx: vx,
           vy: vy,
           mass: this.nextBodyMass,
           radius: this.nextBodyRadius,
+          type: this.nextBodyType,
+          isStar: this.nextBodyType === 'star',
           maxTrail: parseInt(this.inputTrailLength.value, 10)
         });
 
         this.engine.addBody(newBody);
-        this.showToast(`Corpo Injetado: M = ${this.nextBodyMass}`);
+        this.showToast(`${isBH ? 'Buraco Negro Injetado' : 'Corpo Injetado'}: M = ${this.nextBodyMass}`);
       }
     }
 
@@ -1266,6 +1721,114 @@
           this.showToast('Preset: Estrela Binária & Planeta Circumbinário');
           break;
         }
+
+        case 'blackhole_accretion': {
+          // Preset 6: Buraco Negro Supermassivo & Disco de Acreção (Gargantua)
+          this.camera.zoom = 0.92;
+          const bhMass = 4000;
+
+          const gargantua = new CelestialBody({
+            name: 'Gargantua (Singularidade)',
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            mass: bhMass,
+            type: 'black-hole'
+          });
+          this.engine.addBody(gargantua);
+
+          // Disco de Acreção: 160 partículas keplerianas em alta velocidade relativística
+          const debrisCount = 160;
+          const innerR = gargantua.rph + 18;  // ~78 px
+          const outerR = gargantua.rph + 160; // ~220 px
+
+          for (let i = 0; i < debrisCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = innerR + Math.pow(Math.random(), 0.72) * (outerR - innerR);
+            const vOrb = Math.sqrt((this.engine.G * bhMass) / radius) * (1.0 + (Math.random() - 0.5) * 0.03);
+
+            const px = Math.cos(angle) * radius;
+            const py = Math.sin(angle) * radius;
+            const pvx = -Math.sin(angle) * vOrb;
+            const pvy = Math.cos(angle) * vOrb;
+
+            this.engine.accretionDebris.push(new AccretionDebris(
+              px, py, pvx, pvy, '#fbbf24', {
+                mass: 0.04,
+                size: Math.random() * 2.2 + 1.2,
+                isPermanent: true
+              }
+            ));
+          }
+
+          // Planetas em órbitas relativísticas estáveis externas (Teorema de Birkhoff)
+          const dMiller = 295;
+          const vMiller = Math.sqrt((this.engine.G * bhMass) / dMiller);
+          const miller = new CelestialBody({
+            name: 'Planeta Miller',
+            x: 0,
+            y: -dMiller,
+            vx: vMiller,
+            vy: 0,
+            mass: 8,
+            radius: 5.5,
+            color: '#38bdf8'
+          });
+
+          const dMann = 430;
+          const vMann = Math.sqrt((this.engine.G * bhMass) / dMann);
+          const mann = new CelestialBody({
+            name: 'Planeta Mann',
+            x: 0,
+            y: -dMann,
+            vx: vMann,
+            vy: 0,
+            mass: 14,
+            radius: 6.5,
+            color: '#34d399'
+          });
+
+          this.engine.addBody(miller);
+          this.engine.addBody(mann);
+          this.showToast('Preset: Buraco Negro & Disco de Acreção (Gargantua)');
+          break;
+        }
+
+        case 'blackhole_tde': {
+          // Preset 7: Espaguetificação Estelar (Tidal Disruption Event - TDE)
+          this.camera.zoom = 1.05;
+          const bhMass = 4000;
+
+          const bh = new CelestialBody({
+            name: 'Singularidade Central',
+            x: 0,
+            y: 0,
+            vx: 0,
+            vy: 0,
+            mass: bhMass,
+            type: 'black-hole'
+          });
+          this.engine.addBody(bh);
+
+          // Estrela Solar em trajetória altamente excêntrica rasante
+          // Periastro propositalmente abaixo do Limite de Roche (d_Roche ≈ 96 px)
+          const star = new CelestialBody({
+            name: 'Estrela Gigante',
+            x: -440,
+            y: -150,
+            vx: 3.55,
+            vy: 1.15,
+            mass: 25,
+            radius: 14,
+            color: '#fbbf24',
+            isStar: true
+          });
+          this.engine.addBody(star);
+
+          this.showToast('Preset: Espaguetificação Estelar (TDE) — Observe o Rompimento de Roche!');
+          break;
+        }
       }
     }
 
@@ -1297,6 +1860,14 @@
         for (const body of this.engine.bodies) {
           body.drawTrail(this.ctx);
         }
+      }
+
+      // 4.5. Debris de Acreção e Filamentos de Espaguetificação (TDE)
+      const activeBh = this.engine.activeBlackHole;
+      const rs = activeBh ? activeBh.rs : 30;
+      const rph = activeBh ? activeBh.rph : 45;
+      for (let i = 0; i < this.engine.accretionDebris.length; i++) {
+        this.engine.accretionDebris[i].draw(this.ctx, activeBh, rs, rph);
       }
 
       // 5. Corpos Celestes
@@ -1431,6 +2002,22 @@
       const bx = Math.round(this.engine.barycenter.x);
       const by = Math.round(this.engine.barycenter.y);
       this.telemetryBarycenterVal.textContent = `(${bx}, ${by})`;
+
+      // Leitura Relativística de Schwarzschild e Esfera de Fótons
+      if (this.telemetrySchwarzschildVal) {
+        if (this.engine.activeBlackHole) {
+          const bh = this.engine.activeBlackHole;
+          this.telemetrySchwarzschildVal.textContent = `Rs: ${bh.rs.toFixed(1)} px | Rph: ${bh.rph.toFixed(1)} px`;
+        } else {
+          this.telemetrySchwarzschildVal.textContent = 'Inativo (Espaço Newtoniano)';
+        }
+      }
+
+      // Contagem de partículas de Acreção / TDE
+      if (this.telemetryDebrisCount) {
+        const count = this.engine.accretionDebris.length;
+        this.telemetryDebrisCount.textContent = `${count} partícula${count !== 1 ? 's' : ''}`;
+      }
     }
 
     updateFps() {

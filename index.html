@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="./styles.css?v=4">
+  <link rel="stylesheet" href="./styles.css?v=5">
 </head>
 <body>
 
@@ -78,7 +78,7 @@
               <span class="telemetry-label">APLICAÇÕES VIVAS</span>
               <i class="fas fa-layer-group telemetry-icon"></i>
             </div>
-            <div class="telemetry-value">11</div>
+            <div class="telemetry-value">14</div>
             <div class="telemetry-caption">100% funcionais e testadas</div>
           </div>
 
@@ -692,7 +692,7 @@
     </section>
 
     <!-- ==========================================================================
-         SEÇÃO 2: DIRETÓRIO DE PROJETOS & LABORATÓRIO (FILTROS + 11 PROJETOS)
+         SEÇÃO 2: DIRETÓRIO DE PROJETOS & LABORATÓRIO (FILTROS + 14 PROJETOS)
          ========================================================================== -->
     <section class="section lab-section" id="laboratorio" aria-label="Laboratório de Projetos">
       <div class="container">
@@ -708,10 +708,10 @@
         <!-- Barra de Filtros Interativos -->
         <div class="filter-bar" role="toolbar" aria-label="Filtro de Categoria dos Projetos">
           <button type="button" class="filter-btn filter-pill active" data-filter="all" data-category="all" role="tab" aria-selected="true">
-            <i class="fas fa-th-large"></i> Todos <span class="filter-count">(11)</span>
+            <i class="fas fa-th-large"></i> Todos <span class="filter-count">(14)</span>
           </button>
           <button type="button" class="filter-btn filter-pill" data-filter="fisica" data-category="fisica" role="tab" aria-selected="false">
-            <i class="fas fa-atom"></i> Física &amp; Simulação <span class="filter-count">(2)</span>
+            <i class="fas fa-atom"></i> Física &amp; Simulação <span class="filter-count">(5)</span>
           </button>
           <button type="button" class="filter-btn filter-pill" data-filter="bancos" data-category="bancos" role="tab" aria-selected="false">
             <i class="fas fa-database"></i> Bancos &amp; Criptografia <span class="filter-count">(2)</span>
@@ -1163,6 +1163,126 @@
             </div>
           </article>
 
+          <!-- 12. WaveLab 2D — Simulador de Ondas & Difração de Young -->
+          <article class="lab-card" data-category="fisica" data-project="p_waves">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">FÍSICA COMPUTACIONAL &amp; ONDULATÓRIA</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-water text-cyan lab-icon"></i>
+                <h3 class="lab-title">WaveLab 2D — Equação de Onda FDTD &amp; Dupla Fenda</h3>
+              </div>
+              <p class="lab-desc">
+                Laboratório de mecânica ondulatória bidimensional resolvendo a equação hiperbólica de onda via Diferenças Finitas no Domínio do Tempo (FDTD). Simula interferência construtiva/destrutiva, difração na Dupla Fenda de Young com gráfico I(θ) em tempo real, camadas de absorção PML e Efeito Doppler com cone de Mach supersônico.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Solver numérico 2D FDTD com estabilidade estrita de Courant-Friedrichs-Lewy (CFL)</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Anteparo de detecção com gráfico em tempo real de franjas de interferência de Young</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Fonte Doppler subsônica e supersônica com onda de choque e cone de Mach</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Canvas 2D</span>
+                <span class="tag">FDTD 2D</span>
+                <span class="tag">Equação de Onda</span>
+                <span class="tag">Dupla Fenda</span>
+                <span class="tag">Efeito Doppler</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_waves/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir WaveLab 2D">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_waves/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_waves/index.html" data-app-title="WaveLab 2D — Equação de Onda FDTD &amp; Dupla Fenda" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 13. FieldLorentz — Eletromagnetismo & Força de Lorentz -->
+          <article class="lab-card" data-category="fisica" data-project="p_field">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">FÍSICA COMPUTACIONAL &amp; ELETROMAGNETISMO</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-bolt text-solar lab-icon"></i>
+                <h3 class="lab-title">FieldLorentz — Campos Coulombianos RK4 &amp; Ciclotron</h3>
+              </div>
+              <p class="lab-desc">
+                Simulador eletromagnético vetorial com traçado contínuo de linhas de campo elétrico de Faraday via Runge-Kutta de 4ª Ordem (RK4), isolinhas de potencial eletrostático, câmara magnética de Lorentz com algoritmo de Boris conservativo, disparo de partículas (elétrons e prótons) e presets de Ciclotron e Espectrômetro de Massa.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Traçado de linhas de campo elétrico contínuas via integração RK4 Streamlines</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Dinâmica de partículas sob força de Lorentz completa F = q(E + v × B) com Boris</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Instrumentos científicos: Gaiola de Faraday, Acelerador Ciclotron e Espectrômetro</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Canvas 2D</span>
+                <span class="tag">Integração RK4</span>
+                <span class="tag">Força de Lorentz</span>
+                <span class="tag">Algoritmo de Boris</span>
+                <span class="tag">Eletromagnetismo</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_field/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir FieldLorentz">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_field/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_field/index.html" data-app-title="FieldLorentz — Campos Coulombianos RK4 &amp; Ciclotron" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
+          <!-- 14. ChaosPendulum — Pêndulo Duplo & Teoria do Caos -->
+          <article class="lab-card" data-category="fisica" data-project="p_chaos">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">FÍSICA COMPUTACIONAL &amp; TEORIA DO CAOS</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-infinity text-violet lab-icon"></i>
+                <h3 class="lab-title">ChaosPendulum — Pêndulo Duplo RK4 &amp; Atrator Caótico</h3>
+              </div>
+              <p class="lab-desc">
+                Simulador de mecânica analítica lagrangiana resolvendo as equações acopladas não lineares do pêndulo duplo via Runge-Kutta de 4ª Ordem (RK4). Apresenta projeção em tempo real no Espaço de Fase (ω₁ vs θ₁), estimativa contínua do Maior Expoente de Lyapunov (λ) e demonstração do Efeito Borboleta com enxame cromático de 100 pêndulos simultâneos.
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Equações de Euler-Lagrange resolvidas com alta precisão RK4 em subpassos</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Enxame caótico de 100 pêndulos com micro-perturbação Δθ = 10⁻⁶ rad em arco-íris</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Telemetria científica: Expoente de Lyapunov (λ) e conservação estrita de energia</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Canvas 2D</span>
+                <span class="tag">Mecânica Analítica</span>
+                <span class="tag">Euler-Lagrange</span>
+                <span class="tag">Runge-Kutta 4</span>
+                <span class="tag">Teoria do Caos</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_chaos/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir ChaosPendulum">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_chaos/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_chaos/index.html" data-app-title="ChaosPendulum — Pêndulo Duplo RK4 &amp; Atrator Caótico" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
         </div>
 
       </div>
@@ -1202,7 +1322,7 @@
 
             <div class="bio-metrics">
               <div class="bio-metric-item">
-                <span class="metric-num">11/11</span>
+                <span class="metric-num">14/14</span>
                 <span class="metric-label">Apps Nativas no Repo</span>
               </div>
               <div class="bio-metric-item">
@@ -1415,6 +1535,6 @@
   </footer>
 
   <!-- Script Principal Sem Dependências -->
-  <script src="./script.js?v=4"></script>
+  <script src="./script.js?v=5"></script>
 </body>
 </html>

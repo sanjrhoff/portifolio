@@ -7,15 +7,15 @@
 
 > **Acesse o portfólio online:** [https://sanjrhoff.github.io/portifolio/](https://sanjrhoff.github.io/portifolio/)
 
-Plataforma de portfólio interativa com foco em **Engenharia de Software Frontend**, fundamentos sólidos de **JavaScript Puro (ES6+)**, física computacional em tempo real (**Ray Tracing 2D** e **Dinâmica de N-Corpos**), manipulação avançada de **DOM/SVG/Canvas**, integração de **Web APIs nativas do navegador** e **Criptografia Autenticada no Cliente**.
+Plataforma de portfólio interativa com foco em **Engenharia de Software Frontend**, fundamentos sólidos de **JavaScript Puro (ES6+)**, física computacional em tempo real (**Ray Tracing 2D**, **Dinâmica de N-Corpos & Buracos Negros**, **Ondas FDTD 2D**, **Eletromagnetismo de Lorentz** e **Teoria do Caos**), manipulação avançada de **DOM/SVG/Canvas**, integração de **Web APIs nativas do navegador** e **Criptografia Autenticada no Cliente**.
 
 Todo o projeto foi concebido para rodar **100% no navegador (Client-Side)**, com zero dependências de runtime pesadas e compatibilidade nativa com o **GitHub Pages**.
 
 ---
 
-## 🚀 Vitrine de Aplicações (11 Projetos Vivos)
+## 🚀 Vitrine de Aplicações (14 Projetos Vivos)
 
-O repositório reúne 11 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica e arquitetura web:
+O repositório reúne 14 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica avançada e arquitetura web:
 
 | # | Aplicação | Categoria | Destaques Técnicos & Desafios de Engenharia | Demonstração | Código-Fonte |
 | :-: | :--- | :--- | :--- | :---: | :---: |
@@ -28,8 +28,11 @@ O repositório reúne 11 aplicações funcionais completas, cobrindo diferentes 
 | **07** | **Flashcards 3D Study** | Produtividade & Interatividade | Sistema de repetição espaçada com baralhos dinâmicos locais e flip tridimensional de cartões 100% em CSS puro. | [Demo](https://sanjrhoff.github.io/portifolio/p_flashcards/index.html) | [`p_flashcards/`](./p_flashcards/) |
 | **08** | **Quiz Master Pro** | SPA & Lógica de Avaliação | Single Page Application em Vanilla JS com fluxo dinâmico baseado em IDs, motor estatístico de acertos, cálculo de tempo e persistência de histórico. | [Demo](https://sanjrhoff.github.io/portifolio/p_quiz/index.html) | [`p_quiz/`](./p_quiz/) |
 | **09** | **Glass Weather App** | Web APIs & Resiliência | Aplicação de clima com estética Glassmorphism, detecção defensiva de ambiente estático e suporte à arquitetura de backend proxy seguro com `.env`. | [Demo](https://sanjrhoff.github.io/portifolio/p_weather/index.html) | [`p_weather/`](./p_weather/) |
-| **10** | **RayLens Lab** | Física Computacional & Simulação | Bancada interativa de ótica geométrica e traçado vetorial de raios 2D no Canvas. Implementa refração via **Lei de Snell-Descartes**, cálculo do ângulo crítico para **Reflexão Interna Total (TIR)**, **Dispersão Cromática com Equação de Cauchy** ($n(\lambda) = A + B/\lambda^2$) e feixes multiespectrais com aberração esférica. | [Demo](https://sanjrhoff.github.io/portifolio/p_optics/index.html) | [`p_optics/`](./p_optics/) |
-| **11** | **OrbitN** | Física Computacional & Simulação | Simulador de mecânica celeste e gravitação universal newtoniana. Utiliza o integrador simplético **Velocity Verlet de 2ª ordem** $O(\Delta t^2)$ para conservação exata de energia mecânica, amaciamento gravitacional $\epsilon$ anti-singularidade, detecção e fusão inelástica com preservação do momento linear e renderização com trilhas orbitais a 60 FPS. | [Demo](https://sanjrhoff.github.io/portifolio/p_gravity/index.html) | [`p_gravity/`](./p_gravity/) |
+| **10** | **RayLens Lab** | Física Computacional & Ótica | Bancada interativa de ótica geométrica e traçado vetorial de raios 2D no Canvas. Implementa refração via **Lei de Snell-Descartes**, cálculo do ângulo crítico para **Reflexão Interna Total (TIR)**, **Dispersão Cromática com Equação de Cauchy** ($n(\lambda) = A + B/\lambda^2$) e feixes multiespectrais com aberração esférica. | [Demo](https://sanjrhoff.github.io/portifolio/p_optics/index.html) | [`p_optics/`](./p_optics/) |
+| **11** | **OrbitN (Relativistic)** | Física Computacional & Gravitação | Simulador de mecânica celeste e gravitação universal com integrador simplético **Velocity Verlet de 2ª ordem** $O(\Delta t^2)$. **Upgrade Relativístico:** Módulo de Buracos Negros com Raio de Schwarzschild ($r_s = 2GM/c^2$), Esfera de Fótons ($1.5 r_s$), Limite de Roche com **Espaguetificação Estelar em tempo real** e Disco de Acreção com Beaming Doppler. | [Demo](https://sanjrhoff.github.io/portifolio/p_gravity/index.html) | [`p_gravity/`](./p_gravity/) |
+| **12** | **WaveLab 2D** | Física Computacional & Ondas | Resolução da Equação de Onda 2D por diferenças finitas (**FDTD**), simulação do **Experimento da Dupla Fenda de Young** com gráfico de intensidade de franjas de interferência em tempo real, **Efeito Doppler** e cone de choque de Mach supersônico. | [Demo](https://sanjrhoff.github.io/portifolio/p_waves/index.html) | [`p_waves/`](./p_waves/) |
+| **13** | **FieldLorentz** | Eletromagnetismo & Partículas | Traçado contínuo de linhas de campo elétrico via integração **Runge-Kutta 4 (RK4)**, superfícies equipotenciais, câmara de **Força de Lorentz** $\vec{F} = q(\vec{E} + \vec{v}\times\vec{B})$ com **Algoritmo de Boris**, Acelerador Ciclotron e Espectrômetro de Massa. | [Demo](https://sanjrhoff.github.io/portifolio/p_field/index.html) | [`p_field/`](./p_field/) |
+| **14** | **ChaosPendulum** | Mecânica Não-Linear & Caos | Pêndulo Duplo acoplado com equações de **Euler-Lagrange** integradas via RK4 de alta precisão, demonstração do **Efeito Borboleta com Enxame de 100 Pêndulos** ($\Delta\theta = 10^{-6}\text{ rad}$) e cálculo em tempo real do **Espaço de Fase** $(\omega_1, \theta_1)$ e do **Expoente de Lyapunov**. | [Demo](https://sanjrhoff.github.io/portifolio/p_chaos/index.html) | [`p_chaos/`](./p_chaos/) |
 
 ---
 
@@ -62,7 +65,10 @@ portifolio/
 ├── p_quiz/                 # Quiz Master Pro SPA
 ├── p_weather/              # Glass Weather App
 ├── p_optics/               # RayLens Lab — Simulador de Ótica Geométrica & Ray Tracing
-├── p_gravity/              # OrbitN — Simulador Gravitacional de N-Corpos & Dinâmica Orbital
+├── p_gravity/              # OrbitN — Simulador Gravitacional de N-Corpos & Buracos Negros
+├── p_waves/                # WaveLab 2D — Simulador de Ondas FDTD & Dupla Fenda de Young
+├── p_field/                # FieldLorentz — Eletromagnetismo RK4 & Câmara de Lorentz
+├── p_chaos/                # ChaosPendulum — Pêndulo Duplo Lagrangiano & Teoria do Caos
 └── docs/                   # Especificações, Design System e Relatórios de QA
 ```
 

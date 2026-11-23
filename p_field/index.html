@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FieldLorentz | Eletromagnetismo, Linhas de Campo RK4 &amp; Ciclotron</title>
+  <meta name="description" content="Simulador eletromagnético vetorial com traçado de linhas de campo de Faraday via RK4, isolinhas de potencial, força de Lorentz completa com algoritmo de Boris, Ciclotron e Espectrômetro de Massa.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="field-body">
+  <!-- Header de Instrumentação e Controles Centrais -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-bolt text-solar"></i>
+        </div>
+        <div class="brand-text">
+          <h1>FieldLorentz <span class="tag-version">BORIS RK4</span></h1>
+          <p class="brand-subtitle">Eletromagnetismo, Linhas de Campo &amp; Força de Lorentz</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central -->
+    <div class="header-telemetry" id="header-telemetry">
+      <div class="telemetry-pill" title="Cargas pontuais ativas no vácuo">
+        <i class="fas fa-atom text-solar"></i>
+        <span>Cargas: <strong id="stat-charges" class="stat-num">2</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Linhas contínuas de Faraday traçadas por RK4">
+        <i class="fas fa-bezier-curve text-cyan"></i>
+        <span>Linhas RK4: <strong id="stat-streamlines" class="stat-num">32</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Campo magnético transversal perpendicular">
+        <i class="fas fa-magnet text-violet"></i>
+        <span>B_z: <strong id="stat-bz" class="stat-num">0.00 T</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Partículas em trânsito sob força de Lorentz">
+        <i class="fas fa-circle-notch text-emerald"></i>
+        <span>Partículas: <strong id="stat-particles" class="stat-num">0</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-status-badge live" id="sim-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="sim-status-text">Câmara Ativa</span>
+      </div>
+    </div>
+
+    <!-- Ações e Presets no Topo -->
+    <div class="header-actions">
+      <!-- Seletor de Presets Clássicos -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar montagem experimental eletromagnética">
+          <i class="fas fa-microchip"></i>
+          <span>Presets Científicos</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <div class="dropdown-header">SISTEMAS ELETROMAGNÉTICOS (1-5)</div>
+          <button type="button" class="dropdown-item" data-preset="dipole">
+            <i class="fas fa-arrows-alt-h text-solar"></i>
+            <div class="item-info">
+              <strong>Dipolo Eletrostático (+q, -q)</strong>
+              <small>Linhas de força de Faraday e isolinhas de potencial ortogonais</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="faraday-cage">
+            <i class="fas fa-shield-alt text-cyan"></i>
+            <div class="item-info">
+              <strong>Gaiola de Faraday (Blindagem)</strong>
+              <small>Anel de 8 cargas positivas com campo nulo E ≈ 0 no interior</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="cyclotron">
+            <i class="fas fa-sync text-violet"></i>
+            <div class="item-info">
+              <strong>Ciclotron Acelerador de Partículas</strong>
+              <small>Dees magnéticos e gap com campo alternado acelerando em espiral</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="mass-spectrometer">
+            <i class="fas fa-filter text-emerald"></i>
+            <div class="item-info">
+              <strong>Espectrômetro de Bainbridge</strong>
+              <small>Seletor E×B seguido de separação isotópica por raio de Larmor</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="exb-drift">
+            <i class="fas fa-wave-square text-amber"></i>
+            <div class="item-info">
+              <strong>Deriva de Plasma E × B</strong>
+              <small>Movimento cicloidal guia em campos cruzados perpendiculares</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggles de Visualização -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-icon active" id="btn-toggle-lines" title="Alternar Linhas de Campo RK4 (L)" aria-pressed="true">
+          <i class="fas fa-project-diagram"></i>
+        </button>
+        <button type="button" class="btn btn-icon active" id="btn-toggle-equipotentials" title="Alternar Isolinhas Equipotenciais V (V)" aria-pressed="true">
+          <i class="fas fa-circle-notch"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-toggle-grid-vectors" title="Alternar Grid de Vetores E (G)" aria-pressed="false">
+          <i class="fas fa-border-all"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-toggle-play" title="Play / Pause (Espaço)" aria-label="Play ou Pause">
+          <i class="fas fa-pause" id="icon-play"></i>
+        </button>
+      </div>
+
+      <!-- Limpar Câmara -->
+      <button type="button" class="btn btn-danger-soft" id="btn-clear-particles" title="Zerar partículas em trânsito">
+        <i class="fas fa-eraser"></i>
+        <span class="hide-mobile">Limpar Feixe</span>
+      </button>
+      <button type="button" class="btn btn-secondary" id="btn-clear-all" title="Zerar tudo (Cargas e Partículas)">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Principal -->
+  <main class="workbench-main">
+    <!-- Toolbar Lateral de Ferramentas Eletrostáticas e Magnéticas -->
+    <aside class="floating-toolbar" aria-label="Bancada Eletromagnética">
+      <div class="toolbar-title">
+        <i class="fas fa-toolbox"></i>
+        <span>Instrumentos</span>
+      </div>
+
+      <!-- Seção: Cargas Eletrostáticas -->
+      <div class="toolbar-section">
+        <span class="section-label">Adicionar Cargas</span>
+        <button type="button" class="tool-btn active" data-tool="add-pos" title="Inserir Carga Positiva (+q)">
+          <i class="fas fa-plus-circle text-solar"></i>
+          <span>Carga Positiva (+q)</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="add-neg" title="Inserir Carga Negativa (-q)">
+          <i class="fas fa-minus-circle text-cyan"></i>
+          <span>Carga Negativa (-q)</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="select-move" title="Mover ou Remover Carga">
+          <i class="fas fa-mouse-pointer text-dim"></i>
+          <span>Mover / Selecionar</span>
+        </button>
+
+        <div class="control-row">
+          <label for="slider-charge-mag">Módulo da Carga |q|: <span id="val-charge-mag" class="font-mono">5.0 μC</span></label>
+          <input type="range" id="slider-charge-mag" min="1.0" max="15.0" value="5.0" step="0.5">
+        </div>
+
+        <div class="control-row">
+          <label for="slider-seeds-count">Sementes RK4 / Carga: <span id="val-seeds-count" class="font-mono">16</span></label>
+          <input type="range" id="slider-seeds-count" min="8" max="32" value="16" step="2">
+        </div>
+      </div>
+
+      <!-- Seção: Campo Magnético Transversal (B_z) -->
+      <div class="toolbar-section">
+        <span class="section-label">Campo Magnético Transversal (B)</span>
+        <div class="control-row">
+          <label for="slider-b-field">Indução B_z: <span id="val-b-field" class="font-mono">0.00 T</span></label>
+          <input type="range" id="slider-b-field" min="-3.0" max="3.0" value="0.0" step="0.1">
+        </div>
+
+        <div class="b-orientation-badge" id="b-orientation-badge">
+          <span class="b-icon" id="b-icon">○</span>
+          <span class="b-text" id="b-text">Campo B Desativado (B_z = 0)</span>
+        </div>
+
+        <div class="b-quick-buttons">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-b-neg" title="Campo B entrando no plano">⊗ -1.5 T</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-b-zero" title="Zerar campo magnético">B = 0</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-b-pos" title="Campo B saindo do plano">⊙ +1.5 T</button>
+        </div>
+      </div>
+
+      <!-- Seção: Injetor de Partículas Carregadas -->
+      <div class="toolbar-section">
+        <span class="section-label">Injetor de Partículas</span>
+        <div class="particle-selector-pills">
+          <button type="button" class="pill-particle active" data-particle-type="electron" title="Elétron (q = -e, m = 1)">
+            <span class="p-dot dot-electron"></span> Elétron (e⁻)
+          </button>
+          <button type="button" class="pill-particle" data-particle-type="proton" title="Próton (q = +e, m = 1836)">
+            <span class="p-dot dot-proton"></span> Próton (p⁺)
+          </button>
+          <button type="button" class="pill-particle" data-particle-type="alpha" title="Partícula Alfa (q = +2e, m = 4)">
+            <span class="p-dot dot-alpha"></span> Alfa (α²⁺)
+          </button>
+        </div>
+
+        <div class="control-row">
+          <label for="slider-particle-speed">Velocidade Disparo v₀: <span id="val-particle-speed" class="font-mono">1200 km/s</span></label>
+          <input type="range" id="slider-particle-speed" min="200" max="3000" value="1200" step="100">
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" id="btn-fire-particle">
+          <i class="fas fa-crosshairs"></i> Disparar Feixe Central
+        </button>
+      </div>
+
+      <!-- Dica de Interação -->
+      <div class="instruction-box">
+        <i class="fas fa-info-circle text-cyan"></i>
+        <span>Clique e arraste na câmara para mirar e disparar partículas com velocidade customizada!</span>
+      </div>
+    </aside>
+
+    <!-- Área Central da Câmara Eletromagnética -->
+    <section class="chamber-viewport-container" aria-label="Câmara de Vácuo Eletromagnética">
+      <div class="chamber-canvas-wrapper" id="chamber-wrapper">
+        <canvas id="chamber-canvas"></canvas>
+
+        <!-- HUD Flutuante de Mira Vetorial -->
+        <div class="aim-hud-info" id="aim-hud-info" style="display: none;">
+          <div>Velocidade: <strong id="hud-aim-v">0 km/s</strong></div>
+          <div>Ângulo: <strong id="hud-aim-theta">0.0°</strong></div>
+          <div>Força Lorentz Prevista: <strong id="hud-aim-f">0.00 pN</strong></div>
+        </div>
+
+        <!-- Indicador de escala e campo B de fundo -->
+        <div class="b-field-hud-indicator" id="b-field-hud-indicator">
+          <span id="b-hud-symbol">⊙</span>
+          <span id="b-hud-text">B_z = 0.00 T</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Painel Lateral Direito: Telemetria & Mecânica de Lorentz -->
+    <aside class="sensor-panel" aria-label="Telemetria Científica de Lorentz">
+      <div class="sensor-panel-header">
+        <div class="sensor-title">
+          <i class="fas fa-chart-line text-cyan"></i>
+          <span>Dinâmica de Lorentz</span>
+        </div>
+        <span class="sensor-badge">Boris RK4</span>
+      </div>
+
+      <!-- Telemetria Analítica de Larmor -->
+      <div class="sensor-metrics">
+        <div class="metric-card">
+          <span class="metric-label">Raio de Larmor (r_L)</span>
+          <span class="metric-val text-cyan" id="metric-larmor">~45.2 px</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Frequência Ciclotron (f_c)</span>
+          <span class="metric-val text-violet" id="metric-fcyclotron">14.2 MHz</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Energia Cinética Feixe (E_c)</span>
+          <span class="metric-val text-amber" id="metric-kinetic">8.42 keV</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Conservação da Carga</span>
+          <span class="metric-val text-emerald" id="metric-charge-balance">0.00 μC</span>
+        </div>
+      </div>
+
+      <!-- Gráfico do Ciclotron / Espectro -->
+      <div class="sensor-graph-container">
+        <div class="graph-header-meta">
+          <span>Trajetória do Feixe &amp; Energia E(t)</span>
+          <span class="graph-legend"><span class="legend-dot"></span> Amostragem</span>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="telemetry-canvas" width="220" height="150"></canvas>
+        </div>
+      </div>
+
+      <!-- Fórmula Didática da Força de Lorentz -->
+      <div class="formula-box">
+        <div class="formula-header">EQUAÇÃO DA FORÇA DE LORENTZ COMPLETA</div>
+        <div class="formula-math">
+          F = q · ( E + v × B )
+        </div>
+        <div class="formula-desc">
+          No plano 2D: F_x = q(E_x + v_y B_z) e F_y = q(E_y - v_x B_z). O raio de Larmor é r_L = m v_⊥ / (|q| B).
+        </div>
+      </div>
+
+      <!-- Explicação do Preset Ativo -->
+      <div class="preset-info-card" id="preset-info-card">
+        <div class="preset-info-title" id="preset-info-title">Dipolo Eletrostático</div>
+        <p class="preset-info-desc" id="preset-info-desc">
+          O arranjo clássico de Faraday com duas cargas pontuais de sinais opostos. As linhas de campo elétrico emanam do polo positivo e convergem no polo negativo, cortando ortogonalmente as superfícies equipotenciais.
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Rodapé / Status Bar -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="footer-status-pill online"><span class="dot-online"></span> Integrador de Boris (Conservação E_c)</span>
+      <span class="footer-item">Constante Coulomb: <strong>k_e = 8.99e9 N·m²/C²</strong></span>
+      <span class="footer-item">Subpassos: <strong>8 / frame</strong></span>
+    </div>
+    <div class="footer-right">
+      <span class="footer-item"><kbd>Espaço</kbd> Pause</span>
+      <span class="footer-item"><kbd>L</kbd> Linhas</span>
+      <span class="footer-item"><kbd>V</kbd> Isolinhas</span>
+      <span class="footer-item"><kbd>1-5</kbd> Presets</span>
+      <span class="footer-item">Sandro • Física Computacional UFES</span>
+    </div>
+  </footer>
+
+  <!-- Script Principal -->
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WaveLab 2D | Equação de Onda FDTD, Dupla Fenda & Efeito Doppler</title>
+  <meta name="description" content="Laboratório de mecânica ondulatória 2D em tempo real resolvendo a equação hiperbólica de onda via Diferenças Finitas no Domínio do Tempo (FDTD). Dupla Fenda de Young, Efeito Doppler supersônico com cone de Mach e difração.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="waves-body">
+  <!-- Header de Instrumentação e Controles Centrais -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-water text-cyan"></i>
+        </div>
+        <div class="brand-text">
+          <h1>WaveLab 2D <span class="tag-version">FDTD 2D</span></h1>
+          <p class="brand-subtitle">Mecânica Ondulatória, Difração &amp; Efeito Doppler</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central -->
+    <div class="header-telemetry" id="header-telemetry">
+      <div class="telemetry-pill" title="Resolução discreta da malha numérica">
+        <i class="fas fa-th text-cyan"></i>
+        <span>Malha: <strong id="stat-grid" class="stat-num">260×160</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Estabilidade Courant-Friedrichs-Lewy (S <= 0.707)">
+        <i class="fas fa-shield-alt text-emerald"></i>
+        <span>CFL: <strong id="stat-cfl" class="stat-num">0.50 (Estável)</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-pill" title="Taxa de quadros de simulação em tempo real">
+        <i class="fas fa-tachometer-alt text-amber"></i>
+        <span><strong id="stat-fps" class="stat-num">60</strong> FPS</span>
+      </div>
+      <span class="telemetry-divider">•</span>
+      <div class="telemetry-status-badge live" id="sim-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="sim-status-text">Tanque Ativo</span>
+      </div>
+    </div>
+
+    <!-- Controles Rápidos e Presets -->
+    <div class="header-actions">
+      <!-- Seletor de Presets Clássicos -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar montagem experimental clássica">
+          <i class="fas fa-flask"></i>
+          <span>Presets Ondulatórios</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu">
+          <div class="dropdown-header">EXPERIMENTOS HISTÓRICOS (1-5)</div>
+          <button type="button" class="dropdown-item" data-preset="young">
+            <i class="fas fa-columns text-cyan"></i>
+            <div class="item-info">
+              <strong>Dupla Fenda de Young</strong>
+              <small>Interferência construtiva e destrutiva com padrão de franjas</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="single-slit">
+            <i class="fas fa-grip-lines-vertical text-amber"></i>
+            <div class="item-info">
+              <strong>Difração em Fenda Única</strong>
+              <small>Dispersão angular do Princípio de Huygens-Fresnel</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="doppler-sub">
+            <i class="fas fa-plane text-emerald"></i>
+            <div class="item-info">
+              <strong>Doppler Subsônico (M = 0.6)</strong>
+              <small>Compressão frontal de frentes e rarefação traseira</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="doppler-super">
+            <i class="fas fa-fighter-jet text-red"></i>
+            <div class="item-info">
+              <strong>Doppler Supersônico (M = 1.4)</strong>
+              <small>Cone de choque de Mach e onda de choque cônica</small>
+            </div>
+          </button>
+          <button type="button" class="dropdown-item" data-preset="cavity">
+            <i class="fas fa-square-full text-violet"></i>
+            <div class="item-info">
+              <strong>Cavidade Ressonante 2D</strong>
+              <small>Ondas estacionárias e nós de interferência modal</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modos de Shading / Paleta -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-icon dropdown-toggle" id="btn-shading-toggle" title="Esquema de Cores / Shading" aria-label="Mudar Shading">
+          <i class="fas fa-palette"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" id="shading-dropdown-menu">
+          <div class="dropdown-header">MODOS DE SHADING</div>
+          <button type="button" class="dropdown-item active" data-shading="cosmic">
+            <i class="fas fa-circle text-cyan"></i>
+            <div class="item-info"><strong>Deep Wave Cósmico</strong><small>Ciano (cristas) / Indigo (vales)</small></div>
+          </button>
+          <button type="button" class="dropdown-item" data-shading="bipolar">
+            <i class="fas fa-circle text-red"></i>
+            <div class="item-info"><strong>Interferometria Bipolar</strong><small>Vermelho (+A) / Ciano (-A)</small></div>
+          </button>
+          <button type="button" class="dropdown-item" data-shading="magma">
+            <i class="fas fa-circle text-amber"></i>
+            <div class="item-info"><strong>Thermal Magma</strong><small>Branco / Âmbar / Escuro (|u|)</small></div>
+          </button>
+          <button type="button" class="dropdown-item" data-shading="neon">
+            <i class="fas fa-circle text-emerald"></i>
+            <div class="item-info"><strong>Laser Holográfico</strong><small>Verde esmeralda fluorescente</small></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles de Playback -->
+      <div class="btn-group">
+        <button type="button" class="btn btn-icon" id="btn-toggle-play" title="Play / Pause (Espaço)" aria-label="Play ou Pause">
+          <i class="fas fa-pause" id="icon-play"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-step" title="Passo Único (S)" aria-label="Avançar Passo">
+          <i class="fas fa-step-forward"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-toggle-pml" title="Alternar Absorção de Borda PML" aria-pressed="true">
+          <i class="fas fa-border-style"></i>
+        </button>
+      </div>
+
+      <!-- Limpar Tanque -->
+      <button type="button" class="btn btn-danger-soft" id="btn-clear-tank" title="Zerar perturbações da malha (C)">
+        <i class="fas fa-undo"></i>
+        <span class="hide-mobile">Zerar Ondas</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Principal: Toolbar + Tanque FDTD + Painel de Detecção -->
+  <main class="workbench-main">
+    <!-- Toolbar Lateral de Ferramentas -->
+    <aside class="floating-toolbar" aria-label="Bancada de Ferramentas Ondulatórias">
+      <div class="toolbar-title">
+        <i class="fas fa-toolbox"></i>
+        <span>Bancada</span>
+      </div>
+
+      <!-- Seção: Pincéis de Meio e Barreiras -->
+      <div class="toolbar-section">
+        <span class="section-label">Barreiras &amp; Meio</span>
+        <button type="button" class="tool-btn active" data-tool="wall-brush" title="Pincel de Barreiras Rígidas (u = 0)">
+          <i class="fas fa-paint-brush text-dim"></i>
+          <span>Pincel Parede</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="wall-eraser" title="Borracha de Barreiras">
+          <i class="fas fa-eraser text-dim"></i>
+          <span>Borracha</span>
+        </button>
+
+        <div class="control-row">
+          <label for="slider-brush-size">Raio do Pincel: <span id="val-brush-size" class="font-mono">4 px</span></label>
+          <input type="range" id="slider-brush-size" min="1" max="14" value="4" step="1">
+        </div>
+      </div>
+
+      <!-- Seção: Emissores de Ondas -->
+      <div class="toolbar-section">
+        <span class="section-label">Fontes &amp; Excitação</span>
+        <button type="button" class="tool-btn" data-tool="pulse-drop" title="Gerar Pulso Gaussiano Pontual (Gota d'Água)">
+          <i class="fas fa-tint text-cyan"></i>
+          <span>Pulso Único (Gota)</span>
+        </button>
+        <button type="button" class="tool-btn" data-tool="harmonic-source" title="Posicionar Emissor Harmônico Contínuo">
+          <i class="fas fa-broadcast-tower text-amber"></i>
+          <span>Emissor Harmônico</span>
+        </button>
+
+        <div class="control-row">
+          <label for="slider-freq">Frequência ω: <span id="val-freq" class="font-mono">0.45 rad/s</span></label>
+          <input type="range" id="slider-freq" min="0.10" max="1.10" value="0.45" step="0.05">
+        </div>
+
+        <div class="control-row">
+          <label for="slider-amp">Amplitude A: <span id="val-amp" class="font-mono">0.85</span></label>
+          <input type="range" id="slider-amp" min="0.10" max="1.00" value="0.85" step="0.05">
+        </div>
+      </div>
+
+      <!-- Seção: Dinâmica Doppler -->
+      <div class="toolbar-section">
+        <span class="section-label">Efeito Doppler &amp; Mach</span>
+        <button type="button" class="tool-btn" data-tool="doppler-source" title="Fonte Móvel com Efeito Doppler">
+          <i class="fas fa-plane-departure text-emerald"></i>
+          <span>Fonte Doppler</span>
+        </button>
+
+        <div class="control-row">
+          <label for="slider-doppler-vel">Velocidade v_s: <span id="val-doppler-vel" class="font-mono">0.60 c</span></label>
+          <input type="range" id="slider-doppler-vel" min="0.0" max="1.8" value="0.60" step="0.05">
+        </div>
+
+        <div class="mach-badge-wrap">
+          <div class="mach-badge subsônico" id="mach-badge">
+            <span class="mach-icon"><i class="fas fa-tachometer-alt"></i></span>
+            <span class="mach-label" id="mach-label">Subsônico (M = 0.60)</span>
+          </div>
+          <div class="mach-cone-info" id="mach-cone-info">
+            Ângulo Mach: <span id="val-mach-angle" class="font-mono">N/A</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção: Fendas de Young Rápidas -->
+      <div class="toolbar-section">
+        <span class="section-label">Geometria da Fenda</span>
+        <div class="control-row">
+          <label for="slider-slit-width">Largura Fenda (a): <span id="val-slit-width" class="font-mono">4 px</span></label>
+          <input type="range" id="slider-slit-width" min="2" max="16" value="4" step="1">
+        </div>
+        <div class="control-row">
+          <label for="slider-slit-dist">Separação (d): <span id="val-slit-dist" class="font-mono">32 px</span></label>
+          <input type="range" id="slider-slit-dist" min="12" max="64" value="32" step="2">
+        </div>
+        <button type="button" class="btn btn-secondary btn-block" id="btn-rebuild-slits" style="margin-top: 6px;">
+          <i class="fas fa-sync-alt"></i> Aplicar Geometria
+        </button>
+      </div>
+
+      <!-- Ações de Reset e Limpeza Geral -->
+      <div class="toolbar-section">
+        <button type="button" class="btn btn-secondary btn-block" id="btn-clear-walls">
+          <i class="fas fa-trash"></i> Limpar Barreiras
+        </button>
+      </div>
+    </aside>
+
+    <!-- Área Central: Tanque de Ondas FDTD -->
+    <section class="tank-viewport-container" aria-label="Tanque de Ondas">
+      <div class="tank-canvas-wrapper" id="tank-wrapper">
+        <canvas id="tank-canvas" width="260" height="160"></canvas>
+        <canvas id="overlay-canvas"></canvas>
+
+        <!-- Tooltip / HUD flutuante de coordenadas no tanque -->
+        <div class="tank-hud-coords" id="tank-hud-coords">
+          <span class="coord-item">X: <strong id="hud-x">0</strong></span>
+          <span class="coord-item">Y: <strong id="hud-y">0</strong></span>
+          <span class="coord-item">u(x,y): <strong id="hud-u">0.00</strong></span>
+        </div>
+
+        <!-- Indicador da linha do sensor de Young -->
+        <div class="sensor-line-label" id="sensor-line-label">
+          <i class="fas fa-bullseye"></i> Anteparo Sensor de Young
+        </div>
+      </div>
+    </section>
+
+    <!-- Painel Lateral Direito: Sensor de Interferência & Gráfico I(θ) -->
+    <aside class="sensor-panel" aria-label="Sensor de Intensidade e Difração">
+      <div class="sensor-panel-header">
+        <div class="sensor-title">
+          <i class="fas fa-chart-area text-cyan"></i>
+          <span>Anteparo &amp; Difração I(θ)</span>
+        </div>
+        <span class="sensor-badge">Tempo Real</span>
+      </div>
+
+      <div class="sensor-graph-container">
+        <div class="graph-header-meta">
+          <span>Perfil de Intensidade Instantânea ⟨u²(y)⟩</span>
+          <span class="graph-legend"><span class="legend-dot"></span> Sinal Detectado</span>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="sensor-canvas" width="220" height="340"></canvas>
+        </div>
+      </div>
+
+      <!-- Telemetria Analítica de Young -->
+      <div class="sensor-metrics">
+        <div class="metric-card">
+          <span class="metric-label">Intensidade Máxima (I_max)</span>
+          <span class="metric-val text-cyan" id="metric-imax">0.000 W/m²</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Comprimento de Onda Estimado (λ)</span>
+          <span class="metric-val text-amber" id="metric-lambda">~18.2 px</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Franjas Claras Detectadas</span>
+          <span class="metric-val text-emerald" id="metric-fringes">5 picos</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Separação Angular Franjas (Δθ)</span>
+          <span class="metric-val text-bright" id="metric-theta">0.56 rad</span>
+        </div>
+      </div>
+
+      <!-- Fórmula Didática da Dupla Fenda -->
+      <div class="formula-box">
+        <div class="formula-header">EQUAÇÃO DE INTERFERÊNCIA DE YOUNG</div>
+        <div class="formula-math">
+          I(θ) = I₀ · [ sin(β) / β ]² · cos²(α)
+        </div>
+        <div class="formula-desc">
+          Onde β = (π a / λ) sin θ (difração) e α = (π d / λ) sin θ (interferência).
+        </div>
+      </div>
+
+      <div class="sensor-panel-actions">
+        <button type="button" class="btn btn-secondary btn-block" id="btn-reset-sensor">
+          <i class="fas fa-history"></i> Zerar Histórico do Sensor
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Barra de Rodapé / Status Bar -->
+  <footer class="app-footer">
+    <div class="footer-left">
+      <span class="footer-status-pill online"><span class="dot-online"></span> FDTD Solucionador Estável</span>
+      <span class="footer-item">Passo: <strong>Δt = 0.05s</strong></span>
+      <span class="footer-item">Velocidade Fase: <strong>c = 1.0 cel/s</strong></span>
+      <span class="footer-item">PML: <strong id="footer-pml-status">Ativo (20 células)</strong></span>
+    </div>
+    <div class="footer-right">
+      <span class="footer-item"><kbd>Espaço</kbd> Pause</span>
+      <span class="footer-item"><kbd>S</kbd> Passo</span>
+      <span class="footer-item"><kbd>C</kbd> Zerar</span>
+      <span class="footer-item"><kbd>1-5</kbd> Presets</span>
+      <span class="footer-item">Sandro • Física Computacional UFES</span>
+    </div>
+  </footer>
+
+  <!-- Script Principal -->
+  <script src="script.js"></script>
+</body>
+</html>
