@@ -18,9 +18,9 @@
   const N = 600;                     // Número de nós na grade espacial 1D
   const DX = 0.25;                   // Espaçamento espacial dx (Domínio L = (N-1)*dx ≈ 149.75)
   const L = (N - 1) * DX;            // Comprimento total da cavidade unidimensional
-  const SUB_STEPS = 6;               // Subpassos Crank-Nicolson por frame de renderização
-  const DT_SUB = 0.008;              // Intervalo de tempo por subpasso dt
-  const DT_FRAME = SUB_STEPS * DT_SUB; // dt total por frame (~0.048)
+  const SUB_STEPS = 8;               // Subpassos Crank-Nicolson por frame de renderização
+  const DT_SUB = 0.010;              // Intervalo de tempo por subpasso dt
+  const DT_FRAME = SUB_STEPS * DT_SUB; // dt total por frame (~0.080)
   const HBAR = 1.0;                  // Constante de Planck reduzida (unidades atômicas)
   const MASS = 1.0;                  // Massa da partícula
 
@@ -51,18 +51,18 @@
     pmlActive: true,
 
     // Parâmetros do Pacote Gaussiano (Unidades Atômicas Calibradas: k < k_Nyquist)
-    k0: 2.8,               // Momento linear incidente (k0)
-    sigmaFrac: 0.035,      // Largura σ como fração de L
+    k0: 2.6,               // Momento linear incidente (k0) -> E0 = 0.5 * k0^2 ≈ 3.38 u
+    sigmaFrac: 0.038,      // Largura σ como fração de L
     x0Frac: 0.20,          // Posição de injeção x0 como fração de L
 
     // Ferramentas de Pincel
     activeTool: 'brush',   // 'brush' ou 'eraser'
-    brushV: 5.5,           // Altura de potencial para pintura
+    brushV: 4.5,           // Altura de potencial para pintura
     brushRadiusPx: 14,     // Raio do pincel no canvas
 
-    // Geometria Paramétrica de Barreira
-    barrierWidthFrac: 0.016,
-    barrierHeight: 5.2,
+    // Geometria Paramétrica de Barreira Calibrada (Tunelamento Físico Visível T ≈ 20%)
+    barrierWidthFrac: 0.005, // Espessura a ≈ 0.75 u (4 nós)
+    barrierHeight: 4.0,      // Altura V0 = 4.0 u > E0 (E0 ≈ 3.38 u, Barreira Quântica)
 
     // Telemetria Quântica
     norm: 1.0,
@@ -337,21 +337,36 @@
     let expP2 = 0.0;
     let expPotential = 0.0;
 
-    // Detectar região da barreira
-    let barrierStart = -1;
-    let barrierEnd = -1;
-    for (let j = 0; j < N; j++) {
-      if (Math.abs(V[j]) > 0.4) {
-        if (barrierStart === -1) barrierStart = j;
-        barrierEnd = j;
+    // Detectar região da barreira se não for preset de estado ligado (poço harmônico/infinito)
+    const isBoundState = (state.currentPreset === 'harmonic-oscillator' || state.currentPreset === 'infinite-well');
+
+    let ja = Math.floor(N * 0.48);
+    let jb = Math.floor(N * 0.52);
+
+    if (!isBoundState) {
+      if (state.barrierXa > 0 && state.barrierXb > state.barrierXa) {
+        ja = Math.max(1, Math.floor(state.barrierXa / DX));
+        jb = Math.min(N - 2, Math.floor(state.barrierXb / DX));
+      } else {
+        let barrierStart = -1;
+        let barrierEnd = -1;
+        for (let j = 0; j < N; j++) {
+          if (Math.abs(V[j]) > 0.4) {
+            if (barrierStart === -1) barrierStart = j;
+            barrierEnd = j;
+          }
+        }
+        if (barrierStart !== -1 && (barrierEnd - barrierStart) < N * 0.40) {
+          ja = Math.max(1, barrierStart);
+          jb = Math.min(N - 2, barrierEnd);
+          state.barrierXa = ja * DX;
+          state.barrierXb = jb * DX;
+        }
       }
+    } else {
+      state.barrierXa = 0;
+      state.barrierXb = 0;
     }
-
-    let ja = barrierStart !== -1 ? Math.max(1, barrierStart) : Math.floor(N * 0.45);
-    let jb = barrierEnd !== -1 ? Math.min(N - 2, barrierEnd) : Math.floor(N * 0.55);
-
-    state.barrierXa = ja * DX;
-    state.barrierXb = jb * DX;
 
     let reflSum = 0.0;
     let transSum = 0.0;
@@ -373,12 +388,14 @@
       expPotential += V[j] * dP;
 
       // Reflexão, Transmissão e Probabilidade Intrabarreira
-      if (j < ja) {
-        reflSum += dP;
-      } else if (j > jb) {
-        transSum += dP;
-      } else {
-        barSum += dP;
+      if (!isBoundState) {
+        if (j < ja) {
+          reflSum += dP;
+        } else if (j > jb) {
+          transSum += dP;
+        } else {
+          barSum += dP;
+        }
       }
 
       // Observáveis de Momento Linear (derivadas espaciais de 4ª ordem O(dx^4))
@@ -397,9 +414,15 @@
     state.norm = norm;
 
     if (norm > 1e-9) {
-      state.reflection = reflSum / norm;
-      state.transmission = transSum / norm;
-      state.barrierProb = barSum / norm;
+      if (isBoundState) {
+        state.reflection = 0.0;
+        state.transmission = 0.0;
+        state.barrierProb = 1.0;
+      } else {
+        state.reflection = reflSum / norm;
+        state.transmission = transSum / norm;
+        state.barrierProb = barSum / norm;
+      }
 
       state.expectedX = expX / norm;
       const varX = (expX2 / norm) - (state.expectedX * state.expectedX);
@@ -434,7 +457,7 @@
 
     if (statHeisenberg) {
       statHeisenberg.textContent = `${state.heisenbergProduct.toFixed(3)} ℏ`;
-      if (state.heisenbergProduct < 0.500) {
+      if (state.heisenbergProduct < 0.490) {
         statHeisenberg.classList.add('text-amber');
         statHeisenberg.classList.remove('text-bright');
       } else {
@@ -445,24 +468,44 @@
 
     if (statFps) statFps.textContent = state.fps.toFixed(1);
 
-    // Overlays de Tunelamento (T e R)
-    const tPct = (state.transmission * 100).toFixed(1) + '%';
-    const rPct = (state.reflection * 100).toFixed(1) + '%';
+    const isBound = (state.currentPreset === 'harmonic-oscillator' || state.currentPreset === 'infinite-well');
 
-    if (hudValT) hudValT.textContent = tPct;
-    if (hudValR) hudValR.textContent = rPct;
+    if (isBound) {
+      const modeLabel = state.currentPreset === 'harmonic-oscillator' ? 'Oscilador Harmônico' : 'Poço Infinito';
+      if (hudValT) hudValT.textContent = '0.0%';
+      if (hudValR) hudValR.textContent = '100% Confinado';
 
-    if (metricTPct) metricTPct.textContent = tPct;
-    if (metricRPct) metricRPct.textContent = rPct;
-    if (metricTVal) metricTVal.textContent = state.transmission.toFixed(5);
-    if (metricRVal) metricRVal.textContent = state.reflection.toFixed(5);
+      if (metricTPct) metricTPct.textContent = '0.0%';
+      if (metricRPct) metricRPct.textContent = '100%';
+      if (metricTVal) metricTVal.textContent = '0.00000';
+      if (metricRVal) metricRVal.textContent = state.norm.toFixed(5);
 
-    if (barT) barT.style.width = Math.min(100, state.transmission * 100) + '%';
-    if (barR) barR.style.width = Math.min(100, state.reflection * 100) + '%';
+      if (barT) barT.style.width = '0%';
+      if (barR) barR.style.width = '100%';
 
-    if (metricTPlusR) {
-      const sum = state.transmission + state.reflection + state.barrierProb;
-      metricTPlusR.textContent = sum.toFixed(5);
+      if (metricTPlusR) {
+        metricTPlusR.textContent = `${state.norm.toFixed(5)} (${modeLabel})`;
+      }
+    } else {
+      // Overlays de Tunelamento (T e R)
+      const tPct = (state.transmission * 100).toFixed(1) + '%';
+      const rPct = (state.reflection * 100).toFixed(1) + '%';
+
+      if (hudValT) hudValT.textContent = tPct;
+      if (hudValR) hudValR.textContent = rPct;
+
+      if (metricTPct) metricTPct.textContent = tPct;
+      if (metricRPct) metricRPct.textContent = rPct;
+      if (metricTVal) metricTVal.textContent = state.transmission.toFixed(5);
+      if (metricRVal) metricRVal.textContent = state.reflection.toFixed(5);
+
+      if (barT) barT.style.width = Math.min(100, state.transmission * 100) + '%';
+      if (barR) barR.style.width = Math.min(100, state.reflection * 100) + '%';
+
+      if (metricTPlusR) {
+        const sum = state.transmission + state.reflection + state.barrierProb;
+        metricTPlusR.textContent = sum.toFixed(5);
+      }
     }
 
     // Observáveis de Ehrenfest
@@ -821,19 +864,23 @@
 
     oCtx.clearRect(0, 0, w, h);
 
-    // Marcadores de início e fim da barreira
-    const xaPx = (state.barrierXa / L) * w;
-    const xbPx = (state.barrierXb / L) * w;
+    const isBound = (state.currentPreset === 'harmonic-oscillator' || state.currentPreset === 'infinite-well');
 
-    oCtx.lineWidth = 1;
-    oCtx.setLineDash([4, 4]);
-    oCtx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+    // Marcadores de início e fim da barreira (apenas em espalhamento por barreira localizada)
+    if (!isBound && state.barrierXa > 0 && state.barrierXb > state.barrierXa && (state.barrierXb - state.barrierXa) < 0.35 * L) {
+      const xaPx = (state.barrierXa / L) * w;
+      const xbPx = (state.barrierXb / L) * w;
 
-    oCtx.beginPath();
-    oCtx.moveTo(xaPx, 0); oCtx.lineTo(xaPx, h);
-    oCtx.moveTo(xbPx, 0); oCtx.lineTo(xbPx, h);
-    oCtx.stroke();
-    oCtx.setLineDash([]);
+      oCtx.lineWidth = 1;
+      oCtx.setLineDash([4, 4]);
+      oCtx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+
+      oCtx.beginPath();
+      oCtx.moveTo(xaPx, 0); oCtx.lineTo(xaPx, h);
+      oCtx.moveTo(xbPx, 0); oCtx.lineTo(xbPx, h);
+      oCtx.stroke();
+      oCtx.setLineDash([]);
+    }
 
     // Se o mouse estiver sobre o canvas, desenha a mira do pincel
     if (mouse.inside) {
@@ -913,7 +960,7 @@
 
         if (cursorX) cursorX.textContent = `${(nodeIndex * DX).toFixed(1)} u (${((nodeIndex / N) * 100).toFixed(0)}% L)`;
         if (cursorProb) cursorProb.textContent = prob.toFixed(5);
-        if (cursorV) cursorV.textContent = `${vVal.toFixed(0)} u`;
+        if (cursorV) cursorV.textContent = `${vVal.toFixed(2)} u`;
         if (cursorPhase) cursorPhase.textContent = `${phase >= 0 ? '+' : ''}${phase.toFixed(2)} rad`;
       }
     }
@@ -991,24 +1038,30 @@
          1. Tunelamento Quântico em Barreira Retangular (E < V0)
          -------------------------------------------------------------------- */
       case 'tunneling': {
-        state.k0 = 2.8;
-        state.sigmaFrac = 0.035;
+        state.k0 = 2.6;            // E0 = 0.5 * k0^2 ≈ 3.38 u
+        state.sigmaFrac = 0.038;
         state.x0Frac = 0.20;
         state.pmlActive = true;
 
         // Limpar potencial
         V.fill(0);
 
-        // Injetar barreira central
-        const ja = Math.floor(0.492 * N);
-        const jb = Math.floor(0.508 * N);
-        const V0 = 5.2;
+        // Injetar barreira central finita calibrada (T ≈ 20%, R ≈ 80%)
+        // Barreira fina de 3 intervalos (a = 0.75 u, 4 nós) e altura V0 = 4.0 u > E0 (E0 ≈ 3.38 u)
+        const ja = 298;
+        const jb = 301;
+        const V0 = 4.0;
         for (let j = ja; j <= jb; j++) {
           V[j] = V0;
         }
 
+        state.barrierWidthFrac = 0.005; // a ≈ 0.75 u (4 nós)
+        state.barrierHeight = 4.0;
+        state.barrierXa = ja * DX;
+        state.barrierXb = jb * DX;
+
         initializeGaussianPacket();
-        showToast('Preset 1 Carregado: Tunelamento em Barreira Finita (E < V₀)');
+        showToast('Preset 1 Carregado: Tunelamento Quântico Visível (T ≈ 20%, E < V₀)');
         break;
       }
 
@@ -1040,6 +1093,12 @@
           psiR[j] = (psi1 + psi2) / Math.SQRT2;
         }
 
+        state.k0 = 0.0;
+        state.sigmaFrac = (wellWidth * 0.3) / L;
+        state.x0Frac = 0.50;
+        state.barrierXa = 0;
+        state.barrierXb = 0;
+
         normalizeWaveFunction();
         showToast('Preset 2 Carregado: Partícula na Caixa (Superposição Coerente)');
         break;
@@ -1050,20 +1109,28 @@
          -------------------------------------------------------------------- */
       case 'harmonic-oscillator': {
         state.pmlActive = false;
-        const omega0 = 0.20;
+        const omega0 = 0.075;     // Frequência angular calibrada para excelente proporção visual
         const xCenter = L * 0.50;
 
+        // Potencial parabólico harmônico V(x) = 1/2 * m * omega0^2 * (x - x_center)^2
         for (let j = 0; j < N; j++) {
           const x = j * DX;
           const diff = x - xCenter;
           V[j] = 0.5 * omega0 * omega0 * (diff * diff);
         }
 
-        // Pacote gaussiano deslocado da origem de equilíbrio
-        const xDisplaced = xCenter - 14.0;
-        const sigmaCoherent = Math.sqrt(1.0 / (2.0 * omega0));
-        initializeGaussianPacket(xDisplaced, sigmaCoherent, 0.0);
+        // Estado Coerente de Mínima Incerteza de Glauber:
+        // Largura natural do estado fundamental: sigma0 = sqrt(hbar / (m * omega0)) = 1 / sqrt(omega0)
+        const sigmaCoherent = 1.0 / Math.sqrt(omega0); // ≈ 3.65 u (sem dispersão e sem breathing!)
+        const xDisplaced = xCenter - 25.0;            // Solto do repouso no ponto de retorno clássico x0
 
+        state.k0 = 0.0;
+        state.sigmaFrac = sigmaCoherent / L;
+        state.x0Frac = xDisplaced / L;
+        state.barrierXa = 0;
+        state.barrierXb = 0;
+
+        initializeGaussianPacket(xDisplaced, sigmaCoherent, 0.0);
         showToast('Preset 3 Carregado: Oscilador Harmônico Quântico (Glauber Coerente)');
         break;
       }
@@ -1072,22 +1139,30 @@
          4. Tunelamento Ressonante em Dupla Barreira (Diodo Quântico RTD)
          -------------------------------------------------------------------- */
       case 'resonant-tunneling': {
-        state.k0 = 2.7;
+        state.k0 = 2.6;
         state.sigmaFrac = 0.040;
         state.x0Frac = 0.18;
         state.pmlActive = true;
 
         V.fill(0);
 
-        // Duas barreiras de 9 nós separadas por poço ressonante
-        const b1Start = Math.floor(0.47 * N);
-        const b1End = Math.floor(0.485 * N);
-        const b2Start = Math.floor(0.515 * N);
-        const b2End = Math.floor(0.53 * N);
-        const V0 = 5.5;
+        // Dupla barreira fina (RTD) com poço quântico central ressonante
+        // Barreira 1: nós 288 a 291 (a = 0.75 u)
+        // Barreira 2: nós 308 a 311 (a = 0.75 u)
+        // Poço central: nós 292 a 307 (largura w = 4.0 u)
+        const b1Start = 288;
+        const b1End = 291;
+        const b2Start = 308;
+        const b2End = 311;
+        const V0 = 4.2;
 
         for (let j = b1Start; j <= b1End; j++) V[j] = V0;
         for (let j = b2Start; j <= b2End; j++) V[j] = V0;
+
+        state.barrierWidthFrac = 0.005;
+        state.barrierHeight = 4.2;
+        state.barrierXa = b1Start * DX;
+        state.barrierXb = b2End * DX;
 
         initializeGaussianPacket();
         showToast('Preset 4 Carregado: Diodo RTD (Tunelamento Ressonante)');
@@ -1098,8 +1173,8 @@
          5. Degrau de Potencial (Reflexão Quântica com E > V0)
          -------------------------------------------------------------------- */
       case 'potential-step': {
-        state.k0 = 3.2; // E0 ≈ 5.12 u
-        state.sigmaFrac = 0.035;
+        state.k0 = 3.0; // E0 ≈ 4.50 u
+        state.sigmaFrac = 0.038;
         state.x0Frac = 0.20;
         state.pmlActive = true;
 
@@ -1109,6 +1184,11 @@
         for (let j = jStep; j < N; j++) {
           V[j] = V0;
         }
+
+        state.barrierWidthFrac = 0.50;
+        state.barrierHeight = 3.2;
+        state.barrierXa = jStep * DX;
+        state.barrierXb = (N - 1) * DX;
 
         initializeGaussianPacket();
         showToast('Preset 5 Carregado: Degrau de Potencial (Reflexão Quântica E > V₀)');
@@ -1135,6 +1215,14 @@
     if (sliderX0) {
       sliderX0.value = state.x0Frac;
       if (valX0) valX0.textContent = `${state.x0Frac.toFixed(2)} L`;
+    }
+    if (sliderBarrierWidth) {
+      sliderBarrierWidth.value = state.barrierWidthFrac;
+      if (valBarrierWidth) valBarrierWidth.textContent = `${state.barrierWidthFrac.toFixed(3)} L`;
+    }
+    if (sliderBarrierHeight) {
+      sliderBarrierHeight.value = state.barrierHeight;
+      if (valBarrierHeight) valBarrierHeight.textContent = `${state.barrierHeight.toFixed(1)} u`;
     }
   }
 
@@ -1264,12 +1352,17 @@
     // Botões de Injeção de Barreira
     if (btnApplyBarrier) {
       btnApplyBarrier.addEventListener('click', () => {
+        state.currentPreset = 'tunneling';
         V.fill(0);
-        const halfWidthNodes = Math.floor((state.barrierWidthFrac * 0.5) * N);
+        const halfWidthNodes = Math.max(1, Math.floor((state.barrierWidthFrac * 0.5) * N));
         const centerNode = Math.floor(N * 0.5);
-        for (let j = centerNode - halfWidthNodes; j <= centerNode + halfWidthNodes; j++) {
-          if (j >= 0 && j < N) V[j] = state.barrierHeight;
+        const ja = Math.max(1, centerNode - halfWidthNodes);
+        const jb = Math.min(N - 2, centerNode + halfWidthNodes);
+        for (let j = ja; j <= jb; j++) {
+          V[j] = state.barrierHeight;
         }
+        state.barrierXa = ja * DX;
+        state.barrierXb = jb * DX;
         showToast('Barreira Paramétrica Central Injetada');
       });
     }

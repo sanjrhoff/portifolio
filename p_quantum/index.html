@@ -206,20 +206,20 @@
           <div class="control-row">
             <div class="control-label-wrap">
               <label for="slider-k0">Momento Linear (k₀):</label>
-              <span id="val-k0" class="control-value font-mono">2.8 rad/u</span>
+              <span id="val-k0" class="control-value font-mono">2.6 rad/u</span>
             </div>
-            <input type="range" id="slider-k0" min="0.5" max="6.0" value="2.8" step="0.1" class="quantum-slider slider-cyan">
-            <div class="control-subinfo">Energia Cinética: <span id="val-kinetic-energy" class="font-mono">E₀ ≈ 3.9 u</span></div>
+            <input type="range" id="slider-k0" min="0.5" max="6.0" value="2.6" step="0.1" class="quantum-slider slider-cyan">
+            <div class="control-subinfo">Energia Cinética: <span id="val-kinetic-energy" class="font-mono">E₀ ≈ 3.4 u</span></div>
           </div>
 
           <!-- Slider sigma -->
           <div class="control-row">
             <div class="control-label-wrap">
               <label for="slider-sigma">Largura do Pacote (σ):</label>
-              <span id="val-sigma" class="control-value font-mono">0.035 L</span>
+              <span id="val-sigma" class="control-value font-mono">0.038 L</span>
             </div>
-            <input type="range" id="slider-sigma" min="0.015" max="0.080" value="0.035" step="0.005" class="quantum-slider slider-cyan">
-            <div class="control-subinfo">Incerteza Inicial: <span id="val-initial-delta-x" class="font-mono">Δx = 3.71 u</span></div>
+            <input type="range" id="slider-sigma" min="0.015" max="0.080" value="0.038" step="0.005" class="quantum-slider slider-cyan">
+            <div class="control-subinfo">Incerteza Inicial: <span id="val-initial-delta-x" class="font-mono">Δx = 4.02 u</span></div>
           </div>
 
           <!-- Slider x0 -->
@@ -285,18 +285,18 @@
           <div class="control-row">
             <div class="control-label-wrap">
               <label for="slider-barrier-width">Espessura Barreira (a):</label>
-              <span id="val-barrier-width" class="control-value font-mono">0.016 L</span>
+              <span id="val-barrier-width" class="control-value font-mono">0.005 L</span>
             </div>
-            <input type="range" id="slider-barrier-width" min="0.005" max="0.080" value="0.016" step="0.002" class="quantum-slider slider-amber">
+            <input type="range" id="slider-barrier-width" min="0.003" max="0.050" value="0.005" step="0.001" class="quantum-slider slider-amber">
           </div>
 
           <!-- Slider Altura V0 -->
           <div class="control-row">
             <div class="control-label-wrap">
               <label for="slider-barrier-height">Altura da Barreira (V₀):</label>
-              <span id="val-barrier-height" class="control-value font-mono">5.2 u</span>
+              <span id="val-barrier-height" class="control-value font-mono">4.0 u</span>
             </div>
-            <input type="range" id="slider-barrier-height" min="0.0" max="20.0" value="5.2" step="0.2" class="quantum-slider slider-amber">
+            <input type="range" id="slider-barrier-height" min="0.0" max="20.0" value="4.0" step="0.2" class="quantum-slider slider-amber">
           </div>
 
           <div class="btn-group-stacked">
@@ -538,6 +538,6 @@
   <div class="quantum-toast" id="quantum-toast" role="status" aria-live="polite"></div>
 
   <!-- Script do Motor Quântico TDSE -->
-  <script src="script.js?v=1"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>
