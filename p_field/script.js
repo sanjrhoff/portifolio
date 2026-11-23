@@ -1046,10 +1046,11 @@
         state.cyclotron.active = true;
         state.cyclotron.gapX = cx;
         state.cyclotron.omegaC = 1.30 / 1.75; // omega_c = qB / m para proton (m = 1.75)
+        state.currentTool = 'select-move';
         // Injeta próton no centro para iniciar espiral acelerada
         spawnParticle(cx - 5, cy, 30, 0, 'proton');
         if (pTitle) pTitle.textContent = 'Ciclotron Acelerador de Lawrence';
-        if (pDesc) pDesc.textContent = 'Dois semi-círculos condutores (Dees) com campo magnético constante Bz defletindo o próton em semicírculos, enquanto um gap elétrico alternado acelera a partícula a cada passagem, ampliando continuamente seu raio orbital.';
+        if (pDesc) pDesc.textContent = 'Dois semicírculos condutores (Dees) com campo magnético constante Bz defletindo o próton em semicírculos, enquanto um gap elétrico alternado acelera a partícula a cada passagem. (Nota: não utiliza cargas pontuais livres).';
         break;
 
       case 'mass-spectrometer':
@@ -1059,11 +1060,12 @@
         state.spectrometer.slitAperture = 18;
         state.spectrometer.eFieldSelector = 90.0 * 1.25; // Condição de Bainbridge: E = v * B para passar reto na fenda
         state.spectrometer.detectorHits = [];
+        state.currentTool = 'select-move';
         // Injeta duas partículas de massas distintas com mesma velocidade para observar separação
         spawnParticle(45, cy, 90, 0, 'electron');
         spawnParticle(45, cy, 90, 0, 'proton');
         if (pTitle) pTitle.textContent = 'Espectrômetro de Massa de Bainbridge';
-        if (pDesc) pDesc.textContent = 'Estágio 1: Seletor de velocidades E ⊥ B. Apenas partículas com v = E/B passam pela fenda sem bater nas paredes. Estágio 2: Câmara magnética pura que deflete partículas em semicírculos proporcionais à sua massa (r_L = mv/qB), colidindo na placa detectora e gerando os picos espectrais sem girar em cima da fenda!';
+        if (pDesc) pDesc.textContent = 'Estágio 1: Seletor de velocidades E ⊥ B. Estágio 2: Câmara com campo magnético puro (sem cargas elétricas livres, para não perturbar os semicírculos de massa r_L = mv/qB). Os picos espectrais são registrados na placa detectora!';
         break;
 
       case 'exb-drift':
@@ -1111,6 +1113,11 @@
       sSpeed.value = state.particleSpeed;
       vSpeed.textContent = `${state.particleSpeed} km/s`;
     }
+
+    const toolBtns = document.querySelectorAll('.tool-btn');
+    toolBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tool === state.currentTool);
+    });
 
     updateMagneticIndicator();
   }
