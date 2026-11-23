@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="stylesheet" href="./styles.css?v=9">
 </head>
 <body>
 
@@ -78,7 +78,7 @@
               <span class="telemetry-label">APLICAÇÕES VIVAS</span>
               <i class="fas fa-layer-group telemetry-icon"></i>
             </div>
-            <div class="telemetry-value">14</div>
+            <div class="telemetry-value">15</div>
             <div class="telemetry-caption">100% funcionais e testadas</div>
           </div>
 
@@ -692,7 +692,7 @@
     </section>
 
     <!-- ==========================================================================
-         SEÇÃO 2: DIRETÓRIO DE PROJETOS & LABORATÓRIO (FILTROS + 14 PROJETOS)
+         SEÇÃO 2: DIRETÓRIO DE PROJETOS & LABORATÓRIO (FILTROS + 15 PROJETOS)
          ========================================================================== -->
     <section class="section lab-section" id="laboratorio" aria-label="Laboratório de Projetos">
       <div class="container">
@@ -708,10 +708,10 @@
         <!-- Barra de Filtros Interativos -->
         <div class="filter-bar" role="toolbar" aria-label="Filtro de Categoria dos Projetos">
           <button type="button" class="filter-btn filter-pill active" data-filter="all" data-category="all" role="tab" aria-selected="true">
-            <i class="fas fa-th-large"></i> Todos <span class="filter-count">(14)</span>
+            <i class="fas fa-th-large"></i> Todos <span class="filter-count">(15)</span>
           </button>
           <button type="button" class="filter-btn filter-pill" data-filter="fisica" data-category="fisica" role="tab" aria-selected="false">
-            <i class="fas fa-atom"></i> Física &amp; Simulação <span class="filter-count">(5)</span>
+            <i class="fas fa-atom"></i> Física &amp; Simulação <span class="filter-count">(6)</span>
           </button>
           <button type="button" class="filter-btn filter-pill" data-filter="bancos" data-category="bancos" role="tab" aria-selected="false">
             <i class="fas fa-database"></i> Bancos &amp; Criptografia <span class="filter-count">(2)</span>
@@ -1283,6 +1283,46 @@
             </div>
           </article>
 
+          <!-- 15. QuantumLab 1D — Mecânica Quântica & Crank-Nicolson O(N) -->
+          <article class="lab-card" data-category="fisica" data-project="p_quantum">
+            <div class="lab-card-header">
+              <span class="lab-category-badge">FÍSICA COMPUTACIONAL &amp; MECÂNICA QUÂNTICA</span>
+              <span class="lab-status-badge"><span class="dot-online"></span> ONLINE</span>
+            </div>
+            <div class="lab-card-body">
+              <div class="lab-title-row">
+                <i class="fas fa-atom text-cyan lab-icon"></i>
+                <h3 class="lab-title">QuantumLab 1D — TDSE &amp; Crank-Nicolson O(N)</h3>
+              </div>
+              <p class="lab-desc">
+                Simulador da Equação de Schrödinger Dependente do Tempo (1D TDSE) resolvido pelo método implícito Crank-Nicolson estritamente unitário via Algoritmo de Thomas (TDMA) complexo em O(N). Renderização da densidade de probabilidade |ψ|² e fase espectral contínua arg(ψ) em HSL, tunelamento evanescente em barreiras finitas, diodo quântico ressonante, pacotes harmônicos coerentes e pincel interativo de potencial V(x).
+              </p>
+              <div class="lab-specs">
+                <div class="spec-item"><i class="fas fa-check"></i> Solucionador tridiagonal complexo O(N) estritamente unitário (norma = 1.000000)</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Mapeamento contínuo de fase espectral HSL e camada absorvedora PML nas bordas</div>
+                <div class="spec-item"><i class="fas fa-check"></i> Telemetria ao vivo: Teorema de Ehrenfest (&lt;x&gt;, &lt;p&gt;), Heisenberg (Δx·Δp ≥ 0.5ℏ) e T/R</div>
+              </div>
+              <div class="lab-stack">
+                <span class="tag">Canvas 2D</span>
+                <span class="tag">Mecânica Quântica</span>
+                <span class="tag">TDSE 1D</span>
+                <span class="tag">Crank-Nicolson</span>
+                <span class="tag">Thomas TDMA O(N)</span>
+              </div>
+            </div>
+            <div class="lab-card-footer">
+              <a href="./p_quantum/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary" title="Abrir QuantumLab 1D">
+                <i class="fas fa-external-link-alt"></i> Ver Aplicação
+              </a>
+              <a href="https://github.com/sanjrhoff/portifolio/blob/main/p_quantum/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" title="Ver código no GitHub">
+                <i class="fab fa-github"></i> Ver Código
+              </a>
+              <button type="button" class="btn btn-sm btn-ghost preview-trigger-btn" data-app-url="./p_quantum/index.html" data-app-title="QuantumLab 1D — TDSE &amp; Tunelamento Quântico" title="Visualização rápida">
+                <i class="fas fa-eye"></i> Preview
+              </button>
+            </div>
+          </article>
+
         </div>
 
       </div>
@@ -1317,12 +1357,12 @@
             </p>
             
             <p class="bio-text">
-              Cada uma das aplicações deste repositório foi concebida para resolver um desafio técnico específico de arquitetura cliente — unindo Engenharia de Software com Física Computacional e Web Platform (como análise sintática AST de esquemas SQL, criptografia autenticada AES-GCM de conhecimento zero, traçado vetorial de raios luminosos com ótica de Snell-Cauchy e integração simplética Velocity Verlet para sistemas gravitacionais de N-corpos a 60 FPS).
+              Cada uma das aplicações deste repositório foi concebida para resolver um desafio técnico específico de arquitetura cliente — unindo Engenharia de Software com Física Computacional e Web Platform (como análise sintática AST de esquemas SQL, criptografia autenticada AES-GCM de conhecimento zero, mecânica quântica com Crank-Nicolson O(N), traçado vetorial de raios luminosos com ótica de Snell-Cauchy e integração simplética Velocity Verlet para sistemas gravitacionais de N-corpos a 60 FPS).
             </p>
 
             <div class="bio-metrics">
               <div class="bio-metric-item">
-                <span class="metric-num">14/14</span>
+                <span class="metric-num">15/15</span>
                 <span class="metric-label">Apps Nativas no Repo</span>
               </div>
               <div class="bio-metric-item">
@@ -1535,6 +1575,6 @@
   </footer>
 
   <!-- Script Principal Sem Dependências -->
-  <script src="./script.js?v=6"></script>
+  <script src="./script.js?v=9"></script>
 </body>
 </html>

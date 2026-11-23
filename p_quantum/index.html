@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumLab 1D | Simulador da Equação de Schrödinger & Tunelamento Quântico</title>
+  <meta name="description" content="Laboratório interativo de mecânica quântica 1D resolvendo a Equação de Schrödinger Dependente do Tempo (TDSE) via método Crank-Nicolson O(N) estritamente unitário. Demonstração de tunelamento quântico, autoestados, coerência harmônica e ressonância.">
+
+  <!-- Fontes Tipográficas: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons 6.4.0 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet Dark Zinc Quantum Architecture -->
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body class="quantum-body">
+
+  <!-- ==========================================================================
+       HEADER PRINCIPAL / COCKPIT DE INSTRUMENTAÇÃO
+       ========================================================================== -->
+  <header class="app-header" role="banner">
+    <!-- Brand & Retorno ao Portfólio Principal -->
+    <div class="header-brand">
+      <a href="../index.html" class="back-link" title="Voltar ao Portfólio Principal" aria-label="Voltar ao Portfólio">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div class="brand-title-wrap">
+        <div class="brand-icon">
+          <i class="fas fa-atom text-cyan"></i>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-heading">
+            QuantumLab 1D 
+            <span class="tag-version">TDSE 1D</span>
+            <span class="tag-algo">Crank-Nicolson O(N)</span>
+          </h1>
+          <p class="brand-subtitle">Simulador da Equação de Schrödinger &amp; Tunelamento Quântico</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetria Central de Conservação Quântica -->
+    <div class="header-telemetry" id="header-telemetry" aria-label="Telemetria de Conservação Quântica">
+      <div class="telemetry-pill" title="Norma total integrada da função de onda (Conservação de Probabilidade ∫ |ψ|² dx)">
+        <i class="fas fa-check-double text-emerald"></i>
+        <span>Norma: <strong id="stat-norm" class="font-mono text-emerald">1.000000</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+
+      <div class="telemetry-pill" title="Produto das Incertezas quânticas Δx · Δp (Limite de Heisenberg ≥ 0.500 ℏ)">
+        <i class="fas fa-balance-scale text-cyan"></i>
+        <span>Δx·Δp: <strong id="stat-heisenberg" class="font-mono text-bright">0.502 ℏ</strong></span>
+      </div>
+      <span class="telemetry-divider">•</span>
+
+      <div class="telemetry-pill" title="Taxa de quadros do motor numérico em tempo real">
+        <i class="fas fa-tachometer-alt text-amber"></i>
+        <span><strong id="stat-fps" class="font-mono text-bright">60.0</strong> FPS</span>
+      </div>
+      <span class="telemetry-divider">•</span>
+
+      <div class="telemetry-status-badge live" id="sim-status-badge" title="Estado de execução do solucionador TDSE">
+        <span class="pulse-dot"></span>
+        <span class="status-text" id="sim-status-text">Simulação Ativa</span>
+      </div>
+    </div>
+
+    <!-- Ações Globais, Dropdowns & Playback -->
+    <div class="header-actions">
+      <!-- Dropdown de Presets Quânticos -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-secondary dropdown-toggle" id="btn-presets-toggle" aria-haspopup="true" aria-expanded="false" title="Carregar montagem experimental de mecânica quântica">
+          <i class="fas fa-flask text-amber"></i>
+          <span class="hide-mobile">Presets Quânticos</span>
+          <i class="fas fa-chevron-down caret"></i>
+        </button>
+        <div class="dropdown-menu" id="presets-dropdown-menu" role="menu">
+          <div class="dropdown-header">EXPERIMENTOS FUNDAMENTAIS (1-5)</div>
+          
+          <button type="button" class="dropdown-item active" data-preset="tunneling" role="menuitem">
+            <i class="fas fa-dungeon text-cyan"></i>
+            <div class="item-info">
+              <strong>1. Tunelamento Quântico (E &lt; V₀)</strong>
+              <small>Barreira finita e penetração exponencial evanescente</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-preset="infinite-well" role="menuitem">
+            <i class="fas fa-box text-emerald"></i>
+            <div class="item-info">
+              <strong>2. Poço Infinito / Partícula na Caixa</strong>
+              <small>Autoestados estacionários ψ₁ e superposição coerente</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-preset="harmonic-oscillator" role="menuitem">
+            <i class="fas fa-wave-square text-violet"></i>
+            <div class="item-info">
+              <strong>3. Oscilador Harmônico Quântico</strong>
+              <small>Pacote coerente de Glauber oscilando sem dispersão</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-preset="resonant-tunneling" role="menuitem">
+            <i class="fas fa-microchip text-pink"></i>
+            <div class="item-info">
+              <strong>4. Tunelamento Ressonante (Diodo RTD)</strong>
+              <small>Dupla barreira e transmissão unitária T ≈ 100%</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-preset="potential-step" role="menuitem">
+            <i class="fas fa-stairs text-amber"></i>
+            <div class="item-info">
+              <strong>5. Degrau de Potencial (E &gt; V₀)</strong>
+              <small>Reflexão quântica não-clássica por impedância de onda</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dropdown de Modos de Renderização da Função de Onda -->
+      <div class="dropdown-container">
+        <button type="button" class="btn btn-icon dropdown-toggle" id="btn-shading-toggle" title="Modos de Visualização da Função de Onda ψ" aria-label="Mudar Modo de Renderização">
+          <i class="fas fa-palette text-cyan"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" id="shading-dropdown-menu" role="menu">
+          <div class="dropdown-header">MODOS DE VISUALIZAÇÃO DE ψ</div>
+          
+          <button type="button" class="dropdown-item active" data-shading="density-phase" role="menuitem">
+            <i class="fas fa-rainbow text-cyan"></i>
+            <div class="item-info">
+              <strong>Densidade + Fase Espectral HSL</strong>
+              <small>|ψ|² preenchido com matiz contínuo da fase arg(ψ)</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-shading="density-pure" role="menuitem">
+            <i class="fas fa-chart-area text-emerald"></i>
+            <div class="item-info">
+              <strong>Densidade Pura |ψ|²</strong>
+              <small>Curva suave de probabilidade com gradiente translúcido</small>
+            </div>
+          </button>
+
+          <button type="button" class="dropdown-item" data-shading="real-imag" role="menuitem">
+            <i class="fas fa-wave-square text-violet"></i>
+            <div class="item-info">
+              <strong>Partes Real e Imaginária (Re / Im)</strong>
+              <small>Curvas explícitas de Re(ψ) em azul e Im(ψ) em rosa</small>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles de Playback & Step -->
+      <div class="btn-group" role="group" aria-label="Controles de Execução">
+        <button type="button" class="btn btn-icon" id="btn-toggle-play" title="Play / Pause (Espaço)" aria-label="Play ou Pause">
+          <i class="fas fa-pause" id="icon-play"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-step" title="Passo Único no Tempo Δt (S)" aria-label="Avançar Passo Único">
+          <i class="fas fa-step-forward"></i>
+        </button>
+        <button type="button" class="btn btn-icon" id="btn-reset-packet" title="Recriar Pacote Inicial (R)" aria-label="Resetar Pacote">
+          <i class="fas fa-redo"></i>
+        </button>
+      </div>
+
+      <!-- Limpar Potencial V(x) -->
+      <button type="button" class="btn btn-danger-soft" id="btn-clear-potential" title="Zerar Potencial V(x) para Espaço Livre (C)">
+        <i class="fas fa-eraser"></i>
+        <span class="hide-mobile">Zerar V(x)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       WORKBENCH PRINCIPAL (GRID 3 COLUNAS)
+       ========================================================================== -->
+  <div class="workbench-layout">
+
+    <!-- ========================================================================
+         COLUNA 1: SIDEBAR ESQUERDA (INSTRUMENTOS, INJEÇÃO & PINCEL)
+         ======================================================================== -->
+    <aside class="workbench-sidebar" aria-label="Bancada de Instrumentos e Potencial">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fas fa-sliders-h text-cyan"></i>
+          <span>Instrumentos &amp; Injeção</span>
+        </div>
+        <span class="badge-tag">1D TDSE</span>
+      </div>
+
+      <div class="sidebar-scrollable-content">
+        <!-- Seção 1: Pacote de Ondas Gaussiano Inicial -->
+        <section class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title"><i class="fas fa-atom text-cyan"></i> Pacote Gaussiano ψ(x,0)</span>
+          </div>
+
+          <!-- Slider k0 -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-k0">Momento Linear (k₀):</label>
+              <span id="val-k0" class="control-value font-mono">2.8 rad/u</span>
+            </div>
+            <input type="range" id="slider-k0" min="0.5" max="6.0" value="2.8" step="0.1" class="quantum-slider slider-cyan">
+            <div class="control-subinfo">Energia Cinética: <span id="val-kinetic-energy" class="font-mono">E₀ ≈ 3.9 u</span></div>
+          </div>
+
+          <!-- Slider sigma -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-sigma">Largura do Pacote (σ):</label>
+              <span id="val-sigma" class="control-value font-mono">0.035 L</span>
+            </div>
+            <input type="range" id="slider-sigma" min="0.015" max="0.080" value="0.035" step="0.005" class="quantum-slider slider-cyan">
+            <div class="control-subinfo">Incerteza Inicial: <span id="val-initial-delta-x" class="font-mono">Δx = 3.71 u</span></div>
+          </div>
+
+          <!-- Slider x0 -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-x0">Origem de Disparo (x₀):</label>
+              <span id="val-x0" class="control-value font-mono">0.20 L</span>
+            </div>
+            <input type="range" id="slider-x0" min="0.05" max="0.45" value="0.20" step="0.01" class="quantum-slider slider-cyan">
+          </div>
+
+          <!-- Botão Disparar Novo Pacote -->
+          <button type="button" class="btn btn-primary btn-block" id="btn-fire-packet">
+            <i class="fas fa-bolt"></i>
+            <span>Disparar Pacote Quântico</span>
+          </button>
+        </section>
+
+        <!-- Seção 2: Pincel Interativo de Potencial V(x) -->
+        <section class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title"><i class="fas fa-paint-brush text-amber"></i> Pincel de Potencial V(x)</span>
+          </div>
+
+          <div class="tool-grid-2">
+            <button type="button" class="tool-btn active" data-tool="brush" id="tool-brush-potential" title="Desenhar barreira ou poço arrastando o mouse no canvas">
+              <i class="fas fa-paint-brush text-amber"></i>
+              <span>Pincel V(x)</span>
+            </button>
+            <button type="button" class="tool-btn" data-tool="eraser" id="tool-eraser-potential" title="Apagar potencial no local do cursor">
+              <i class="fas fa-eraser text-dim"></i>
+              <span>Borracha V</span>
+            </button>
+          </div>
+
+          <!-- Slider Altura do Pincel -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-brush-v">Altura do Pincel (V₀):</label>
+              <span id="val-brush-v" class="control-value font-mono">5.5 u</span>
+            </div>
+            <input type="range" id="slider-brush-v" min="-10.0" max="25.0" value="5.5" step="0.5" class="quantum-slider slider-amber">
+            <div class="control-subinfo">V &gt; 0: Barreira | V &lt; 0: Poço Atrativo</div>
+          </div>
+
+          <!-- Slider Raio do Pincel -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-brush-radius">Largura do Traço:</label>
+              <span id="val-brush-radius" class="control-value font-mono">14 px</span>
+            </div>
+            <input type="range" id="slider-brush-radius" min="4" max="40" value="14" step="2" class="quantum-slider slider-amber">
+          </div>
+        </section>
+
+        <!-- Seção 3: Barreira Paramétrica Rápida -->
+        <section class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title"><i class="fas fa-monument text-amber"></i> Barreira Paramétrica</span>
+          </div>
+
+          <!-- Slider Largura a -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-barrier-width">Espessura Barreira (a):</label>
+              <span id="val-barrier-width" class="control-value font-mono">0.016 L</span>
+            </div>
+            <input type="range" id="slider-barrier-width" min="0.005" max="0.080" value="0.016" step="0.002" class="quantum-slider slider-amber">
+          </div>
+
+          <!-- Slider Altura V0 -->
+          <div class="control-row">
+            <div class="control-label-wrap">
+              <label for="slider-barrier-height">Altura da Barreira (V₀):</label>
+              <span id="val-barrier-height" class="control-value font-mono">5.2 u</span>
+            </div>
+            <input type="range" id="slider-barrier-height" min="0.0" max="20.0" value="5.2" step="0.2" class="quantum-slider slider-amber">
+          </div>
+
+          <div class="btn-group-stacked">
+            <button type="button" class="btn btn-secondary btn-block" id="btn-apply-barrier">
+              <i class="fas fa-layer-group"></i> Injetar Barreira Central
+            </button>
+            <button type="button" class="btn btn-secondary btn-block" id="btn-apply-double-barrier">
+              <i class="fas fa-grip-lines-vertical"></i> Injetar Dupla Barreira (RTD)
+            </button>
+          </div>
+        </section>
+
+        <!-- Seção 4: Camada Absorvedora Óptica (PML / CAP) -->
+        <section class="sidebar-section">
+          <div class="section-header">
+            <span class="section-title"><i class="fas fa-shield-alt text-emerald"></i> Contorno &amp; Absorção</span>
+          </div>
+
+          <label class="custom-toggle-wrap">
+            <input type="checkbox" id="toggle-pml" checked>
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">Camada Absorvedora -i W(x)</span>
+          </label>
+          <p class="section-help-text">
+            Atenua suavemente a onda incidente nas bordas extremas do domínio, evitando reflexões e permitindo medir coeficientes purificados de transmissão e reflexão.
+          </p>
+        </section>
+      </div>
+    </aside>
+
+    <!-- ========================================================================
+         COLUNA 2: VIEWPORT CENTRAL (CANVAS QUÂNTICO & OVERLAYS)
+         ======================================================================== -->
+    <main class="quantum-viewport-container" role="main" aria-label="Visualização da Simulação Quântica">
+      <div class="canvas-stage-wrapper" id="canvas-stage-wrapper">
+        <!-- Canvas Principal de Renderização TDSE -->
+        <canvas id="quantum-canvas" width="960" height="540"></canvas>
+
+        <!-- Canvas de Interação & Pincel Overlay -->
+        <canvas id="overlay-canvas" width="960" height="540"></canvas>
+
+        <!-- Overlays Superiores de Tunelamento Instantâneo -->
+        <div class="viewport-hud-top">
+          <div class="hud-metric-pill reflection-pill">
+            <div class="metric-indicator-dot dot-amber"></div>
+            <span class="hud-pill-label">Reflexão (R):</span>
+            <strong id="hud-val-r" class="font-mono text-amber">0.0%</strong>
+          </div>
+
+          <div class="hud-center-spacer"></div>
+
+          <div class="hud-metric-pill transmission-pill">
+            <div class="metric-indicator-dot dot-cyan"></div>
+            <span class="hud-pill-label">Transmissão (T):</span>
+            <strong id="hud-val-t" class="font-mono text-cyan">0.0%</strong>
+          </div>
+        </div>
+
+        <!-- Indicador Flutuante da Energia Média <E> -->
+        <div class="energy-line-hud" id="energy-line-hud">
+          <span class="energy-tag"><i class="fas fa-bolt text-emerald"></i> ⟨E⟩ = <span id="hud-energy-val" class="font-mono">3.9 u</span></span>
+        </div>
+
+        <!-- Tooltip HUD de Coordenadas sob o Cursor -->
+        <div class="cursor-quantum-hud" id="cursor-quantum-hud" style="display: none;">
+          <div class="hud-row"><span class="hud-prop">x:</span> <span id="cursor-x" class="font-mono">0.485 L</span></div>
+          <div class="hud-row"><span class="hud-prop">|ψ|²:</span> <span id="cursor-prob" class="font-mono text-cyan">0.0312</span></div>
+          <div class="hud-row"><span class="hud-prop">V(x):</span> <span id="cursor-v" class="font-mono text-amber">5.2 u</span></div>
+          <div class="hud-row"><span class="hud-prop">Fase θ:</span> <span id="cursor-phase" class="font-mono text-violet">+1.54 rad</span></div>
+        </div>
+
+        <!-- Legenda de Fases Quânticas (Modo HSL) -->
+        <div class="phase-legend-hud" id="phase-legend-hud">
+          <span class="legend-title">Fase Quântica arg(ψ):</span>
+          <div class="phase-bar"></div>
+          <div class="phase-labels">
+            <span>-π</span>
+            <span>-π/2</span>
+            <span>0</span>
+            <span>+π/2</span>
+            <span>+π</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         COLUNA 3: SIDEBAR DIREITA (TELEMETRIA DE TUNELAMENTO & TEORIA)
+         ======================================================================== -->
+    <aside class="telemetry-sidebar" aria-label="Painel de Diagnóstico Quântico e Teoria">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <i class="fas fa-chart-line text-cyan"></i>
+          <span>Telemetria de Tunelamento</span>
+        </div>
+        <span class="badge-tag">Tempo Real</span>
+      </div>
+
+      <div class="sidebar-scrollable-content">
+        <!-- Coeficientes de Transmissão e Reflexão -->
+        <section class="telemetry-section">
+          <span class="section-micro-heading">COEFICIENTES DE FLUXO QUÂNTICO</span>
+          
+          <!-- Card Transmissão T -->
+          <div class="telemetry-card">
+            <div class="card-meta">
+              <span class="card-label"><i class="fas fa-arrow-right text-cyan"></i> Transmissão (T)</span>
+              <span class="card-pct text-cyan" id="metric-t-pct">0.0%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill fill-cyan" id="bar-t" style="width: 0%;"></div>
+            </div>
+            <div class="card-footer-val">
+              <span>Integral ∫_{xb}^L |ψ|² dx:</span>
+              <strong id="metric-t-val" class="font-mono text-bright">0.00000</strong>
+            </div>
+          </div>
+
+          <!-- Card Reflexão R -->
+          <div class="telemetry-card">
+            <div class="card-meta">
+              <span class="card-label"><i class="fas fa-undo text-amber"></i> Reflexão (R)</span>
+              <span class="card-pct text-amber" id="metric-r-pct">0.0%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill fill-amber" id="bar-r" style="width: 0%;"></div>
+            </div>
+            <div class="card-footer-val">
+              <span>Integral ∫_0^{xa} |ψ|² dx:</span>
+              <strong id="metric-r-val" class="font-mono text-bright">0.00000</strong>
+            </div>
+          </div>
+
+          <!-- Verificação de Conservação -->
+          <div class="unit-check-pill ok" id="unit-check-pill">
+            <div class="check-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="check-text">
+              <span>Conservação Quântica:</span>
+              <strong class="font-mono">T + R + P_bar = <span id="metric-t-plus-r">1.00000</span></strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- Observáveis de Ehrenfest & Heisenberg -->
+        <section class="telemetry-section">
+          <span class="section-micro-heading">OBSERVÁVEIS MÉDIOS &amp; EHRENFEST</span>
+
+          <div class="observables-grid">
+            <div class="obs-item">
+              <span class="obs-label">Posição Média ⟨x⟩</span>
+              <span class="obs-val text-bright font-mono" id="obs-x">30.0 u</span>
+            </div>
+            <div class="obs-item">
+              <span class="obs-label">Momento Médio ⟨p⟩</span>
+              <span class="obs-val text-cyan font-mono" id="obs-p">45.0 rad/u</span>
+            </div>
+            <div class="obs-item">
+              <span class="obs-label">Incerteza Espacial Δx</span>
+              <span class="obs-val text-bright font-mono" id="obs-delta-x">3.72 u</span>
+            </div>
+            <div class="obs-item">
+              <span class="obs-label">Incerteza Momento Δp</span>
+              <span class="obs-val text-bright font-mono" id="obs-delta-p">0.135 rad/u</span>
+            </div>
+          </div>
+
+          <!-- Card Destaque Heisenberg -->
+          <div class="heisenberg-card">
+            <div class="heisenberg-header">
+              <span>Princípio de Incerteza de Heisenberg</span>
+              <span class="badge-heisenberg" id="heisenberg-badge">Mínima Incerteza</span>
+            </div>
+            <div class="heisenberg-math font-mono">
+              Δx · Δp = <strong id="heisenberg-product">0.502</strong> ℏ &ge; 0.500 ℏ
+            </div>
+          </div>
+        </section>
+
+        <!-- Mini-Canvas de Histórico de Detecção -->
+        <section class="telemetry-section">
+          <div class="section-meta-between">
+            <span class="section-micro-heading">FLUXO NO DETECTOR TRANSMITIDO T(t)</span>
+            <button type="button" class="btn-text-small" id="btn-clear-detector">Zerar Gráfico</button>
+          </div>
+          <div class="mini-graph-wrapper">
+            <canvas id="detector-canvas" width="280" height="110"></canvas>
+          </div>
+        </section>
+
+        <!-- Caixa Didática da Equação de Schrödinger -->
+        <section class="telemetry-section theory-section">
+          <div class="formula-box">
+            <div class="formula-header"><i class="fas fa-graduation-cap text-cyan"></i> FORMULAÇÃO MATEMÁTICA TDSE</div>
+            <div class="formula-math font-mono">
+              i ∂ψ/∂t = -½ ∂²ψ/∂x² + V(x)ψ
+            </div>
+            <div class="formula-desc">
+              Resolvida via método implícito <strong>Crank-Nicolson</strong> com operador de Cayley unitário e 
+              <strong>Algoritmo de Thomas (TDMA) Complexo</strong> em tempo estrito <strong>O(N)</strong> por frame.
+            </div>
+          </div>
+        </section>
+
+        <!-- Ações e Exportação -->
+        <div class="telemetry-actions">
+          <button type="button" class="btn btn-secondary btn-block" id="btn-copy-telemetry">
+            <i class="fas fa-copy"></i> Copiar Dados Quânticos
+          </button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ==========================================================================
+       FOOTER INFERIOR (STATUS BAR & TECLAS DE ATALHO)
+       ========================================================================== -->
+  <footer class="app-footer" role="contentinfo">
+    <div class="footer-left">
+      <span class="footer-status-pill online">
+        <span class="dot-online"></span> TDMA Tridiagonal Complexo O(N) Estável
+      </span>
+      <span class="footer-item">Nós: <strong id="footer-nodes" class="font-mono">N = 600</strong></span>
+      <span class="footer-item">Passo: <strong class="font-mono">Δt = 0.05</strong></span>
+      <span class="footer-item">PML: <strong id="footer-pml" class="font-mono">Ativo</strong></span>
+    </div>
+
+    <div class="footer-right">
+      <span class="footer-item"><kbd>Espaço</kbd> Pause</span>
+      <span class="footer-item"><kbd>S</kbd> Passo</span>
+      <span class="footer-item"><kbd>R</kbd> Reset Pacote</span>
+      <span class="footer-item"><kbd>1-5</kbd> Presets</span>
+      <span class="footer-item"><kbd>C</kbd> Limpar V</span>
+      <span class="footer-brand-signature">Sandro • Bacharel em Física (UFES) &amp; TSI (IFES)</span>
+    </div>
+  </footer>
+
+  <!-- Toast de Notificações Rápidas -->
+  <div class="quantum-toast" id="quantum-toast" role="status" aria-live="polite"></div>
+
+  <!-- Script do Motor Quântico TDSE -->
+  <script src="script.js?v=1"></script>
+</body>
+</html>

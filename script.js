@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'background: #10b981; color: #09090b; font-weight: 700; padding: 4px 8px; border-radius: 4px;'
   );
   console.info(
-    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (14):\n' +
+    'Inspecione os módulos em https://github.com/sanjrhoff/portifolio\nProjetos integrados (15):\n' +
     '1. SQL-to-ERD Schema Analyzer (AST Parser, Dynamic Bézier SVG)\n' +
     '2. Zero-Knowledge Secret Vault (Web Crypto API, AES-GCM 256, PBKDF2)\n' +
     '3. Pomodoro Timer Pro (Document PiP API, Web Audio API)\n' +
@@ -227,7 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
     '11. OrbitN (N-Body Symplectic Verlet Integrator & Relativistic Black Holes)\n' +
     '12. WaveLab 2D (2D Wave Equation FDTD, Young Double Slit & Mach Shockwaves)\n' +
     '13. FieldLorentz (RK4 Electric Streamlines, Boris Lorentz Integrator & Cyclotron)\n' +
-    '14. ChaosPendulum (Euler-Lagrange Double Pendulum, 100-Swarm Chaos & Phase Space)'
+    '14. ChaosPendulum (Euler-Lagrange Double Pendulum, 100-Swarm Chaos & Phase Space)\n' +
+    '15. QuantumLab 1D (1D TDSE, Crank-Nicolson O(N), Complex Thomas TDMA & Tunneling)'
   );
 
 });

@@ -7,15 +7,15 @@
 
 > **Acesse o portfólio online:** [https://sanjrhoff.github.io/portifolio/](https://sanjrhoff.github.io/portifolio/)
 
-Plataforma de portfólio interativa com foco em **Engenharia de Software Frontend**, fundamentos sólidos de **JavaScript Puro (ES6+)**, física computacional em tempo real (**Ray Tracing 2D**, **Dinâmica de N-Corpos & Buracos Negros**, **Ondas FDTD 2D**, **Eletromagnetismo de Lorentz** e **Teoria do Caos**), manipulação avançada de **DOM/SVG/Canvas**, integração de **Web APIs nativas do navegador** e **Criptografia Autenticada no Cliente**.
+Plataforma de portfólio interativa com foco em **Engenharia de Software Frontend**, fundamentos sólidos de **JavaScript Puro (ES6+)**, física computacional em tempo real (**Mecânica Quântica TDSE Crank-Nicolson**, **Ray Tracing 2D**, **Dinâmica de N-Corpos & Buracos Negros**, **Ondas FDTD 2D**, **Eletromagnetismo de Lorentz** e **Teoria do Caos**), manipulação avançada de **DOM/SVG/Canvas**, integração de **Web APIs nativas do navegador** e **Criptografia Autenticada no Cliente**.
 
 Todo o projeto foi concebido para rodar **100% no navegador (Client-Side)**, com zero dependências de runtime pesadas e compatibilidade nativa com o **GitHub Pages**.
 
 ---
 
-## 🚀 Vitrine de Aplicações (14 Projetos Vivos)
+## 🚀 Vitrine de Aplicações (15 Projetos Vivos)
 
-O repositório reúne 14 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica avançada e arquitetura web:
+O repositório reúne 15 aplicações funcionais completas, cobrindo diferentes desafios práticos de computação, simulação científica avançada e arquitetura web:
 
 | # | Aplicação | Categoria | Destaques Técnicos & Desafios de Engenharia | Demonstração | Código-Fonte |
 | :-: | :--- | :--- | :--- | :---: | :---: |
@@ -33,6 +33,7 @@ O repositório reúne 14 aplicações funcionais completas, cobrindo diferentes 
 | **12** | **WaveLab 2D** | Física Computacional & Ondas | Resolução da Equação de Onda 2D por diferenças finitas (**FDTD**), simulação do **Experimento da Dupla Fenda de Young** com gráfico de intensidade de franjas de interferência em tempo real, **Efeito Doppler** e cone de choque de Mach supersônico. | [Demo](https://sanjrhoff.github.io/portifolio/p_waves/index.html) | [`p_waves/`](./p_waves/) |
 | **13** | **FieldLorentz** | Eletromagnetismo & Partículas | Traçado contínuo de linhas de campo elétrico via integração **Runge-Kutta 4 (RK4)**, superfícies equipotenciais, câmara de **Força de Lorentz** $\vec{F} = q(\vec{E} + \vec{v}\times\vec{B})$ com **Algoritmo de Boris**, Acelerador Ciclotron e Espectrômetro de Massa. | [Demo](https://sanjrhoff.github.io/portifolio/p_field/index.html) | [`p_field/`](./p_field/) |
 | **14** | **ChaosPendulum** | Mecânica Não-Linear & Caos | Pêndulo Duplo acoplado com equações de **Euler-Lagrange** integradas via RK4 de alta precisão, demonstração do **Efeito Borboleta com Enxame de 100 Pêndulos** ($\Delta\theta = 10^{-6}\text{ rad}$) e cálculo em tempo real do **Espaço de Fase** $(\omega_1, \theta_1)$ e do **Expoente de Lyapunov**. | [Demo](https://sanjrhoff.github.io/portifolio/p_chaos/index.html) | [`p_chaos/`](./p_chaos/) |
+| **15** | **QuantumLab 1D** | Física Computacional & Mecânica Quântica | Resolução da **Equação de Schrödinger Dependente do Tempo (1D TDSE)** via **Crank-Nicolson Cayley O(N)** estritamente unitário ($\int |\psi|^2 dx = 1.000000$). Algoritmo de **Thomas (TDMA) Complexo**, mapeamento de fase espectral HSL ($\arg\psi$), **Tunelamento Quântico**, Diodo RTD ressonante, oscilador harmônico coerente e pincel interativo de potencial $V(x)$. | [Demo](https://sanjrhoff.github.io/portifolio/p_quantum/index.html) | [`p_quantum/`](./p_quantum/) |
 
 ---
 
@@ -69,6 +70,7 @@ portifolio/
 ├── p_waves/                # WaveLab 2D — Simulador de Ondas FDTD & Dupla Fenda de Young
 ├── p_field/                # FieldLorentz — Eletromagnetismo RK4 & Câmara de Lorentz
 ├── p_chaos/                # ChaosPendulum — Pêndulo Duplo Lagrangiano & Teoria do Caos
+├── p_quantum/              # QuantumLab 1D — Simulador TDSE & Crank-Nicolson O(N)
 └── docs/                   # Especificações, Design System e Relatórios de QA
 ```
 
