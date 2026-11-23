@@ -56,7 +56,9 @@
     spectrometer: {
       active: false,
       splitX: 0,
-      eFieldSelector: 120.0
+      slitAperture: 18,
+      eFieldSelector: 112.5,
+      detectorHits: []
     },
 
     // Controle de interação por ponteiro
@@ -97,7 +99,7 @@
     proton: {
       name: 'Próton (p⁺)',
       q: 1.0,
-      m: 6.0,          // Escala reduzida para visualização orbital clara dentro do canvas
+      m: 2.8,          // Escala reduzida para semicírculo caber perfeitamente no detector do espectrômetro
       radius: 5.5,
       color: '#fbbf24',
       trailGlow: 'rgba(251, 191, 36, 0.4)'
@@ -105,7 +107,7 @@
     alpha: {
       name: 'Partícula Alfa (α²⁺)',
       q: 2.0,
-      m: 12.0,
+      m: 5.6,
       radius: 6.5,
       color: '#ef4444',
       trailGlow: 'rgba(239, 68, 68, 0.4)'
@@ -297,8 +299,50 @@
       p.vy = vyPlus + qOverM * field.Ey * halfDt;
 
       // 4. Atualização de Posição: r^{t+dt} = r^t + v^{t+dt} * dt
+      const prevX = p.x;
+      const prevY = p.y;
       p.x += p.vx * subDt;
       p.y += p.vy * subDt;
+
+      // Colisões e Absorções Físicas no Espectrômetro de Massa
+      if (state.spectrometer.active) {
+        const spec = state.spectrometer;
+        const splitX = spec.splitX;
+        const cy = canvas.height / 2;
+        const slitHalf = spec.slitAperture || 18;
+
+        // A. Colisão com o anteparo colimador vindo da esquerda (bloqueio do feixe)
+        if (prevX < splitX && p.x >= splitX) {
+          if (Math.abs(p.y - cy) > slitHalf) {
+            // Não passou pelo orifício da fenda: absorve no anteparo
+            state.particles.splice(i, 1);
+            continue;
+          }
+        }
+
+        // B. Colisão com a placa detectora fotográfica no retorno do semicírculo magnético
+        if (prevX >= splitX && p.x <= splitX && p.vx < 0) {
+          if (!spec.detectorHits) spec.detectorHits = [];
+          spec.detectorHits.push({
+            x: splitX,
+            y: p.y,
+            type: p.typeKey || (p.q < 0 ? 'electron' : 'proton'),
+            color: p.color,
+            time: performance.now()
+          });
+          if (spec.detectorHits.length > 40) spec.detectorHits.shift();
+
+          // Absorve a partícula para registrar o pico espectral e não deixá-la girar em cima da fenda
+          state.particles.splice(i, 1);
+          continue;
+        }
+
+        // C. Colisão com as placas superior/inferior do capacitor do seletor
+        if (p.x < splitX && (p.y < cy - 50 || p.y > cy + 50)) {
+          state.particles.splice(i, 1);
+          continue;
+        }
+      }
 
       // Atualiza rastro histórico
       p.trail.unshift({ x: p.x, y: p.y });
@@ -322,6 +366,7 @@
       y,
       vx,
       vy,
+      typeKey: typeKey || 'electron',
       q: spec.q,
       m: spec.m,
       radius: spec.radius,
@@ -361,11 +406,31 @@
         }
         break;
 
+      case 'faraday-cage':
+        // A cada ~30 quadros (~0.5s), dispara sondas de teste:
+        // Sonda central: passa por dentro da gaiola (comprova E = 0 e movimento reto por inércia)
+        // Sondas periféricas: passam fora da gaiola (mostram a deflexão pelo campo elétrico externo)
+        if (state.streamTimer % 30 === 0 && state.particles.length < 18) {
+          streamAlternator++;
+          const pType = (streamAlternator % 4 < 2) ? 'electron' : 'proton';
+          const isCentral = (streamAlternator % 2 === 0);
+
+          if (isCentral) {
+            // Sonda central (atravessa o interior blindado em linha reta)
+            spawnParticle(30, cy, 65, 0, pType);
+          } else {
+            // Sonda periférica (passa pelo lado de fora da gaiola para evidenciar o campo externo)
+            const offY = (streamAlternator % 4 === 1) ? -165 : 165;
+            spawnParticle(30, cy + offY, 45, 0, pType);
+          }
+        }
+        break;
+
       case 'mass-spectrometer':
-        // A cada ~50 quadros (~0.8s), se tiver menos de 8 partículas, injeta par elétron + próton
-        if (state.streamTimer % 50 === 0 && state.particles.length < 8) {
-          spawnParticle(45, cy, 95, 0, 'electron');
-          spawnParticle(45, cy, 95, 0, 'proton');
+        // Injeta par elétron + próton com velocidade calibrada para o seletor v = E/B
+        if (state.streamTimer % 45 === 0 && state.particles.length < 8) {
+          spawnParticle(45, cy, 90, 0, 'electron');
+          spawnParticle(45, cy, 90, 0, 'proton');
         }
         break;
 
@@ -590,33 +655,134 @@
       ctx.restore();
     }
 
-    // B. Espectrômetro de Massa: Câmara de Seleção E x B e Câmara Magnética Pura
+    // B. Espectrômetro de Massa: Câmara de Seleção E x B e Placa Detectora Fotográfica
     if (state.spectrometer.active) {
       const spec = state.spectrometer;
       const splitX = spec.splitX;
+      const cy = canvas.height / 2;
+      const slitHalf = spec.slitAperture || 18;
 
       ctx.save();
-      // Linha divisória da fenda
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
-      ctx.lineWidth = 4;
+      // 1. Anteparo Colimador Opaco (Barreira física que bloqueia feixe fora da fenda)
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 5;
       ctx.beginPath();
       ctx.moveTo(splitX, 0);
-      ctx.lineTo(splitX, canvas.height / 2 - 18);
-      ctx.moveTo(splitX, canvas.height / 2 + 18);
+      ctx.lineTo(splitX, cy - slitHalf);
+      ctx.moveTo(splitX, cy + slitHalf);
       ctx.lineTo(splitX, canvas.height);
       ctx.stroke();
 
-      // Placas do seletor E x B à esquerda
-      ctx.fillStyle = 'rgba(245, 158, 11, 0.1)';
-      ctx.fillRect(40, canvas.height / 2 - 50, splitX - 60, 100);
+      // Placa Detectora Fotográfica no verso da fenda (para absorver os semicírculos de retorno)
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(splitX + 3, 0);
+      ctx.lineTo(splitX + 3, cy - slitHalf);
+      ctx.moveTo(splitX + 3, cy + slitHalf);
+      ctx.lineTo(splitX + 3, canvas.height);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
+      // 2. Placas do seletor E x B à esquerda
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.08)';
+      ctx.fillRect(35, cy - 50, splitX - 50, 100);
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(35, cy - 50, splitX - 50, 100);
+
+      // Labels informativas
       ctx.fillStyle = '#f59e0b';
       ctx.font = '10px JetBrains Mono, monospace';
-      ctx.fillText('+ Placa Superior (+V)', 45, canvas.height / 2 - 56);
+      ctx.fillText('+ Placa Superior (+V)', 42, cy - 56);
       ctx.fillStyle = '#06b6d4';
-      ctx.fillText('- Placa Inferior (-V)', 45, canvas.height / 2 + 66);
-      ctx.fillStyle = '#fafafa';
-      ctx.fillText('Fenda Colimadora', splitX - 52, canvas.height / 2 + 32);
+      ctx.fillText('- Placa Inferior (-V)', 42, cy + 66);
+      ctx.fillStyle = '#e4e4e7';
+      ctx.fillText('Fenda Colimadora', splitX - 110, cy + 4);
+
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
+      ctx.fillText('Placa Detectora (Filme)', splitX + 8, 22);
+
+      // 3. Renderiza marcas de detecção dos impactos acumulados
+      if (spec.detectorHits && spec.detectorHits.length > 0) {
+        for (let hit of spec.detectorHits) {
+          const age = (performance.now() - hit.time) / 1000;
+          const alpha = Math.max(0.25, 1.0 - age * 0.08);
+
+          // Marca espectral (linha perpendicular ao anteparo)
+          ctx.strokeStyle = hit.color;
+          ctx.globalAlpha = alpha;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(splitX, hit.y);
+          ctx.lineTo(splitX + 16, hit.y);
+          ctx.stroke();
+
+          // Ponto de impacto no detector
+          ctx.fillStyle = hit.color;
+          ctx.beginPath();
+          ctx.arc(splitX + 2, hit.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        // Rótulos explicativos dos picos espectrais
+        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.fillStyle = '#06b6d4';
+        ctx.fillText('◄ Pico Elétron (e⁻)', splitX + 22, cy - 110);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillText('◄ Pico Próton (p⁺)', splitX + 22, cy + 220);
+      }
+
+      ctx.restore();
+    }
+
+    // C. Gaiola de Faraday: Destaque visual da Zona Blindada
+    if (state.activePreset === 'faraday-cage') {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const cageRadius = 130;
+
+      ctx.save();
+      // Disco suave indicando interior blindado
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, cageRadius - 15);
+      grad.addColorStop(0, 'rgba(16, 185, 129, 0.08)');
+      grad.addColorStop(0.85, 'rgba(16, 185, 129, 0.03)');
+      grad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, cageRadius - 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Borda pontilhada da blindagem
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, cageRadius - 18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Badge didático no centro da gaiola
+      ctx.fillStyle = 'rgba(14, 14, 18, 0.88)';
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.45)';
+      ctx.lineWidth = 1;
+      const boxW = 190;
+      const boxH = 46;
+      ctx.fillRect(cx - boxW / 2, cy - boxH / 2, boxW, boxH);
+      ctx.strokeRect(cx - boxW / 2, cy - boxH / 2, boxW, boxH);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 11px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('🛡️ ZONA BLINDADA', cx, cy - 8);
+
+      ctx.fillStyle = '#a1a1aa';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.fillText('E ≈ 0 N/C • Força Nula (Inércia)', cx, cy + 12);
+
       ctx.restore();
     }
   }
@@ -857,15 +1023,15 @@
             q: 2.0
           });
         }
-        if (pTitle) pTitle.textContent = 'Gaiola de Faraday (Blindagem)';
-        if (pDesc) pDesc.textContent = 'Anel de condutores com cargas idênticas gerando blindagem eletrostática. No interior da gaiola, a superposição de todos os vetores resulta em campo elétrico rigorosamente nulo E ≈ 0.';
+        if (pTitle) pTitle.textContent = 'Gaiola de Faraday (Blindagem Eletrostática)';
+        if (pDesc) pDesc.textContent = 'O Teorema de Gauss demonstra que a superposição dos campos de todas as cargas do anel se anula perfeitamente no interior (∑E = 0). As partículas que entram na zona blindada não sofrem força elétrica (F = q·E = 0) e viajam em linha reta por inércia! As partículas que passam por fora sofrem forte deflexão pelas cargas.';
         break;
 
       case 'cyclotron':
         state.bField = 1.30;
         state.cyclotron.active = true;
         state.cyclotron.gapX = cx;
-        state.cyclotron.omegaC = 1.30 / 6.0; // omega_c = qB / m para proton
+        state.cyclotron.omegaC = 1.30 / 2.8; // omega_c = qB / m para proton
         // Injeta próton no centro para iniciar espiral acelerada
         spawnParticle(cx - 5, cy, 30, 0, 'proton');
         if (pTitle) pTitle.textContent = 'Ciclotron Acelerador de Lawrence';
@@ -873,14 +1039,17 @@
         break;
 
       case 'mass-spectrometer':
-        state.bField = 1.10;
+        state.bField = 1.25;
         state.spectrometer.active = true;
-        state.spectrometer.splitX = cx - 50;
+        state.spectrometer.splitX = cx - 40;
+        state.spectrometer.slitAperture = 18;
+        state.spectrometer.eFieldSelector = 90.0 * 1.25; // Condição de Bainbridge: E = v * B para passar reto na fenda
+        state.spectrometer.detectorHits = [];
         // Injeta duas partículas de massas distintas com mesma velocidade para observar separação
-        spawnParticle(50, cy, 90, 0, 'electron');
-        spawnParticle(50, cy, 90, 0, 'proton');
-        if (pTitle) pTitle.textContent = 'Espectrômetro de Bainbridge';
-        if (pDesc) pDesc.textContent = 'Estágio 1: Seletor de velocidades com campos cruzados E ⊥ B onde apenas partículas com v = E/B passam. Estágio 2: Câmara magnética pura que separa isótopos com massas distintas em raios de Larmor diferentes.';
+        spawnParticle(45, cy, 90, 0, 'electron');
+        spawnParticle(45, cy, 90, 0, 'proton');
+        if (pTitle) pTitle.textContent = 'Espectrômetro de Massa de Bainbridge';
+        if (pDesc) pDesc.textContent = 'Estágio 1: Seletor de velocidades E ⊥ B. Apenas partículas com v = E/B passam pela fenda sem bater nas paredes. Estágio 2: Câmara magnética pura que deflete partículas em semicírculos proporcionais à sua massa (r_L = mv/qB), colidindo na placa detectora e gerando os picos espectrais sem girar em cima da fenda!';
         break;
 
       case 'exb-drift':
