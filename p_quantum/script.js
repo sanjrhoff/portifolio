@@ -339,12 +339,16 @@
 
     // Detectar região da barreira se não for preset de estado ligado (poço harmônico/infinito)
     const isBoundState = (state.currentPreset === 'harmonic-oscillator' || state.currentPreset === 'infinite-well');
+    const isStep = (state.currentPreset === 'potential-step');
 
     let ja = Math.floor(N * 0.48);
     let jb = Math.floor(N * 0.52);
 
     if (!isBoundState) {
-      if (state.barrierXa > 0 && state.barrierXb > state.barrierXa) {
+      if (isStep) {
+        ja = Math.floor(state.barrierXa / DX);
+        jb = ja;
+      } else if (state.barrierXa > 0 && state.barrierXb > state.barrierXa) {
         ja = Math.max(1, Math.floor(state.barrierXa / DX));
         jb = Math.min(N - 2, Math.floor(state.barrierXb / DX));
       } else {
@@ -389,12 +393,20 @@
 
       // Reflexão, Transmissão e Probabilidade Intrabarreira
       if (!isBoundState) {
-        if (j < ja) {
-          reflSum += dP;
-        } else if (j > jb) {
-          transSum += dP;
+        if (isStep) {
+          if (j < ja) {
+            reflSum += dP;
+          } else {
+            transSum += dP;
+          }
         } else {
-          barSum += dP;
+          if (j < ja) {
+            reflSum += dP;
+          } else if (j > jb) {
+            transSum += dP;
+          } else {
+            barSum += dP;
+          }
         }
       }
 
@@ -865,9 +877,19 @@
     oCtx.clearRect(0, 0, w, h);
 
     const isBound = (state.currentPreset === 'harmonic-oscillator' || state.currentPreset === 'infinite-well');
+    const isStep = (state.currentPreset === 'potential-step');
 
-    // Marcadores de início e fim da barreira (apenas em espalhamento por barreira localizada)
-    if (!isBound && state.barrierXa > 0 && state.barrierXb > state.barrierXa && (state.barrierXb - state.barrierXa) < 0.35 * L) {
+    // Marcadores de início e fim da barreira ou degrau
+    if (isStep && state.barrierXa > 0) {
+      const xaPx = (state.barrierXa / L) * w;
+      oCtx.lineWidth = 1;
+      oCtx.setLineDash([4, 4]);
+      oCtx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+      oCtx.beginPath();
+      oCtx.moveTo(xaPx, 0); oCtx.lineTo(xaPx, h);
+      oCtx.stroke();
+      oCtx.setLineDash([]);
+    } else if (!isBound && state.barrierXa > 0 && state.barrierXb > state.barrierXa && (state.barrierXb - state.barrierXa) < 0.35 * L) {
       const xaPx = (state.barrierXa / L) * w;
       const xbPx = (state.barrierXb / L) * w;
 
@@ -1188,7 +1210,7 @@
         state.barrierWidthFrac = 0.50;
         state.barrierHeight = 3.2;
         state.barrierXa = jStep * DX;
-        state.barrierXb = (N - 1) * DX;
+        state.barrierXb = jStep * DX;
 
         initializeGaussianPacket();
         showToast('Preset 5 Carregado: Degrau de Potencial (Reflexão Quântica E > V₀)');
