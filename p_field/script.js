@@ -99,7 +99,7 @@
     proton: {
       name: 'Próton (p⁺)',
       q: 1.0,
-      m: 2.8,          // Escala reduzida para semicírculo caber perfeitamente no detector do espectrômetro
+      m: 1.75,          // 1.75 u: raio calibrado para foco perfeito no detector dentro da tela
       radius: 5.5,
       color: '#fbbf24',
       trailGlow: 'rgba(251, 191, 36, 0.4)'
@@ -107,7 +107,7 @@
     alpha: {
       name: 'Partícula Alfa (α²⁺)',
       q: 2.0,
-      m: 5.6,
+      m: 3.5,
       radius: 6.5,
       color: '#ef4444',
       trailGlow: 'rgba(239, 68, 68, 0.4)'
@@ -702,13 +702,34 @@
       ctx.fillText('Fenda Colimadora', splitX - 110, cy + 4);
 
       ctx.fillStyle = 'rgba(56, 189, 248, 0.9)';
-      ctx.fillText('Placa Detectora (Filme)', splitX + 8, 22);
+      ctx.fillText('Placa Detectora (Filme)', splitX + 8, 54);
+
+      // Posições teóricas dos picos de absorção espectral (diâmetro d = 2 * r_L = 2 * m * v / (q * B))
+      const rLe = (1.0 * 90.0) / 1.25;      // r_L = 72 px (Elétron curva para baixo)
+      const rLp = (1.75 * 90.0) / 1.25;     // r_L = 126 px (Próton curva para cima)
+      const yTargetElectron = cy + 2 * rLe;  // cy + 144 px (Abaixo da fenda)
+      const yTargetProton = cy - 2 * rLp;    // cy - 252 px (Acima da fenda)
+
+      // Rótulos alinhados exatamente com o ponto físico de impacto de cada partícula
+      ctx.font = '10px JetBrains Mono, monospace';
+
+      // 1. Alvo e Rótulo do Próton (Para CIMA da fenda)
+      ctx.fillStyle = 'rgba(251, 191, 36, 0.15)';
+      ctx.fillRect(splitX, yTargetProton - 7, 10, 14);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(`◄ Pico Próton (p⁺) [d = ${(2 * rLp).toFixed(0)} px]`, splitX + 16, yTargetProton + 4);
+
+      // 2. Alvo e Rótulo do Elétron (Para BAIXO da fenda)
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
+      ctx.fillRect(splitX, yTargetElectron - 7, 10, 14);
+      ctx.fillStyle = '#06b6d4';
+      ctx.fillText(`◄ Pico Elétron (e⁻) [d = ${(2 * rLe).toFixed(0)} px]`, splitX + 16, yTargetElectron + 4);
 
       // 3. Renderiza marcas de detecção dos impactos acumulados
       if (spec.detectorHits && spec.detectorHits.length > 0) {
         for (let hit of spec.detectorHits) {
           const age = (performance.now() - hit.time) / 1000;
-          const alpha = Math.max(0.25, 1.0 - age * 0.08);
+          const alpha = Math.max(0.25, 1.0 - age * 0.06);
 
           // Marca espectral (linha perpendicular ao anteparo)
           ctx.strokeStyle = hit.color;
@@ -716,23 +737,16 @@
           ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.moveTo(splitX, hit.y);
-          ctx.lineTo(splitX + 16, hit.y);
+          ctx.lineTo(splitX + 14, hit.y);
           ctx.stroke();
 
           // Ponto de impacto no detector
           ctx.fillStyle = hit.color;
           ctx.beginPath();
-          ctx.arc(splitX + 2, hit.y, 3, 0, Math.PI * 2);
+          ctx.arc(splitX + 2, hit.y, 3.5, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = 1.0;
-
-        // Rótulos explicativos dos picos espectrais
-        ctx.font = '10px JetBrains Mono, monospace';
-        ctx.fillStyle = '#06b6d4';
-        ctx.fillText('◄ Pico Elétron (e⁻)', splitX + 22, cy - 110);
-        ctx.fillStyle = '#fbbf24';
-        ctx.fillText('◄ Pico Próton (p⁺)', splitX + 22, cy + 220);
       }
 
       ctx.restore();
@@ -1031,7 +1045,7 @@
         state.bField = 1.30;
         state.cyclotron.active = true;
         state.cyclotron.gapX = cx;
-        state.cyclotron.omegaC = 1.30 / 2.8; // omega_c = qB / m para proton
+        state.cyclotron.omegaC = 1.30 / 1.75; // omega_c = qB / m para proton (m = 1.75)
         // Injeta próton no centro para iniciar espiral acelerada
         spawnParticle(cx - 5, cy, 30, 0, 'proton');
         if (pTitle) pTitle.textContent = 'Ciclotron Acelerador de Lawrence';
