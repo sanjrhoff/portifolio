@@ -1229,8 +1229,12 @@
       }
 
       if (this.btnResign) {
-        this.btnResign.addEventListener('click', () => {
-          this.calculateSignatureAndRender();
+        this.btnResign.addEventListener('click', async () => {
+          if (this.header.alg === 'none') {
+            this.header = { alg: 'HS256', typ: 'JWT' };
+            this.updateEditors();
+          }
+          await this.calculateSignatureAndRender();
           logger.log('CRYPTO', 'M4: JWT', 'Nova assinatura HMAC-SHA256 gerada legitimamente com o segredo.');
         });
       }
@@ -1297,6 +1301,17 @@
       return this.base64UrlEncode(new Uint8Array(signatureBuffer));
     }
 
+    updateAlgNoneButtonText() {
+      if (!this.btnAlgNone) return;
+      if (this.header.alg === 'none') {
+        this.btnAlgNone.innerHTML = '<i class="fas fa-rotate-left"></i> Desativar Exploit (Restaurar HS256)';
+        this.btnAlgNone.className = 'btn-sec btn-sec--outline';
+      } else {
+        this.btnAlgNone.innerHTML = '<i class="fas fa-bomb"></i> Ativar Exploit \'alg: none\'';
+        this.btnAlgNone.className = 'btn-sec btn-sec--danger';
+      }
+    }
+
     async calculateSignatureAndRender() {
       try {
         const headerB64 = this.base64UrlEncode(JSON.stringify(this.header));
@@ -1312,6 +1327,7 @@
         }
 
         this.updateRawDisplay(headerB64, payloadB64, this.currentSignature);
+        this.updateAlgNoneButtonText();
       } catch (err) {
         this.setInvalidStatus(`Erro no Web Crypto: ${err.message}`);
       }
@@ -1324,6 +1340,7 @@
         const signingInput = `${headerB64}.${payloadB64}`;
 
         this.updateRawDisplay(headerB64, payloadB64, this.currentSignature);
+        this.updateAlgNoneButtonText();
 
         if (this.header.alg === 'none') {
           this.setAlgNoneStatus();
@@ -1378,6 +1395,14 @@
     }
 
     executeAlgNoneExploit() {
+      if (this.header.alg === 'none') {
+        this.header = { alg: 'HS256', typ: 'JWT' };
+        this.updateEditors();
+        this.calculateSignatureAndRender();
+        logger.log('INFO', 'M4: JWT', 'Exploit "alg: none" desativado. Algoritmo restaurado para HS256.');
+        return;
+      }
+
       this.header = { alg: 'none', typ: 'JWT' };
       this.payload.role = 'admin';
       this.updateEditors();
@@ -1391,17 +1416,36 @@
       if (this.header.alg === 'none') {
         this.bruteforceResult.className = 'jwt-bruteforce-result is-active';
         this.bruteforceResult.innerHTML = `
-          <div class="text-amber font-mono">
-            <i class="fas fa-info-circle"></i> O token atual utiliza <strong>'alg: none'</strong> (sem assinatura). Não há chave HMAC a ser quebrada.
+          <div class="text-amber font-mono" style="line-height: 1.6;">
+            <div style="font-weight: 700; margin-bottom: 0.25rem;">
+              <i class="fas fa-info-circle"></i> O token atual utiliza <strong>'alg: none'</strong> (sem assinatura).
+            </div>
+            <div style="font-size: 0.74rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+              No exploit <code>alg: none</code>, a assinatura foi deliberadamente removida pelo atacante. Para demonstrar a <strong>quebra de chave fraca por dicionário</strong>, o token precisa ter uma assinatura HMAC ativa:
+            </div>
+            <button type="button" class="btn-sec btn-sec--primary" id="btn-fix-jwt-and-bruteforce" style="font-size: 0.75rem; padding: 0.35rem 0.8rem;">
+              <i class="fas fa-bolt text-amber"></i> Assinar com chave "${this.secret}" e Quebrar Agora
+            </button>
           </div>
         `;
-        logger.log('WARN', 'M4: JWT', 'Tentativa de teste de dicionário ignorada: token configurado com exploit "alg: none".');
+
+        const fixBtn = document.getElementById('btn-fix-jwt-and-bruteforce');
+        if (fixBtn) {
+          fixBtn.addEventListener('click', async () => {
+            this.header = { alg: 'HS256', typ: 'JWT' };
+            this.updateEditors();
+            await this.calculateSignatureAndRender();
+            await this.executeWeakKeyBruteforce();
+          });
+        }
+
+        logger.log('WARN', 'M4: JWT', 'Tentativa de teste de dicionário em token sem assinatura ("alg: none").');
         return;
       }
 
       const dictionary = [
-        'password', '123456', 'admin', 'jwt', 'secret',
-        'qwerty', 'developer', 'sandro', 'root', 'cybersec',
+        'password', '123456', 'admin', 'admin2026', 'jwt', 'secret',
+        'qwerty', 'developer', 'sandro', 'sandrosec99', 'root', 'cybersec',
         'supersecret', 'letmein', 'sandro-super-secret-key-2026'
       ];
 
