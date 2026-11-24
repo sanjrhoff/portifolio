@@ -269,6 +269,9 @@
         } else if (e.altKey && (e.key === 'l' || e.key === 'L')) {
           e.preventDefault();
           logger.toggleExpand();
+        } else if (e.altKey && (e.key === 'g' || e.key === 'G')) {
+          e.preventDefault();
+          toggleGuideModal();
         } else if (e.altKey && (e.key === 'r' || e.key === 'R')) {
           e.preventDefault();
           resetCurrentModule();
@@ -277,6 +280,7 @@
           openAuditModal();
         } else if (e.key === 'Escape') {
           closeAuditModal();
+          closeGuideModal();
         }
       });
     }
@@ -1834,6 +1838,94 @@
       if (e.target === auditModal) closeAuditModal();
     });
   }
+
+  // ==========================================================================
+  // GUIA PRÁTICO DA BANCADA: "COMO TESTAR?"
+  // ==========================================================================
+  const guideModal = document.getElementById('guide-modal');
+  const btnGlobalGuide = document.getElementById('btn-global-guide');
+  const btnCloseGuideModal = document.getElementById('btn-close-guide-modal');
+  const btnGuideCloseBottom = document.getElementById('btn-guide-close-bottom');
+
+  function openGuideModal(targetTab) {
+    if (!guideModal) return;
+    const tabToOpen = targetTab || tabManager.activeTab || 'sqli';
+    switchGuideModalTab(tabToOpen);
+    guideModal.classList.add('is-open');
+    logger.log('INFO', 'GUIDE', `Guia de Testes aberto no módulo [${tabToOpen.toUpperCase()}].`);
+  }
+
+  function closeGuideModal() {
+    if (guideModal) guideModal.classList.remove('is-open');
+  }
+
+  function toggleGuideModal() {
+    if (guideModal && guideModal.classList.contains('is-open')) {
+      closeGuideModal();
+    } else {
+      openGuideModal();
+    }
+  }
+
+  function switchGuideModalTab(tabId) {
+    const validTabs = ['sqli', 'xss', 'tls', 'jwt', 'hash'];
+    if (!validTabs.includes(tabId)) tabId = 'sqli';
+
+    document.querySelectorAll('.guide-modal-tab-btn').forEach(btn => {
+      const active = btn.getAttribute('data-guide-tab') === tabId;
+      btn.classList.toggle('is-active', active);
+    });
+
+    document.querySelectorAll('.guide-module-section').forEach(sec => {
+      const active = sec.getAttribute('data-guide-section') === tabId;
+      sec.classList.toggle('is-active', active);
+    });
+  }
+
+  if (btnGlobalGuide) {
+    btnGlobalGuide.addEventListener('click', () => openGuideModal());
+  }
+
+  if (btnCloseGuideModal) {
+    btnCloseGuideModal.addEventListener('click', closeGuideModal);
+  }
+
+  if (btnGuideCloseBottom) {
+    btnGuideCloseBottom.addEventListener('click', closeGuideModal);
+  }
+
+  if (guideModal) {
+    guideModal.addEventListener('click', (e) => {
+      if (e.target === guideModal) closeGuideModal();
+    });
+  }
+
+  // Abas dentro do modal de guia
+  document.querySelectorAll('.guide-modal-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-guide-tab');
+      switchGuideModalTab(tabId);
+    });
+  });
+
+  // Botões de "Ver Guia Completo" espalhados pelos módulos
+  document.querySelectorAll('.open-guide-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-target-tab') || tabManager.activeTab;
+      openGuideModal(target);
+    });
+  });
+
+  // Botão "Ir para este Módulo" dentro do modal
+  document.querySelectorAll('.guide-jump-module-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-jump');
+      if (target) {
+        tabManager.switchTab(target);
+        closeGuideModal();
+      }
+    });
+  });
 
   function downloadFile(content, fileName, contentType) {
     const a = document.createElement('a');

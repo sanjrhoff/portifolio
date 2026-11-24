@@ -67,6 +67,11 @@
 
     <!-- Ações Globais da Bancada -->
     <div class="header-actions">
+      <button type="button" class="btn-header btn-header--guide" id="btn-global-guide" title="Guia Prático: Como testar cada um dos 5 módulos (Alt + G)">
+        <i class="fas fa-book-open text-amber"></i>
+        <span>Como Testar?</span>
+        <span class="kbd">Alt+G</span>
+      </button>
       <button type="button" class="btn-header" id="btn-global-reset" title="Restaurar parâmetros padrão do módulo ativo (Alt + R)">
         <i class="fas fa-rotate-left"></i>
         <span>Reset</span>
@@ -129,6 +134,30 @@
           <p class="module-desc">
             Compreenda a subversão da gramática SQL através da visualização em tempo real da Árvore Sintática Abstrata (AST). Observe como operadores de escape alteram a árvore lógica forçando tautologias, e compare lado a lado com a blindagem por Prepared Statements.
           </p>
+
+          <!-- Roteiro de Teste Rápido -->
+          <div class="guide-quick-banner">
+            <div class="guide-quick-header">
+              <span class="guide-quick-title"><i class="fas fa-lightbulb text-amber"></i> Como Testar Este Módulo (Passo a Passo):</span>
+              <button type="button" class="btn-sec btn-sec--outline open-guide-btn" data-target-tab="sqli" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">
+                <i class="fas fa-circle-info"></i> Ver Guia Completo
+              </button>
+            </div>
+            <div class="guide-quick-steps">
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--attack"><i class="fas fa-bug"></i> 1. O Ataque:</span>
+                <span class="guide-step-text">Em <strong>Modo Vulnerável</strong>, clique no preset <code>' OR '1'='1' --</code> e clique em <strong>Executar Query</strong>.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--expect"><i class="fas fa-eye"></i> O Que Esperar:</span>
+                <span class="guide-step-text">A <strong>AST</strong> ganha um nó vermelho de tautologia <code>OR TRUE</code> e o Mock DB vaza <strong>5 contas com senhas</strong>!</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--defense"><i class="fas fa-shield-check"></i> 2. A Defesa:</span>
+                <span class="guide-step-text">Mude para <strong>Modo Seguro (Prepared Statement)</strong> e re-execute: a query usa <code>?</code>, a AST fica verde e retorna <strong>0 linhas (Acesso Negado)</strong>!</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -258,6 +287,30 @@
           <p class="module-desc">
             Simule o roubo de sessões por injeção de scripts no contexto do navegador da vítima. Compare lado a lado os efeitos da falta de sanitização, a eficácia do contextual output encoding e o bloqueio estrito via cabeçalho HTTP Content-Security-Policy.
           </p>
+
+          <!-- Roteiro de Teste Rápido -->
+          <div class="guide-quick-banner">
+            <div class="guide-quick-header">
+              <span class="guide-quick-title"><i class="fas fa-lightbulb text-amber"></i> Como Testar Este Módulo (Passo a Passo):</span>
+              <button type="button" class="btn-sec btn-sec--outline open-guide-btn" data-target-tab="xss" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">
+                <i class="fas fa-circle-info"></i> Ver Guia Completo
+              </button>
+            </div>
+            <div class="guide-quick-steps">
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--attack"><i class="fas fa-bug"></i> 1. O Ataque:</span>
+                <span class="guide-step-text">Com defesas desligadas, escolha o preset <code>&lt;script&gt;stealSession...</code> e clique em <strong>Submeter / Injetar</strong>.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--expect"><i class="fas fa-eye"></i> O Que Esperar:</span>
+                <span class="guide-step-text">Um modal vermelho pisca com <strong>"Exfiltração C2 Detectada"</strong> mostrando cookies e token JWT da vítima sendo roubados!</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--defense"><i class="fas fa-shield-check"></i> 2. A Defesa:</span>
+                <span class="guide-step-text">Ligue <strong>Sanitização</strong> (o script vira texto <code>&amp;lt;script&amp;gt;</code>) ou ligue <strong>CSP</strong> (o browser bloqueia e gera relatório!).</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -415,6 +468,30 @@
           <p class="module-desc">
             Acompanhe visualmente a sequência de pacotes entre Cliente, Sniffer de Rede e Servidor HTTPS. Entenda a matemática do Diffie-Hellman Efêmero ($g^{ab} \pmod p$) que impede bisbilhoteiros de decifrarem mensagens mesmo interceptando todos os pacotes públicos.
           </p>
+
+          <!-- Roteiro de Teste Rápido -->
+          <div class="guide-quick-banner">
+            <div class="guide-quick-header">
+              <span class="guide-quick-title"><i class="fas fa-lightbulb text-amber"></i> Como Testar Este Módulo (Passo a Passo):</span>
+              <button type="button" class="btn-sec btn-sec--outline open-guide-btn" data-target-tab="tls" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">
+                <i class="fas fa-circle-info"></i> Ver Guia Completo
+              </button>
+            </div>
+            <div class="guide-quick-steps">
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--attack"><i class="fas fa-play"></i> 1. O Handshake:</span>
+                <span class="guide-step-text">Clique em <strong>Iniciar Handshake TLS 1.3</strong> para ver a negociação de cifras e chaves Diffie-Hellman em 5 fases.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--expect"><i class="fas fa-eye"></i> O Que Esperar:</span>
+                <span class="guide-step-text">Cliente e Servidor calculam o mesmo segredo <code>K = 2</code> matematicamente, derivando a chave simétrica AES-GCM.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--defense"><i class="fas fa-shield-check"></i> 2. Compare no Sniffer:</span>
+                <span class="guide-step-text">Na raia central: em <strong>HTTP</strong> o invasor lia a senha em texto claro; em <strong>HTTPS</strong> tudo vira <code>0x7a8f... [ENCRYPTED]</code>!</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -604,6 +681,30 @@
           <p class="module-desc">
             Inspecione e manipule tokens JWT com assinatura criptográfica HMAC-SHA256 real calculada pela Web Crypto API. Observe a detecção imediata de violação de assinatura ao alterar privilégios e explore o clássico exploit <code>alg: none</code>.
           </p>
+
+          <!-- Roteiro de Teste Rápido -->
+          <div class="guide-quick-banner">
+            <div class="guide-quick-header">
+              <span class="guide-quick-title"><i class="fas fa-lightbulb text-amber"></i> Como Testar Este Módulo (Passo a Passo):</span>
+              <button type="button" class="btn-sec btn-sec--outline open-guide-btn" data-target-tab="jwt" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">
+                <i class="fas fa-circle-info"></i> Ver Guia Completo
+              </button>
+            </div>
+            <div class="guide-quick-steps">
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--attack"><i class="fas fa-user-shield"></i> 1. Fraudar Privilégio:</span>
+                <span class="guide-step-text">No Payload roxo, clique em <strong>Tornar 'admin'</strong> (muda <code>role: "user"</code> para <code>"admin"</code>).</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--expect"><i class="fas fa-eye"></i> O Que Esperar:</span>
+                <span class="guide-step-text">O badge fica vermelho: <strong>ASSINATURA VIOLADA (TAMPERED)</strong>! A assinatura antiga não confere com o novo payload.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--defense"><i class="fas fa-key"></i> 2. Exploits &amp; Força Bruta:</span>
+                <span class="guide-step-text">Teste <strong>Bypass alg: none</strong> (sem assinatura) ou clique em <strong>Testar Dicionário</strong> para quebrar chaves fracas como <code>secret</code>.</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -720,6 +821,30 @@
           <p class="module-desc">
             Compreenda por que funções de hash rápidas (MD5, SHA-1 e SHA-256) não são adequadas para armazenamento de senhas sem salt criptográfico e prova de trabalho iterativa (Bcrypt). Execute benchmarks em tempo real diretamente na CPU do seu navegador.
           </p>
+
+          <!-- Roteiro de Teste Rápido -->
+          <div class="guide-quick-banner">
+            <div class="guide-quick-header">
+              <span class="guide-quick-title"><i class="fas fa-lightbulb text-amber"></i> Como Testar Este Módulo (Passo a Passo):</span>
+              <button type="button" class="btn-sec btn-sec--outline open-guide-btn" data-target-tab="hash" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">
+                <i class="fas fa-circle-info"></i> Ver Guia Completo
+              </button>
+            </div>
+            <div class="guide-quick-steps">
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--attack"><i class="fas fa-bug"></i> 1. O Problema (Sem Salt):</span>
+                <span class="guide-step-text">Observe o <strong>Caso A</strong>: dois usuários distintos com a mesma senha <code>"senha123"</code> geram hashes <strong>idênticos</strong>, vulneráveis a Rainbow Tables!</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--defense"><i class="fas fa-shield-check"></i> 2. A Solução (Salt + Bcrypt):</span>
+                <span class="guide-step-text">No <strong>Caso B</strong>, clique em <strong>Regenerar Salts</strong>: 16 bytes aleatórios tornam cada hash único. O <strong>Bcrypt</strong> força custo iterativo resistente a GPUs.</span>
+              </div>
+              <div class="guide-step-card">
+                <span class="guide-step-badge guide-step-badge--expect"><i class="fas fa-stopwatch"></i> 3. Benchmark Local:</span>
+                <span class="guide-step-text">Clique em <strong>Rodar Benchmark</strong> para medir hashes/s na sua CPU e veja por que quebrar Bcrypt levaria <strong>&gt; 2.300 anos</strong> em GPU!</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -968,7 +1093,235 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       6. MODAL DO GUIA PRÁTICO "COMO TESTAR?"
+       ========================================================================== -->
+  <div class="cyber-modal-backdrop" id="guide-modal" role="dialog" aria-modal="true" aria-labelledby="modal-guide-title">
+    <div class="cyber-modal-card guide-modal-card">
+      <div class="cyber-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.55rem;">
+          <i class="fas fa-book-open text-amber" style="font-size: 1.1rem;"></i>
+          <h3 id="modal-guide-title" style="font-size: 0.95rem; font-weight: 700; color: var(--text-pure);">
+            Guia Prático da Bancada — O Que Esperar e Como Testar
+          </h3>
+        </div>
+        <button type="button" class="siem-tool-btn" id="btn-close-guide-modal" aria-label="Fechar Guia">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="cyber-modal-body">
+        <!-- Navegação por Abas do Guia -->
+        <div class="guide-modal-tabs" role="tablist">
+          <button type="button" class="guide-modal-tab-btn is-active" data-guide-tab="sqli">
+            <i class="fas fa-database text-amber"></i> 1. SQLi &amp; AST
+          </button>
+          <button type="button" class="guide-modal-tab-btn" data-guide-tab="xss">
+            <i class="fas fa-shield-virus text-crimson"></i> 2. XSS &amp; CSP
+          </button>
+          <button type="button" class="guide-modal-tab-btn" data-guide-tab="tls">
+            <i class="fas fa-network-wired text-emerald"></i> 3. TLS 1.3
+          </button>
+          <button type="button" class="guide-modal-tab-btn" data-guide-tab="jwt">
+            <i class="fas fa-id-badge text-violet"></i> 4. JWT &amp; HMAC
+          </button>
+          <button type="button" class="guide-modal-tab-btn" data-guide-tab="hash">
+            <i class="fas fa-hashtag text-cyan"></i> 5. Hashing &amp; Salt
+          </button>
+        </div>
+
+        <!-- Seção 1: SQL Injection -->
+        <div class="guide-module-section is-active" data-guide-section="sqli">
+          <div class="guide-mission-box">
+            <div class="guide-mission-header">
+              <span class="guide-mission-title text-amber"><i class="fas fa-database"></i> Módulo 1: Injeção SQL &amp; Árvore Sintática (AST)</span>
+              <button type="button" class="btn-sec btn-sec--primary guide-jump-module-btn" data-jump="sqli" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;">
+                <i class="fas fa-arrow-right"></i> Ir para este Módulo
+              </button>
+            </div>
+            <p class="guide-mission-story">
+              <strong>O Cenário Real:</strong> Um sistema de login vulnerável concatena a entrada do usuário diretamente na string SQL: <code>SELECT * FROM users WHERE user = '" + input + "'</code>.
+            </p>
+            <div class="guide-phase-grid">
+              <div class="guide-phase-card guide-phase-card--attack">
+                <span class="guide-phase-title guide-phase-title--attack"><i class="fas fa-bug"></i> Passo 1: O Ataque (Tautologia)</span>
+                <p class="guide-phase-desc">
+                  1. Mantenha em <strong>Modo Vulnerável</strong>.<br>
+                  2. Clique no preset <code>' OR '1'='1' --</code> e depois em <strong>Executar Query</strong>.<br>
+                  3. <strong>O que esperar na tela:</strong> A Árvore AST ganha um nó vermelho <code>OR TRUE</code>. O Mock DB retorna <strong>todas as 5 contas do banco</strong> com senhas e salários expostos!
+                </p>
+              </div>
+              <div class="guide-phase-card guide-phase-card--defense">
+                <span class="guide-phase-title guide-phase-title--defense"><i class="fas fa-shield-check"></i> Passo 2: A Blindagem (Prepared Statement)</span>
+                <p class="guide-phase-desc">
+                  1. Alterne para <strong>Modo Seguro (Prepared Statement)</strong>.<br>
+                  2. Clique novamente em <strong>Executar Query</strong>.<br>
+                  3. <strong>O que esperar na tela:</strong> A query usa placeholder <code>WHERE username = ?</code>. O banco trata <code>' OR '1'='1'</code> como literal de texto, a AST fica azul/verde e retorna <strong>0 linhas (Acesso Negado)</strong>!
+                </p>
+              </div>
+            </div>
+            <div class="guide-lesson-banner">
+              💡 <strong>Conceito-Chave para Entrevistas:</strong> Prepared Statements separam o <em>código</em> dos <em>dados</em> no nível do compilador do SGBD, impossibilitando que dados de entrada alterem a gramática da instrução.
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção 2: XSS -->
+        <div class="guide-module-section" data-guide-section="xss">
+          <div class="guide-mission-box">
+            <div class="guide-mission-header">
+              <span class="guide-mission-title text-crimson"><i class="fas fa-shield-virus"></i> Módulo 2: Cross-Site Scripting (XSS) &amp; CSP</span>
+              <button type="button" class="btn-sec btn-sec--primary guide-jump-module-btn" data-jump="xss" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;">
+                <i class="fas fa-arrow-right"></i> Ir para este Módulo
+              </button>
+            </div>
+            <p class="guide-mission-story">
+              <strong>O Cenário Real:</strong> Um fórum ou rede social exibe comentários de usuários usando <code>innerHTML</code> sem sanitizar tags HTML ou caracteres especiais, permitindo execução arbitrária de JavaScript.
+            </p>
+            <div class="guide-phase-grid">
+              <div class="guide-phase-card guide-phase-card--attack">
+                <span class="guide-phase-title guide-phase-title--attack"><i class="fas fa-bug"></i> Passo 1: O Ataque (Roubo de Sessão)</span>
+                <p class="guide-phase-desc">
+                  1. Desmarque as opções de <strong>Sanitização</strong> e <strong>CSP</strong>.<br>
+                  2. Clique no preset <code>&lt;script&gt;stealSession(document.cookie)&lt;/script&gt;</code> e clique em <strong>Submeter / Injetar</strong>.<br>
+                  3. <strong>O que esperar na tela:</strong> Um modal vermelho <strong>"Exfiltração C2 Detectada"</strong> surge instantaneamente mostrando o cookie de sessão e token JWT sendo roubados para o servidor do invasor!
+                </p>
+              </div>
+              <div class="guide-phase-card guide-phase-card--defense">
+                <span class="guide-phase-title guide-phase-title--defense"><i class="fas fa-shield-check"></i> Passo 2: Defesa em Camadas (Encoding + CSP)</span>
+                <p class="guide-phase-desc">
+                  1. <strong>Ligue Sanitização:</strong> Caracteres perigosos viram entidades HTML (<code>&amp;lt;script&amp;gt;</code>) e o texto é exibido inofensivo na tela.<br>
+                  2. <strong>Ligue CSP (Content-Security-Policy):</strong> O cabeçalho <code>script-src 'self'</code> impede a execução de scripts inline; o navegador bloqueia a injeção e emite relatório de violação!
+                </p>
+              </div>
+            </div>
+            <div class="guide-lesson-banner">
+              💡 <strong>Conceito-Chave para Entrevistas:</strong> Cookies com flag <code>HttpOnly</code> não podem ser lidos via JS, e políticas de CSP estritas bloqueiam scripts inline mesmo se a sanitização falhar.
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção 3: TLS 1.3 -->
+        <div class="guide-module-section" data-guide-section="tls">
+          <div class="guide-mission-box">
+            <div class="guide-mission-header">
+              <span class="guide-mission-title text-emerald"><i class="fas fa-network-wired"></i> Módulo 3: Handshake TLS 1.3 &amp; Sniffer de Pacotes</span>
+              <button type="button" class="btn-sec btn-sec--primary guide-jump-module-btn" data-jump="tls" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;">
+                <i class="fas fa-arrow-right"></i> Ir para este Módulo
+              </button>
+            </div>
+            <p class="guide-mission-story">
+              <strong>O Cenário Real:</strong> Um usuário envia credenciais bancárias pela rede Wi-Fi de uma cafeteria onde um atacante está rodando um sniffer (Wireshark) interceptando todo o tráfego.
+            </p>
+            <div class="guide-phase-grid">
+              <div class="guide-phase-card guide-phase-card--attack">
+                <span class="guide-phase-title guide-phase-title--attack"><i class="fas fa-bug"></i> Passo 1: Sniffer em HTTP Aberto</span>
+                <p class="guide-phase-desc">
+                  1. Observe o botão de alternância <strong>HTTP vs HTTPS</strong>.<br>
+                  2. Em <strong>HTTP</strong>, veja a raia central do Sniffer: qualquer atacante na mesma rede lê a requisição <code>POST /login password=sandro123</code> em texto puro sem qualquer esforço!
+                </p>
+              </div>
+              <div class="guide-phase-card guide-phase-card--defense">
+                <span class="guide-phase-title guide-phase-title--defense"><i class="fas fa-shield-check"></i> Passo 2: Handshake TLS 1.3 Criptográfico</span>
+                <p class="guide-phase-desc">
+                  1. Clique em <strong>Iniciar Handshake TLS 1.3</strong>.<br>
+                  2. <strong>O que esperar na tela:</strong> 5 fases são executadas com pacotes voando na tela. Cliente e Servidor usam <strong>Diffie-Hellman Efêmero</strong> para calcular o mesmo segredo compartilhado (K=2) e derivar chaves AES-GCM.<br>
+                  3. O Sniffer passa a enxergar apenas ruído criptográfico: <code>0x7a8f2b... [ENCRYPTED DATA]</code>!
+                </p>
+              </div>
+            </div>
+            <div class="guide-lesson-banner">
+              💡 <strong>Conceito-Chave para Entrevistas:</strong> TLS 1.3 garante <em>Perfect Forward Secrecy (PFS)</em> via ECDHE: mesmo se a chave privada do servidor vazar no futuro, comunicações passadas gravadas não podem ser decifradas.
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção 4: JWT Inspector -->
+        <div class="guide-module-section" data-guide-section="jwt">
+          <div class="guide-mission-box">
+            <div class="guide-mission-header">
+              <span class="guide-mission-title text-violet"><i class="fas fa-id-badge"></i> Módulo 4: JWT Inspector &amp; HMAC-SHA256 Real</span>
+              <button type="button" class="btn-sec btn-sec--primary guide-jump-module-btn" data-jump="jwt" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;">
+                <i class="fas fa-arrow-right"></i> Ir para este Módulo
+              </button>
+            </div>
+            <p class="guide-mission-story">
+              <strong>O Cenário Real:</strong> Uma aplicação confia no JSON Web Token (JWT) enviado pelo cliente para conceder permissões administrativas de sistema sem validar a assinatura criptográfica no backend.
+            </p>
+            <div class="guide-phase-grid">
+              <div class="guide-phase-card guide-phase-card--attack">
+                <span class="guide-phase-title guide-phase-title--attack"><i class="fas fa-bug"></i> Passo 1: Fraudar Privilégio &amp; Bypass alg: none</span>
+                <p class="guide-phase-desc">
+                  1. No editor de Payload (roxo), clique no preset <strong>Tornar 'admin'</strong>.<br>
+                  2. <strong>O que esperar na tela:</strong> O badge de integridade vira vermelho: <code>ASSINATURA VIOLADA (TAMPERED)</code>! O servidor detecta que o payload mudou.<br>
+                  3. Clique em <strong>Bypass alg: none</strong>: o token tem a assinatura removida, demonstrando o clássico exploit onde bibliotecas antigas aceitavam tokens sem conferir assinatura.
+                </p>
+              </div>
+              <div class="guide-phase-card guide-phase-card--defense">
+                <span class="guide-phase-title guide-phase-title--defense"><i class="fas fa-shield-check"></i> Passo 2: Brute-Force de Segredos Fracos</span>
+                <p class="guide-phase-desc">
+                  1. Mude o Segredo do Servidor para <code>secret</code>.<br>
+                  2. Clique em <strong>Testar Dicionário de Chaves</strong>.<br>
+                  3. <strong>O que esperar na tela:</strong> A Web Crypto API testa uma wordlist em milissegundos e <strong>quebra a chave fraca</strong>, provando por que segredos devem ter alta entropia (&ge; 256 bits).
+                </p>
+              </div>
+            </div>
+            <div class="guide-lesson-banner">
+              💡 <strong>Conceito-Chave para Entrevistas:</strong> JWTs são codificados em Base64URL, <em>não encriptados</em>. Qualquer um pode ler o conteúdo; a segurança reside exclusivamente na verificação da assinatura criptográfica no backend.
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção 5: Hash & Salt -->
+        <div class="guide-module-section" data-guide-section="hash">
+          <div class="guide-mission-box">
+            <div class="guide-mission-header">
+              <span class="guide-mission-title text-cyan"><i class="fas fa-hashtag"></i> Módulo 5: Hashing, Salting &amp; Força Bruta</span>
+              <button type="button" class="btn-sec btn-sec--primary guide-jump-module-btn" data-jump="hash" style="padding: 0.25rem 0.65rem; font-size: 0.72rem;">
+                <i class="fas fa-arrow-right"></i> Ir para este Módulo
+              </button>
+            </div>
+            <p class="guide-mission-story">
+              <strong>O Cenário Real:</strong> Uma empresa sofre um vazamento de banco de dados (data breach). Como as senhas dos colaboradores estavam guardadas determina se todos os logins serão quebrados em segundos ou se permanecerão blindados por séculos.
+            </p>
+            <div class="guide-phase-grid">
+              <div class="guide-phase-card guide-phase-card--attack">
+                <span class="guide-phase-title guide-phase-title--attack"><i class="fas fa-bug"></i> Passo 1: O Risco de Hashes Sem Salt (Caso A)</span>
+                <p class="guide-phase-desc">
+                  1. Veja o painel <strong>Caso A: Sem Salt</strong>.<br>
+                  2. Mariana e Roberto têm a mesma senha (<code>"senha123"</code>). Seus hashes SHA-256 são <strong>rigorosamente idênticos</strong>.<br>
+                  3. <strong>O que esperar:</strong> O atacante percebe o padrão e usa uma Rainbow Table pré-calculada para descobrir ambas as senhas em 1 milissegundo.
+                </p>
+              </div>
+              <div class="guide-phase-card guide-phase-card--defense">
+                <span class="guide-phase-title guide-phase-title--defense"><i class="fas fa-shield-check"></i> Passo 2: Salt Criptográfico &amp; Bcrypt (Caso B)</span>
+                <p class="guide-phase-desc">
+                  1. Clique em <strong>Regenerar Salts Aleatórios</strong> no Caso B.<br>
+                  2. Cada usuário recebe 16 bytes aleatórios antes da senha: os hashes ficam <strong>completamente diferentes</strong>.<br>
+                  3. Clique em <strong>Rodar Benchmark (10.000 Hashes)</strong>: veja a CPU do seu navegador calcular milhares de SHA256 em microssegundos, e confira na tabela por que o <strong>Bcrypt</strong> (lento por design) exige <strong>&gt; 2.300 anos</strong> para ser quebrado em GPU!
+                </p>
+              </div>
+            </div>
+            <div class="guide-lesson-banner">
+              💡 <strong>Conceito-Chave para Entrevistas:</strong> Funções de hash velozes (SHA-256) foram criadas para integridade de arquivos, não senhas. Para senhas, são mandatórios algoritmos com fator de trabalho iterativo (KDF) como Bcrypt, Argon2id ou PBKDF2.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="cyber-modal-footer" style="justify-content: space-between;">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+          Atalho de teclado: <kbd style="background: rgba(255,255,255,0.1); padding: 0.15rem 0.35rem; border-radius: 3px; color: var(--text-pure);">Alt + G</kbd>
+        </span>
+        <button type="button" class="btn-sec btn-sec--outline" id="btn-guide-close-bottom">
+          <i class="fas fa-check"></i> Entendi, Fechar Guia
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Script Vanilla ES6+ Principal -->
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
